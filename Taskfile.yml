@@ -379,7 +379,7 @@ tasks:
     sources:
       - "**/*"
     generates:
-      - dist/*
+      - build/*
     deps:
       - install:frontend:deps
       - task: generate:bindings
@@ -395,10 +395,10 @@ tasks:
       - go.mod
       - go.sum
     generates:
-      - "frontend/bindings/**/*"
+      - "frontend/src/lib/api/**/*"
     cmds:
       # For a complete list of options, run `wails3 generate bindings -help`
-      - wails3 generate bindings -f '{{.BUILD_FLAGS}}'
+      - wails3 generate bindings -ts -i -d frontend/src/lib/api -f '{{.BUILD_FLAGS}}'
 
   go:mod:tidy:
     summary: Runs `go mod tidy`
