@@ -9,12 +9,12 @@ import {Call as $Call} from "@wailsio/runtime";
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
-export function GetMessage(busID: string, nodeID: string, msgID: string): Promise<$models.Message> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(4130498616, busID, nodeID, msgID) as any;
+export function GetNetwork(): Promise<$models.Network> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(742909121) as any;
     return $resultPromise;
 }
 
-export function GetNetwork(): Promise<$models.Network | null> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(742909121) as any;
+export function GetNetworkStub(): Promise<$models.NetworkStub> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1431333233) as any;
     return $resultPromise;
 }

@@ -3,6 +3,39 @@
 
 
 /**
+ * CANID is the CAN-ID of a [Message] within a [Bus].
+ * Every message should have a different CAN-ID.
+ */
+export type CANID = number;
+
+/**
+ * MessageByteOrder rappresents the byte order of the payload of a [Message].
+ * By default a [MessageByteOrder] of [MessageByteOrderLittleEndian] is used.
+ */
+export enum MessageByteOrder {
+    /**
+     * The Go zero value for the underlying type of the enum.
+     */
+    $zero = 0,
+
+    /**
+     * MessageByteOrderLittleEndian defines a little endian byte order.
+     */
+    MessageByteOrderLittleEndian = 0,
+
+    /**
+     * MessageByteOrderBigEndian defines a big endian byte order.
+     */
+    MessageByteOrderBigEndian = 1,
+};
+
+/**
+ * MessageID rappresents the ID of a [Message].
+ * It must be unique within all the messages sended by a [NodeInterface].
+ */
+export type MessageID = number;
+
+/**
  * SignalKind rappresents the kind of a [Signal].
  * It can be standard, enum, or multiplexer
  */

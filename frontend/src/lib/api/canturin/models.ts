@@ -9,45 +9,105 @@ import * as acmelib$0 from "../github.com/squadracorsepolito/acmelib/models.js";
 // @ts-ignore: Unused imports
 import * as time$0 from "../time/models.js";
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
+import * as $internal from "./internal.js";
+
 export interface Bus {
-    "id": string;
+    "entityId": string;
     "name": string;
     "desc": string;
     "createTime": time$0.Time;
-    "nodes": (Node | null)[] | null;
+    "nodes": Node[] | null;
+}
+
+export interface BusStub {
+    "entityId": string;
+    "name": string;
+    "nodes": NodeStub[] | null;
 }
 
 export interface Message {
-    "id": string;
+    "entityId": string;
     "name": string;
     "desc": string;
     "createTime": time$0.Time;
+    "id": acmelib$0.MessageID;
+    "hasStaticCANID": boolean;
+    "canId": acmelib$0.CANID;
     "sizeByte": number;
+    "byteOrder": acmelib$0.MessageByteOrder;
     "signals": Signal[] | null;
+    "receivers": Node[] | null;
+}
+
+export interface MessageStub {
+    "entityId": string;
+    "name": string;
 }
 
 export interface Network {
-    "id": string;
+    "entityId": string;
     "name": string;
     "desc": string;
     "createTime": time$0.Time;
-    "buses": (Bus | null)[] | null;
+    "buses": Bus[] | null;
+}
+
+export interface NetworkStub {
+    "entityId": string;
+    "name": string;
+    "buses": BusStub[] | null;
+    "signalUnits": SignalUnitStub[] | null;
 }
 
 export interface Node {
-    "id": string;
+    "entityId": string;
     "name": string;
     "desc": string;
     "createTime": time$0.Time;
-    "sendedMessages": (Message | null)[] | null;
+    "sendedMessages": Message[] | null;
+}
+
+export interface NodeStub {
+    "entityId": string;
+    "name": string;
+    "sendedMessages": MessageStub[] | null;
 }
 
 export interface Signal {
-    "id": string;
+    "entityId": string;
     "name": string;
     "desc": string;
     "createTime": time$0.Time;
     "kind": acmelib$0.SignalKind;
     "startPos": number;
     "size": number;
+}
+
+export interface SignalReference {
+    "entityId": string;
+    "name": string;
+    "parentMessage": $internal.entityStub;
+}
+
+export interface SignalType {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+}
+
+export interface SignalUnit {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+    "symbol": string;
+    "references": SignalReference[] | null;
+}
+
+export interface SignalUnitStub {
+    "entityId": string;
+    "name": string;
 }

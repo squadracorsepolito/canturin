@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"log"
 
+	"github.com/squadracorsepolito/acmelib"
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
@@ -18,6 +19,11 @@ var assets embed.FS
 
 var app *application.App
 
+var (
+	sigTypeCh chan *acmelib.SignalType = make(chan *acmelib.SignalType)
+	sigUnitCh chan *acmelib.SignalUnit = make(chan *acmelib.SignalUnit)
+)
+
 // main function serves as the application's entry point. It initializes the application, creates a window,
 // and starts a goroutine that emits a time-based event every second. It subsequently runs the application and
 // logs any error that might occur.
@@ -26,6 +32,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Initialize the services
+	sigTypeServ := newSignalTypeService(sigTypeCh)
+	defer close(sigTypeCh)
+
+	sigUnitServ := newSignalUnitService(sigUnitCh)
+	defer close(sigUnitCh)
 
 	// Create a new Wails application by providing the necessary options.
 	// Variables 'Name' and 'Description' are for application metadata.
@@ -37,6 +50,12 @@ func main() {
 		Description: "A demo of using raw HTML & CSS",
 		Services: []application.Service{
 			application.NewService(networkService),
+			application.NewService(&MessageService{
+				ns: networkService,
+			}),
+
+			application.NewService(sigTypeServ),
+			application.NewService(sigUnitServ),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
@@ -74,6 +93,10 @@ func main() {
 	// 		time.Sleep(time.Second)
 	// 	}
 	// }()
+
+	// Run the services
+	go sigUnitServ.run()
+	go sigUnitServ.run()
 
 	// Run the application. This blocks until the application has been exited.
 	// If an error occurred while running the application, log it and exit.

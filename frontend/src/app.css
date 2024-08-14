@@ -6,3 +6,7 @@ body,
 main {
 	@apply h-screen w-screen;
 }
+
+#drag-handle {
+	--wails-draggable: drag;
+}

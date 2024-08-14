@@ -1,29 +1,50 @@
 <script lang="ts">
-	import { NetworkService, type Message, type Network } from '$lib/api/canturin';
+	import {
+		MessageService,
+		NetworkService,
+		SignalUnitService,
+		type Message,
+		type NetworkStub
+	} from '$lib/api/canturin';
 	import { NetworkIcon, BusIcon, NodeIcon, MessageIcon } from '$lib/components/icon';
 	import Tree from '$lib/components/tree/tree.svelte';
 	import type { TreeNode } from '$lib/components/tree/types';
 	import MessagePanel from '$lib/panel/message-panel.svelte';
+	import SignalUnitPanel from '$lib/panel/signal-unit-panel.svelte';
 	import { onMount } from 'svelte';
 
 	let { children } = $props();
 
-	let net: Network | undefined = $state();
+	let net: NetworkStub | undefined = $state();
 
 	onMount(async () => {
-		const res = await NetworkService.GetNetwork();
-		if (res) {
+		try {
+			const res = await NetworkService.GetNetworkStub();
 			net = res;
+		} catch (error) {
+			console.error(error);
 		}
 	});
 
-	function getTreeNodes(network: Network) {
+	function getTreeNodes(network: NetworkStub) {
 		let rootNode: TreeNode = {
 			name: network.name,
 			icon: NetworkIcon,
 			childNodes: [],
 			onclick: () => console.log('network')
 		};
+
+		if (network.signalUnits) {
+			for (let sigUnit of network.signalUnits) {
+				let sigUnitNode: TreeNode = {
+					name: sigUnit.name,
+					icon: BusIcon,
+					childNodes: [],
+					onclick: () => openSignalUnit(sigUnit.entityId)
+				};
+				rootNode.childNodes.push(sigUnitNode);
+			}
+		}
 
 		if (network.buses) {
 			for (let bus of network.buses) {
@@ -50,7 +71,9 @@
 										name: sendMsg.name,
 										icon: MessageIcon,
 										childNodes: [],
-										onclick: () => getMessage(bus.id, node.id, sendMsg.id)
+										onclick: () => {
+											registerMessage(bus.entityId, node.entityId, sendMsg.entityId);
+										}
 									});
 								}
 							}
@@ -67,16 +90,33 @@
 		return rootNode;
 	}
 
-	async function getMessage(busID: string, nodeID: string, msgID: string) {
+	async function openSignalUnit(sigEntId: string) {
 		try {
-			const res = await NetworkService.GetMessage(busID, nodeID, msgID);
-			message = res;
+			await SignalUnitService.Open(sigEntId);
+			entityId = sigEntId;
+			openPanel = 'signal_unit';
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	async function registerMessage(busEntID: string, nodeEntID: string, msgEntID: string) {
+		try {
+			await MessageService.Register(busEntID, nodeEntID, msgEntID);
+			const msg = await MessageService.Get();
+			message = msg;
+			entityId = msgEntID;
+
+			openPanel = 'message';
 		} catch (error) {
 			console.error(error);
 		}
 	}
 
 	let message: Message | undefined = $state();
+
+	let openPanel: 'signal_unit' | 'message' | 'none' = $state('none');
+	let entityId = $state('');
 </script>
 
 <div class="flex h-full w-full">
@@ -94,8 +134,10 @@
 		<!-- {@render children()} -->
 		<div class="h-12 block bg-base-300 sticky top-0"></div>
 
-		{#if message}
+		{#if openPanel === 'message' && message}
 			<MessagePanel {message} />
+		{:else if openPanel === 'signal_unit'}
+			<SignalUnitPanel {entityId} />
 		{/if}
 	</div>
 </div>
