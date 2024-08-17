@@ -21,6 +21,7 @@
 		"@types/randomcolor": "^0.5.9",
 		"@wailsio/runtime": "latest",
 		"autoprefixer": "^10.4.19",
+		"color2k": "^2.0.3",
 		"daisyui": "^4.12.10",
 		"eslint": "^9.0.0",
 		"eslint-config-prettier": "^9.1.0",

@@ -39,6 +39,8 @@ type NodeStub struct {
 
 type MessageStub struct {
 	entityStub
+
+	Signals []entityStub `json:"signals"`
 }
 
 type SignalUnitStub struct {

@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { SignalUnitService, type SignalUnit } from '$lib/api/canturin';
-	import Table from '$lib/components/table/table.svelte';
+	import { SignalUnitService, type SignalUnit, type SignalReference } from '$lib/api/canturin';
+	import { ReferenceTree } from '$lib/components/tree';
+	import type { ReferenceTreeNode } from '$lib/components/tree/types';
 	import Panel from './panel.svelte';
 
 	type Props = {
@@ -17,6 +18,54 @@
 			console.error(error);
 		}
 	});
+
+	function getReferences(refs: SignalReference[]): ReferenceTreeNode[] {
+		const res: ReferenceTreeNode[] = [];
+
+		for (let ref of refs) {
+			const signalNode: ReferenceTreeNode = {
+				name: ref.signal.name,
+				childNodes: []
+			};
+
+			const msgNode: ReferenceTreeNode = {
+				name: ref.message.name,
+				childNodes: [signalNode]
+			};
+
+			const nodeNode: ReferenceTreeNode = {
+				name: ref.node.name,
+				childNodes: [msgNode]
+			};
+
+			const busNode: ReferenceTreeNode = {
+				name: ref.bus.name,
+				childNodes: [nodeNode]
+			};
+
+			const bus = res.find((b) => b.name === ref.bus.name);
+			if (bus === undefined) {
+				res.push(busNode);
+				continue;
+			}
+
+			const node = bus.childNodes.find((n) => n.name === ref.node.name);
+			if (node === undefined) {
+				bus.childNodes.push(nodeNode);
+				continue;
+			}
+
+			const msg = node.childNodes.find((m) => m.name === ref.message.name);
+			if (msg === undefined) {
+				node.childNodes.push(msgNode);
+				continue;
+			}
+
+			msg.childNodes.push(signalNode);
+		}
+
+		return res;
+	}
 </script>
 
 {#snippet sigUnitPanel(sigUnit: SignalUnit)}
@@ -29,17 +78,7 @@
 		<section>
 			<h4>References</h4>
 
-			<Table items={sigUnit.references}>
-				{#snippet header()}
-					<th>Message</th>
-					<th>Signals</th>
-				{/snippet}
-
-				{#snippet row(ref)}
-					<td>{ref.parentMessage.name}</td>
-					<td>{ref.name}</td>
-				{/snippet}
-			</Table>
+			<ReferenceTree siblingNodes={getReferences(sigUnit.references)} depth={4} />
 		</section>
 	{/if}
 {/snippet}

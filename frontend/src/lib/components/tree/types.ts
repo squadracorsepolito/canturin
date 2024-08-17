@@ -7,3 +7,8 @@ export type TreeNode = {
 	childNodes: TreeNode[];
 	onclick: () => void;
 };
+
+export type ReferenceTreeNode = {
+	name: string;
+	childNodes: ReferenceTreeNode[];
+};

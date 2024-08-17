@@ -44,6 +44,7 @@ export interface Message {
 export interface MessageStub {
     "entityId": string;
     "name": string;
+    "signals": $internal.entityStub[] | null;
 }
 
 export interface Network {
@@ -86,9 +87,10 @@ export interface Signal {
 }
 
 export interface SignalReference {
-    "entityId": string;
-    "name": string;
-    "parentMessage": $internal.entityStub;
+    "bus": $internal.entityStub;
+    "node": $internal.entityStub;
+    "message": $internal.entityStub;
+    "signal": $internal.entityStub;
 }
 
 export interface SignalType {
