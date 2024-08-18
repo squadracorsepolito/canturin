@@ -2,25 +2,30 @@
 
 Congratulations on generating your Wails3 application! This README will guide you through the next steps to get your project up and running.
 
+> [!IMPORTANT]
+> Install wails3 by following the [getting started](https://v3alpha.wails.io/getting-started/installation/).
+> Windows: because of a bug in the go-webview2 lib, wails3 must be installed in the "git cloning" way and use the commit `6c7cd651da8c2be348e38fbd89fe28fcac803084` of `v3-alpha` branch.
+> The `go.mod` and `go.sum` may be different for local developement, so DON'T push it !!!
+
 ## Getting Started
 
 1. Navigate to your project directory in the terminal.
 
 2. To run your application in development mode, use the following command:
 
-   ```
-   wails3 dev
-   ```
+    ```
+    wails3 dev
+    ```
 
-   This will start your application and enable hot-reloading for both frontend and backend changes.
+    This will start your application and enable hot-reloading for both frontend and backend changes.
 
 3. To build your application for production, use:
 
-   ```
-   wails3 build
-   ```
+    ```
+    wails3 build
+    ```
 
-   This will create a production-ready executable in the `build` directory.
+    This will create a production-ready executable in the `build` directory.
 
 ## Exploring Wails3 Features
 
@@ -30,11 +35,11 @@ Now that you have your project set up, it's time to explore the features that Wa
 
 2. **Run an example**: To run any of the examples, navigate to the example's directory and use:
 
-   ```
-   go run .
-   ```
+    ```
+    go run .
+    ```
 
-   Note: Some examples may be under development during the alpha phase.
+    Note: Some examples may be under development during the alpha phase.
 
 3. **Explore the documentation**: Visit the [Wails3 documentation](https://v3alpha.wails.io/) for in-depth guides and API references.
 
@@ -44,10 +49,10 @@ Now that you have your project set up, it's time to explore the features that Wa
 
 Take a moment to familiarize yourself with your project structure:
 
-- `frontend/`: Contains your frontend code (HTML, CSS, JavaScript/TypeScript)
-- `main.go`: The entry point of your Go backend
-- `app.go`: Define your application structure and methods here
-- `wails.json`: Configuration file for your Wails project
+-   `frontend/`: Contains your frontend code (HTML, CSS, JavaScript/TypeScript)
+-   `main.go`: The entry point of your Go backend
+-   `app.go`: Define your application structure and methods here
+-   `wails.json`: Configuration file for your Wails project
 
 ## Next Steps
 
