@@ -60,6 +60,7 @@ export interface NetworkStub {
     "name": string;
     "buses": BusStub[] | null;
     "signalUnits": SignalUnitStub[] | null;
+    "signalTypes": SignalTypeStub[] | null;
 }
 
 export interface Node {
@@ -98,6 +99,18 @@ export interface SignalType {
     "name": string;
     "desc": string;
     "createTime": time$0.Time;
+    "kind": acmelib$0.SignalTypeKind;
+    "min": number;
+    "max": number;
+    "scale": number;
+    "offset": number;
+    "referenceCount": number;
+    "references": SignalReference[] | null;
+}
+
+export interface SignalTypeStub {
+    "entityId": string;
+    "name": string;
 }
 
 export interface SignalUnit {
@@ -106,6 +119,7 @@ export interface SignalUnit {
     "desc": string;
     "createTime": time$0.Time;
     "symbol": string;
+    "referenceCount": number;
     "references": SignalReference[] | null;
 }
 

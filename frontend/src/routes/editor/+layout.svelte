@@ -2,14 +2,23 @@
 	import {
 		MessageService,
 		NetworkService,
+		SignalTypeService,
 		SignalUnitService,
 		type Message,
 		type NetworkStub
 	} from '$lib/api/canturin';
-	import { NetworkIcon, BusIcon, NodeIcon, MessageIcon } from '$lib/components/icon';
+	import {
+		NetworkIcon,
+		BusIcon,
+		NodeIcon,
+		MessageIcon,
+		SignalUnitIcon,
+		SignalTypeIcon
+	} from '$lib/components/icon';
 	import Tree from '$lib/components/tree/tree.svelte';
 	import type { TreeNode } from '$lib/components/tree/types';
 	import MessagePanel from '$lib/panel/message-panel.svelte';
+	import SignalTypePanel from '$lib/panel/signal-type-panel.svelte';
 	import SignalUnitPanel from '$lib/panel/signal-unit-panel.svelte';
 	import { onMount } from 'svelte';
 
@@ -34,16 +43,46 @@
 			onclick: () => console.log('network')
 		};
 
+		if (network.signalTypes) {
+			let sigTypes: TreeNode = {
+				name: 'Signal Types',
+				icon: SignalTypeIcon,
+				childNodes: [],
+				onclick: () => console.log('signal types')
+			};
+
+			for (let sigtype of network.signalTypes) {
+				let sigTypeNode: TreeNode = {
+					name: sigtype.name,
+					icon: SignalTypeIcon,
+					childNodes: [],
+					onclick: () => openSignalType(sigtype.entityId)
+				};
+				sigTypes.childNodes.push(sigTypeNode);
+			}
+
+			rootNode.childNodes.push(sigTypes);
+		}
+
 		if (network.signalUnits) {
+			let sigUnits: TreeNode = {
+				name: 'Signal Units',
+				icon: SignalUnitIcon,
+				childNodes: [],
+				onclick: () => console.log('signal units')
+			};
+
 			for (let sigUnit of network.signalUnits) {
 				let sigUnitNode: TreeNode = {
 					name: sigUnit.name,
-					icon: BusIcon,
+					icon: SignalUnitIcon,
 					childNodes: [],
 					onclick: () => openSignalUnit(sigUnit.entityId)
 				};
-				rootNode.childNodes.push(sigUnitNode);
+				sigUnits.childNodes.push(sigUnitNode);
 			}
+
+			rootNode.childNodes.push(sigUnits);
 		}
 
 		if (network.buses) {
@@ -100,6 +139,16 @@
 		}
 	}
 
+	async function openSignalType(sigTypeEntityId: string) {
+		try {
+			await SignalTypeService.Open(sigTypeEntityId);
+			entityId = sigTypeEntityId;
+			openPanel = 'signal_type';
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
 	async function registerMessage(busEntID: string, nodeEntID: string, msgEntID: string) {
 		try {
 			await MessageService.Register(busEntID, nodeEntID, msgEntID);
@@ -115,7 +164,7 @@
 
 	let message: Message | undefined = $state();
 
-	let openPanel: 'signal_unit' | 'message' | 'none' = $state('none');
+	let openPanel: 'signal_type' | 'signal_unit' | 'message' | 'none' = $state('none');
 	let entityId = $state('');
 </script>
 
@@ -138,6 +187,8 @@
 			<MessagePanel {message} />
 		{:else if openPanel === 'signal_unit'}
 			<SignalUnitPanel {entityId} />
+		{:else if openPanel === 'signal_type'}
+			<SignalTypePanel {entityId} />
 		{/if}
 	</div>
 </div>

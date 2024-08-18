@@ -33,9 +33,11 @@ func (ns *NetworkService) GetNetworkStub() NetworkStub {
 
 		Buses:       []BusStub{},
 		SignalUnits: []SignalUnitStub{},
+		SignalTypes: []SignalTypeStub{},
 	}
 
 	sigUnits := make(map[acmelib.EntityID]*acmelib.SignalUnit)
+	sigTypes := make(map[acmelib.EntityID]*acmelib.SignalType)
 
 	for _, tmpBus := range ns.network.Buses() {
 		bus := BusStub{
@@ -65,6 +67,9 @@ func (ns *NetworkService) GetNetworkStub() NetworkStub {
 						if tmpSigUnit != nil {
 							sigUnits[tmpSigUnit.EntityID()] = tmpSigUnit
 						}
+
+						tmpSigType := tmpStdSig.Type()
+						sigTypes[tmpSigType.EntityID()] = tmpSigType
 					}
 				}
 			}
@@ -79,6 +84,12 @@ func (ns *NetworkService) GetNetworkStub() NetworkStub {
 		res.SignalUnits = append(res.SignalUnits, SignalUnitStub{entityStub: getEntityStub(tmpSigUnit)})
 
 		sigUnitCh <- tmpSigUnit
+	}
+
+	for _, tmpSigType := range sigTypes {
+		res.SignalTypes = append(res.SignalTypes, SignalTypeStub{entityStub: getEntityStub(tmpSigType)})
+
+		sigTypeCh <- tmpSigType
 	}
 
 	return res

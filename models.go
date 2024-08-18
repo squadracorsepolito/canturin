@@ -1,6 +1,8 @@
 package main
 
 import (
+	"slices"
+	"strings"
 	"time"
 
 	"github.com/squadracorsepolito/acmelib"
@@ -23,6 +25,7 @@ type NetworkStub struct {
 
 	Buses       []BusStub        `json:"buses"`
 	SignalUnits []SignalUnitStub `json:"signalUnits"`
+	SignalTypes []SignalTypeStub `json:"signalTypes"`
 }
 
 type BusStub struct {
@@ -44,6 +47,10 @@ type MessageStub struct {
 }
 
 type SignalUnitStub struct {
+	entityStub
+}
+
+type SignalTypeStub struct {
 	entityStub
 }
 
@@ -110,22 +117,51 @@ type Signal struct {
 	Size     int                `json:"size"`
 }
 
-type SignalType struct {
-	base
+type SignalReference struct {
+	Bus     entityStub `json:"bus"`
+	Node    entityStub `json:"node"`
+	Message entityStub `json:"message"`
+	Signal  entityStub `json:"signal"`
 }
 
-type withReferences struct {
-	References []entityStub `json:"references"`
+type entityWithRefs[T entity] interface {
+	References() []T
 }
 
-func getWithReferences(refs []entity) withReferences {
-	res := withReferences{
-		References: []entityStub{},
+func getSignalReferences(refs entityWithRefs[*acmelib.StandardSignal]) []SignalReference {
+	res := []SignalReference{}
+
+	for _, tmpStdSig := range refs.References() {
+		tmpMsg := tmpStdSig.ParentMessage()
+		tmpNode := tmpMsg.SenderNodeInterface().Node()
+		tmpBus := tmpMsg.SenderNodeInterface().ParentBus()
+
+		res = append(res, SignalReference{
+			Bus:     getEntityStub(tmpBus),
+			Node:    getEntityStub(tmpNode),
+			Message: getEntityStub(tmpMsg),
+			Signal:  getEntityStub(tmpStdSig),
+		})
 	}
 
-	for _, tmpEnt := range refs {
-		res.References = append(res.References, getEntityStub(tmpEnt))
-	}
+	slices.SortFunc(res, func(a, b SignalReference) int {
+		busCmp := strings.Compare(a.Bus.Name, b.Bus.Name)
+		if busCmp != 0 {
+			return busCmp
+		}
+
+		nodeCmp := strings.Compare(a.Node.Name, b.Node.Name)
+		if nodeCmp != 0 {
+			return nodeCmp
+		}
+
+		msgCmp := strings.Compare(a.Message.Name, b.Message.Name)
+		if msgCmp != 0 {
+			return msgCmp
+		}
+
+		return strings.Compare(a.Signal.Name, b.Signal.Name)
+	})
 
 	return res
 }

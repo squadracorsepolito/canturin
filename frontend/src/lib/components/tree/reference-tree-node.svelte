@@ -18,7 +18,7 @@
 		style:color={color.textColor}
 		class="flex items-center justify-center rounded-box"
 	>
-		<span class="text-sm m-3">{name}</span>
+		<span class="text-sm m-3 truncate text-ellipsis">{name}</span>
 	</div>
 {/snippet}
 

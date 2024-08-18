@@ -95,7 +95,7 @@ func main() {
 	// }()
 
 	// Run the services
-	go sigUnitServ.run()
+	go sigTypeServ.run()
 	go sigUnitServ.run()
 
 	// Run the application. This blocks until the application has been exited.

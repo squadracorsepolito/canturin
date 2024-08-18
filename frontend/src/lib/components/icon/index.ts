@@ -8,3 +8,5 @@ export { default as NodeIcon } from './node-icon.svelte';
 export { default as MessageIcon } from './message-icon.svelte';
 export { default as ForwardIcon } from './forward-icon.svelte';
 export { default as BackwardIcon } from './backward-icon.svelte';
+export { default as SignalUnitIcon } from './signal-unit-icon.svelte';
+export { default as SignalTypeIcon } from './signal-type-icon.svelte';
