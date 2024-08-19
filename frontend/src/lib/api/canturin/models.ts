@@ -100,6 +100,7 @@ export interface SignalType {
     "desc": string;
     "createTime": time$0.Time;
     "kind": acmelib$0.SignalTypeKind;
+    "size": number;
     "min": number;
     "max": number;
     "scale": number;

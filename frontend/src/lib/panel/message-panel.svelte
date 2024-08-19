@@ -1,157 +1,27 @@
 <script lang="ts">
-	import { MessageService, type Message } from '$lib/api/canturin';
+	import { type Message } from '$lib/api/canturin';
 	import { MessageByteOrder, SignalKind } from '$lib/api/github.com/squadracorsepolito/acmelib';
 	import { BackwardIcon, ForwardIcon } from '$lib/components/icon';
 	import Table from '$lib/components/table/table.svelte';
 	import randomColor from 'randomcolor';
 	import Panel from './panel.svelte';
-	import { getHexNumber } from '$lib/utils';
-	import { Textarea } from '$lib/components/textarea';
-	import { Editable } from '$lib/components/editable';
+	import { getColorByName, getHexNumber } from '$lib/utils';
+	import { useMessage, type GridItem } from '$lib/state/message-state.svelte';
+	import type { SummaryInfo } from '$lib/components/summary/types';
+	import Summary from '$lib/components/summary/summary.svelte';
 
 	const gridWidth = 8;
 
 	type Props = {
-		message: Message;
+		entityId: string;
 	};
 
-	let { message }: Props = $props();
+	let { entityId }: Props = $props();
 
-	type GridItem = {
-		id: string;
-		colStart: number;
-		colEnd: number;
-		rowStart: number;
-		rowEnd: number;
-		name: string;
-		continues?: boolean;
-		follows?: boolean;
-	};
-
-	let gridItems: GridItem[] = $state([]);
-	let hoveredID = $state('');
+	let state = useMessage(entityId);
 
 	$effect(() => {
-		if (!message.signals) {
-			return;
-		}
-
-		const items: GridItem[] = [];
-
-		for (const sig of message.signals) {
-			const startPos = sig.startPos;
-			const size = sig.size;
-			const name = sig.name;
-			const id = sig.entityId;
-
-			const nRows = Math.ceil(((startPos % gridWidth) + size) / gridWidth);
-
-			const startRow =
-				startPos % gridWidth === 0
-					? Math.ceil(startPos / gridWidth) + 1
-					: Math.ceil(startPos / gridWidth);
-
-			const startCol = (startPos % gridWidth) + 1;
-
-			if (startPos % 8 === 0 && size % 8 === 0) {
-				// spans exactly over one/multiple rows
-				items.push({
-					colStart: 1,
-					colEnd: gridWidth + 1,
-					rowStart: startRow,
-					rowEnd: startRow + nRows,
-					name,
-					id
-				});
-				continue;
-			}
-
-			if (nRows === 1) {
-				items.push({
-					colStart: startCol,
-					colEnd: startCol + size,
-					rowStart: startRow,
-					rowEnd: startRow,
-					name,
-					id
-				});
-				continue;
-			}
-
-			if (nRows === 2) {
-				items.push(
-					{
-						colStart: startCol,
-						colEnd: gridWidth + 1,
-						rowStart: startRow,
-						rowEnd: startRow,
-						name,
-						id,
-						continues: true
-					},
-					{
-						colStart: 1,
-						colEnd: size - (gridWidth - (startCol - 1)) + 1,
-						rowStart: startRow + nRows - 1,
-						rowEnd: startRow + nRows - 1,
-						name,
-						id,
-						follows: true
-					}
-				);
-				continue;
-			}
-
-			items.push({
-				colStart: startCol,
-				colEnd: gridWidth + 1,
-				rowStart: startRow,
-				rowEnd: startRow,
-				name,
-				id,
-				continues: true
-			});
-
-			items.push({
-				colStart: 1,
-				colEnd: gridWidth + 1,
-				rowStart: startRow + 1,
-				rowEnd: startRow + nRows - 1,
-				name,
-				id,
-				continues: true,
-				follows: true
-			});
-
-			items.push({
-				colStart: 1,
-				colEnd: size - (startCol - 1) - gridWidth * (nRows - 2) + 1,
-				rowStart: startRow + nRows - 1,
-				rowEnd: startRow + nRows - 1,
-				name,
-				id,
-				follows: true
-			});
-		}
-
-		// flip colStart/colEnd because 0 is on the right
-		for (let i = 0; i < items.length; i++) {
-			const cs = items[i].colStart;
-			if (cs < 5) {
-				items[i].colStart = cs + 2 * (5 - cs);
-			} else if (cs) {
-				items[i].colStart = cs - 2 * (cs - 5);
-			}
-
-			const ce = items[i].colEnd;
-			if (cs < 5) {
-				items[i].colEnd = ce + 2 * (5 - ce);
-			} else if (cs) {
-				items[i].colEnd = ce - 2 * (ce - 5);
-			}
-		}
-
-		gridItems = items;
+		state.reload(entityId);
 	});
 
 	function getPlaceholder(idx: number) {
@@ -188,69 +58,79 @@
 		}
 	}
 
-	let desc = $state('');
-	$effect(() => {
-		desc = message.desc;
-	});
+	function getSummaryInfos(msg: Message) {
+		const infos: SummaryInfo[] = [];
 
-	let name = $state(message.name);
-	$effect(() => {
-		name = message.name;
-	});
+		infos.push({
+			title: 'CAN ID',
+			value: getHexNumber(msg.canId),
+			desc: `Decimal: ${msg.canId}`
+		});
 
-	async function setDesc() {
-		try {
-			const msg = await MessageService.SetDesc(desc);
-			message = msg;
-		} catch (error) {
-			console.error(error);
+		if (msg.hasStaticCANID) {
+			infos[0].badge = { text: 'Static', color: 'secondary' };
+		} else {
+			infos[0].badge = { text: 'Generated', color: 'primary' };
+
+			infos.push({
+				title: 'Message ID',
+				value: getHexNumber(msg.id),
+				desc: `Decimal: ${msg.id}`
+			});
 		}
-	}
 
-	async function updateName(name: string) {
-		try {
-			const msg = await MessageService.UpdateName(name);
-			message = msg;
-		} catch (error) {
-			console.error(error);
-		}
+		infos.push({
+			title: 'Size',
+			value: msg.sizeByte,
+			desc: `The size in bytes`
+		});
+		infos.push({
+			title: 'Byte Order',
+			value: getByteOrderName(msg.byteOrder),
+			desc: `Endianness`
+		});
+
+		return infos;
 	}
 </script>
 
 {#snippet gridItem({ colStart, colEnd, rowStart, rowEnd, id, name, continues, follows }: GridItem)}
+	{@const color = getColorByName(name)}
+
 	<div
-		onpointerenter={() => (hoveredID = id)}
-		onpointerleave={() => (hoveredID = '')}
-		class="rounded-box text-xs cursor-pointer hover:opacity-50 transition-all {id === hoveredID &&
-			'opacity-50'}"
+		onpointerenter={() => (state.hoveredID = id)}
+		onpointerleave={() => (state.hoveredID = '')}
+		class="rounded-box text-xs cursor-pointer hover:opacity-50 transition-all {id ===
+			state.hoveredID && 'opacity-50'}"
 		style:grid-column-start={colStart}
 		style:grid-column-end={colEnd}
 		style:grid-row-start={rowStart}
 		style:grid-row-end={rowEnd}
-		style:background-color={genSignalColor(name)}
+		style:background-color={color.bgColor}
+		style:color={color.textColor}
 	>
-		<a href="#{id}" class="link flex p-3 h-full w-full">
-			{#if continues}
-				<span class="self-end"><ForwardIcon /></span>
-			{/if}
-
-			<span class="flex-1 self-center text-center truncate text-ellipsis">
-				{#if hoveredID !== id}
-					{name}
+		<div class="flex p-3 h-full w-full">
+			{#if state.hoveredID !== id}
+				{#if continues}
+					<span class="self-end"><ForwardIcon /></span>
 				{/if}
-			</span>
 
-			{#if follows}
-				<span class="self-start"> <BackwardIcon /></span>
+				<span class="flex-1 self-center text-center truncate text-ellipsis">
+					{name}
+				</span>
+
+				{#if follows}
+					<span class="self-start"> <BackwardIcon /></span>
+				{/if}
 			{/if}
-		</a>
+		</div>
 	</div>
 {/snippet}
 
-{#snippet grid()}
+{#snippet grid(sizeByte: number, items: GridItem[])}
 	<div class="flex gap-2">
 		<div class="flex flex-col py-2 gap-2 justify-around">
-			{#each { length: message.sizeByte } as _, idx}
+			{#each { length: sizeByte } as _, idx}
 				<div class="font-semibold pr-5">
 					{idx + 1}
 				</div>
@@ -263,9 +143,9 @@
 			<div
 				class="absolute w-full h-full grid gap-2 p-2"
 				style:grid-template-columns="repeat({gridWidth}, minmax(0, 1fr))"
-				style:grid-template-rows="repeat({message.sizeByte}, minmax(0, 1fr))"
+				style:grid-template-rows="repeat({sizeByte}, minmax(0, 1fr))"
 			>
-				{#each { length: gridWidth * message.sizeByte } as _, idx}
+				{#each { length: gridWidth * sizeByte } as _, idx}
 					<div class="flex items-center rounded-box justify-center bg-base-100">
 						<span class="text-base-content font-semibold">
 							{getPlaceholder(idx)}
@@ -277,10 +157,10 @@
 			<div
 				class="relative grid gap-2 p-2"
 				style:grid-template-columns="repeat({gridWidth}, minmax(0, 1fr))"
-				style:grid-template-rows="repeat({message.sizeByte}, minmax(0, 1fr))"
-				style:aspect-ratio={gridWidth / message.sizeByte}
+				style:grid-template-rows="repeat({sizeByte}, minmax(0, 1fr))"
+				style:aspect-ratio={gridWidth / sizeByte}
 			>
-				{#each gridItems as sigItem}
+				{#each items as sigItem}
 					{@render gridItem(sigItem)}
 				{/each}
 			</div>
@@ -288,58 +168,20 @@
 	</div>
 {/snippet}
 
-<Panel>
+{#snippet msgPanel(msg: Message)}
 	<section>
-		<h3>{message.name}</h3>
-		<p>{message.desc}</p>
+		<h3>{msg.name}</h3>
+		<p>{msg.desc}</p>
 	</section>
 
-	<Editable initialValue={message.name} onsubmit={(v) => updateName(v)}></Editable>
-
-	<Textarea bind:value={desc}></Textarea>
-	<button onclick={setDesc}>save desc</button>
-
-	<section class="pb-5">
-		<div class="stats">
-			<div class="stat">
-				<div class="stat-title">
-					{#if message.hasStaticCANID}
-						<span class="badge badge-secondary">Static</span>
-					{:else}
-						<span class="badge badge-primary">Generated</span>
-					{/if}
-					<span>CAN ID</span>
-				</div>
-				<div class="stat-value">{getHexNumber(message.canId)}</div>
-				<div class="stat-desc">Decimal: {message.canId}</div>
-			</div>
-
-			{#if !message.hasStaticCANID}
-				<div class="stat">
-					<div class="stat-title">Message ID</div>
-					<div class="stat-value">{getHexNumber(message.id)}</div>
-					<div class="stat-desc">Decimal: {message.id}</div>
-				</div>
-			{/if}
-
-			<div class="stat">
-				<div class="stat-title">Size</div>
-				<div class="stat-value">{message.sizeByte}</div>
-				<div class="stat-desc">Bytes</div>
-			</div>
-
-			<div class="stat">
-				<div class="stat-title">Byte Order</div>
-				<div class="stat-value">{getByteOrderName(message.byteOrder)}</div>
-				<div class="stat-desc">Endian</div>
-			</div>
-		</div>
+	<section>
+		<Summary infos={getSummaryInfos(msg)} />
 	</section>
 
-	{#if message.signals}
+	{#if msg.signals}
 		<section class="flex flex-col gap-2 @5xl:flex-row">
 			<div class="flex-1">
-				<Table items={message.signals}>
+				<Table items={msg.signals}>
 					{#snippet header()}
 						<th></th>
 						<th>Name</th>
@@ -350,7 +192,7 @@
 					{#snippet row({ entityId, name, startPos, size, kind })}
 						<td>
 							<span
-								class="block h-10 w-10 rounded-box {hoveredID === entityId &&
+								class="block h-10 w-10 rounded-box {state.hoveredID === entityId &&
 									'scale-125'} transition-all"
 								style:background-color={genSignalColor(name)}
 							></span>
@@ -358,8 +200,8 @@
 						<td>
 							<div class="flex flex-col gap-1">
 								<div
-									onpointerenter={() => (hoveredID = entityId)}
-									onpointerleave={() => (hoveredID = '')}
+									onpointerenter={() => (state.hoveredID = entityId)}
+									onpointerleave={() => (state.hoveredID = '')}
 								>
 									<a class="link" href="#{entityId}">
 										<span>{name}</span>
@@ -377,15 +219,21 @@
 			<div class="@5xl:divider @5xl:divider-horizontal"></div>
 
 			<div class="flex-1">
-				{@render grid()}
+				{@render grid(msg.sizeByte, state.gridItems)}
 			</div>
 		</section>
 
-		{#each message.signals as signal}
+		{#each msg.signals as signal}
 			<section id={signal.entityId}>
 				<h4># {signal.name}</h4>
 				<p>{signal.desc}</p>
 			</section>
 		{/each}
+	{/if}
+{/snippet}
+
+<Panel>
+	{#if !state.isLoading && state.message}
+		{@render msgPanel(state.message)}
 	{/if}
 </Panel>

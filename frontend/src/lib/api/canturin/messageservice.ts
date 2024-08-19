@@ -9,22 +9,22 @@ import {Call as $Call} from "@wailsio/runtime";
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
-export function Get(): Promise<$models.Message> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(383147390) as any;
+export function Close(entityID: string): Promise<void> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1434334350, entityID) as any;
     return $resultPromise;
 }
 
-export function Register(busEntID: string, nodeEntID: string, msgEntID: string): Promise<void> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(3283363979, busEntID, nodeEntID, msgEntID) as any;
+export function Get(entityID: string): Promise<$models.Message> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(383147390, entityID) as any;
     return $resultPromise;
 }
 
-export function SetDesc(desc: string): Promise<$models.Message> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(2250476003, desc) as any;
+export function GetOpen(entityID: string): Promise<$models.Message> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3174028670, entityID) as any;
     return $resultPromise;
 }
 
-export function UpdateName(name: string): Promise<$models.Message> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(1372204560, name) as any;
+export function Open(entityID: string): Promise<void> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1884394074, entityID) as any;
     return $resultPromise;
 }

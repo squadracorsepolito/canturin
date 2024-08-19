@@ -1,12 +1,5 @@
 <script lang="ts">
-	import {
-		MessageService,
-		NetworkService,
-		SignalTypeService,
-		SignalUnitService,
-		type Message,
-		type NetworkStub
-	} from '$lib/api/canturin';
+	import { NetworkService, type NetworkStub } from '$lib/api/canturin';
 	import {
 		NetworkIcon,
 		BusIcon,
@@ -17,9 +10,7 @@
 	} from '$lib/components/icon';
 	import Tree from '$lib/components/tree/tree.svelte';
 	import type { TreeNode } from '$lib/components/tree/types';
-	import MessagePanel from '$lib/panel/message-panel.svelte';
-	import SignalTypePanel from '$lib/panel/signal-type-panel.svelte';
-	import SignalUnitPanel from '$lib/panel/signal-unit-panel.svelte';
+	import { setLayoutState } from '$lib/state/layout-state.svelte';
 	import { onMount } from 'svelte';
 
 	let { children } = $props();
@@ -34,6 +25,8 @@
 			console.error(error);
 		}
 	});
+
+	const layout = setLayoutState();
 
 	function getTreeNodes(network: NetworkStub) {
 		let rootNode: TreeNode = {
@@ -51,12 +44,12 @@
 				onclick: () => console.log('signal types')
 			};
 
-			for (let sigtype of network.signalTypes) {
+			for (let sigType of network.signalTypes) {
 				let sigTypeNode: TreeNode = {
-					name: sigtype.name,
+					name: sigType.name,
 					icon: SignalTypeIcon,
 					childNodes: [],
-					onclick: () => openSignalType(sigtype.entityId)
+					onclick: () => layout.openPanel('signal_type', sigType.entityId)
 				};
 				sigTypes.childNodes.push(sigTypeNode);
 			}
@@ -77,7 +70,7 @@
 					name: sigUnit.name,
 					icon: SignalUnitIcon,
 					childNodes: [],
-					onclick: () => openSignalUnit(sigUnit.entityId)
+					onclick: () => layout.openPanel('signal_unit', sigUnit.entityId)
 				};
 				sigUnits.childNodes.push(sigUnitNode);
 			}
@@ -110,9 +103,7 @@
 										name: sendMsg.name,
 										icon: MessageIcon,
 										childNodes: [],
-										onclick: () => {
-											registerMessage(bus.entityId, node.entityId, sendMsg.entityId);
-										}
+										onclick: () => layout.openPanel('message', sendMsg.entityId)
 									});
 								}
 							}
@@ -129,43 +120,43 @@
 		return rootNode;
 	}
 
-	async function openSignalUnit(sigEntId: string) {
-		try {
-			await SignalUnitService.Open(sigEntId);
-			entityId = sigEntId;
-			openPanel = 'signal_unit';
-		} catch (error) {
-			console.error(error);
-		}
-	}
+	// async function openSignalUnit(sigEntId: string) {
+	// 	try {
+	// 		await SignalUnitService.Open(sigEntId);
+	// 		entityId = sigEntId;
+	// 		openPanel = 'signal_unit';
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 	}
+	// }
 
-	async function openSignalType(sigTypeEntityId: string) {
-		try {
-			await SignalTypeService.Open(sigTypeEntityId);
-			entityId = sigTypeEntityId;
-			openPanel = 'signal_type';
-		} catch (error) {
-			console.error(error);
-		}
-	}
+	// async function openSignalType(sigTypeEntityId: string) {
+	// 	try {
+	// 		await SignalTypeService.Open(sigTypeEntityId);
+	// 		entityId = sigTypeEntityId;
+	// 		openPanel = 'signal_type';
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 	}
+	// }
 
-	async function registerMessage(busEntID: string, nodeEntID: string, msgEntID: string) {
-		try {
-			await MessageService.Register(busEntID, nodeEntID, msgEntID);
-			const msg = await MessageService.Get();
-			message = msg;
-			entityId = msgEntID;
+	// async function registerMessage(busEntID: string, nodeEntID: string, msgEntID: string) {
+	// 	try {
+	// 		await MessageService.Register(busEntID, nodeEntID, msgEntID);
+	// 		const msg = await MessageService.Get();
+	// 		message = msg;
+	// 		entityId = msgEntID;
 
-			openPanel = 'message';
-		} catch (error) {
-			console.error(error);
-		}
-	}
+	// 		openPanel = 'message';
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 	}
+	// }
 
-	let message: Message | undefined = $state();
+	// let message: Message | undefined = $state();
 
-	let openPanel: 'signal_type' | 'signal_unit' | 'message' | 'none' = $state('none');
-	let entityId = $state('');
+	// let openPanel: 'signal_type' | 'signal_unit' | 'message' | 'none' = $state('none');
+	// let entityId = $state('');
 </script>
 
 <div class="flex h-full w-full">
@@ -180,15 +171,16 @@
 	</div>
 
 	<div class="flex-1 flex flex-col">
-		<!-- {@render children()} -->
 		<div class="h-12 block bg-base-300 sticky top-0"></div>
 
-		{#if openPanel === 'message' && message}
+		{@render children()}
+
+		<!-- {#if openPanel === 'message' && message}
 			<MessagePanel {message} />
 		{:else if openPanel === 'signal_unit'}
 			<SignalUnitPanel {entityId} />
 		{:else if openPanel === 'signal_type'}
 			<SignalTypePanel {entityId} />
-		{/if}
+		{/if} -->
 	</div>
 </div>

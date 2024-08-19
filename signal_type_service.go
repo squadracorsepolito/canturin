@@ -6,6 +6,7 @@ type SignalType struct {
 	base
 
 	Kind   acmelib.SignalTypeKind `json:"kind"`
+	Size   int                    `json:"size"`
 	Min    float64                `json:"min"`
 	Max    float64                `json:"max"`
 	Scale  float64                `json:"scale"`
@@ -26,10 +27,11 @@ func newSignalTypeService(sigTypeCh chan *acmelib.SignalType) *SignalTypeService
 				base: getBase(st),
 
 				Kind:   st.Kind(),
+				Size:   st.Size(),
 				Min:    st.Min(),
 				Max:    st.Max(),
 				Scale:  st.Scale(),
-				Offset: st.Scale(),
+				Offset: st.Offset(),
 
 				ReferenceCount: st.ReferenceCount(),
 				References:     getSignalReferences(st),

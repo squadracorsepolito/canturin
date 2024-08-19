@@ -72,6 +72,8 @@ func (ns *NetworkService) GetNetworkStub() NetworkStub {
 						sigTypes[tmpSigType.EntityID()] = tmpSigType
 					}
 				}
+
+				messageCh <- tmpSendMsg
 			}
 
 			bus.Nodes = append(bus.Nodes, node)

@@ -20,6 +20,7 @@ var assets embed.FS
 var app *application.App
 
 var (
+	messageCh chan *acmelib.Message    = make(chan *acmelib.Message)
 	sigTypeCh chan *acmelib.SignalType = make(chan *acmelib.SignalType)
 	sigUnitCh chan *acmelib.SignalUnit = make(chan *acmelib.SignalUnit)
 )
@@ -34,6 +35,9 @@ func main() {
 	}
 
 	// Initialize the services
+	msgServ := newMessageService(messageCh)
+	defer close(messageCh)
+
 	sigTypeServ := newSignalTypeService(sigTypeCh)
 	defer close(sigTypeCh)
 
@@ -50,10 +54,8 @@ func main() {
 		Description: "A demo of using raw HTML & CSS",
 		Services: []application.Service{
 			application.NewService(networkService),
-			application.NewService(&MessageService{
-				ns: networkService,
-			}),
 
+			application.NewService(msgServ),
 			application.NewService(sigTypeServ),
 			application.NewService(sigUnitServ),
 		},
@@ -95,6 +97,7 @@ func main() {
 	// }()
 
 	// Run the services
+	go msgServ.run()
 	go sigTypeServ.run()
 	go sigUnitServ.run()
 

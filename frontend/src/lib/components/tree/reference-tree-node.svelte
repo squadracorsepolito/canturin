@@ -16,7 +16,7 @@
 	<div
 		style:background-color={color.bgColor}
 		style:color={color.textColor}
-		class="flex items-center justify-center rounded-box"
+		class="flex items-center justify-center rounded-box hover:scale-105 transition-all cursor-pointer"
 	>
 		<span class="text-sm m-3 truncate text-ellipsis">{name}</span>
 	</div>
