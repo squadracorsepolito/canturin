@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"sync"
 
 	"github.com/squadracorsepolito/acmelib"
 )
@@ -12,6 +13,7 @@ type service[T entity, M any] struct {
 	pool      map[acmelib.EntityID]T
 	poolInsCh chan T
 
+	mux    sync.RWMutex
 	opened map[acmelib.EntityID]T
 
 	converterFn serviceConverterFn[T, M]
@@ -31,38 +33,53 @@ func newService[T entity, M any](poolInsCh chan T, converterFn serviceConverterF
 func (s *service[T, M]) run() {
 	for {
 		select {
-		case sigUnit := <-s.poolInsCh:
-			s.pool[sigUnit.EntityID()] = sigUnit
+		case item := <-s.poolInsCh:
+			s.mux.Lock()
+			s.pool[item.EntityID()] = item
+			s.mux.Unlock()
 		}
 	}
 }
 
 func (s *service[T, M]) Open(entityID string) error {
 	tmpEntID := acmelib.EntityID(entityID)
-	sigUnit, ok := s.pool[tmpEntID]
+
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	item, ok := s.pool[tmpEntID]
 	if !ok {
-		return errors.New("not found")
+		return errors.New("cannot open: not found")
 	}
-	s.opened[tmpEntID] = sigUnit
+	s.opened[tmpEntID] = item
 	return nil
 }
 
 func (s *service[T, M]) Close(entityID string) {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
 	delete(s.opened, acmelib.EntityID(entityID))
 }
 
 func (s *service[T, M]) Get(entityID string) (dummyRes M, _ error) {
+	s.mux.RLock()
+	defer s.mux.RUnlock()
+
 	item, ok := s.pool[acmelib.EntityID(entityID)]
 	if !ok {
-		return dummyRes, errors.New("not found")
+		return dummyRes, errors.New("get: not found")
 	}
 	return s.converterFn(item), nil
 }
 
 func (s *service[T, M]) GetOpen(entityID string) (dummyRes M, _ error) {
+	s.mux.RLock()
+	defer s.mux.RUnlock()
+
 	item, ok := s.opened[acmelib.EntityID(entityID)]
 	if !ok {
-		return dummyRes, errors.New("not found")
+		return dummyRes, errors.New("get open: not found")
 	}
 	return s.converterFn(item), nil
 }

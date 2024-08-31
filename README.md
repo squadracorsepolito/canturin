@@ -4,8 +4,6 @@ Congratulations on generating your Wails3 application! This README will guide yo
 
 > [!IMPORTANT]
 > Install wails3 by following the [getting started](https://v3alpha.wails.io/getting-started/installation/).
-> Windows: because of a bug in the go-webview2 lib, wails3 must be installed in the "git cloning" way and use the commit `6c7cd651da8c2be348e38fbd89fe28fcac803084` of `v3-alpha` branch.
-> The `go.mod` and `go.sum` may be different for local developement, so DON'T push it !!!
 
 ## Getting Started
 

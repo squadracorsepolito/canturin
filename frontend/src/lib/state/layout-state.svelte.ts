@@ -8,9 +8,6 @@ class LayoutState {
 	openPanelId = $state('');
 
 	async openPanel(typ: PanelType, panelId: string) {
-		this.openPanelType = typ;
-		this.openPanelId = panelId;
-
 		switch (typ) {
 			case 'message':
 				await MessageService.Open(panelId);
@@ -22,6 +19,9 @@ class LayoutState {
 				await SignalUnitService.Open(panelId);
 				break;
 		}
+
+		this.openPanelType = typ;
+		this.openPanelId = panelId;
 	}
 }
 
