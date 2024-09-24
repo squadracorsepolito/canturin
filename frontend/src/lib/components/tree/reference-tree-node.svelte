@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getColorByName } from '$lib/utils';
 	import type { ReferenceTreeNode } from './types';
+	import Self from './reference-tree-node.svelte';
 
 	type Props = {
 		node: ReferenceTreeNode;
@@ -32,7 +33,7 @@
 			class="grid"
 		>
 			{#each node.childNodes as child}
-				<svelte:self node={child} depth={depth - 1} />
+				<Self node={child} depth={depth - 1} />
 			{/each}
 		</div>
 	</div>

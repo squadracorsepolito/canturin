@@ -6,8 +6,7 @@ toolchain go1.22.5
 
 require (
 	github.com/squadracorsepolito/acmelib v1.2.0
-	github.com/wailsapp/wails/v3 v3.0.0-alpha.6
-// github.com/wailsapp/wails/v3 v3.0.0-alpha.0
+	github.com/wailsapp/wails/v3 v3.0.0-alpha.7
 )
 
 require (
@@ -41,12 +40,11 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/samber/lo v1.38.1 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/skeema/knownhosts v1.2.1 // indirect
-	github.com/wailsapp/go-webview2 v1.0.13 // indirect
+	github.com/wailsapp/go-webview2 v1.0.15 // indirect
 	github.com/wailsapp/mimetype v1.4.1 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
@@ -59,5 +57,3 @@ require (
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )
-
-// replace github.com/wailsapp/wails/v3 => ../../../../../../../Wails3/wails/v3

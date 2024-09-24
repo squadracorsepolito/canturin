@@ -39,3 +39,25 @@ func newSignalTypeService(sigTypeCh chan *acmelib.SignalType) *SignalTypeService
 		}),
 	}
 }
+
+func (s *SignalTypeService) UpdateName(entityID string, newName string) (SignalType, error) {
+	sigType, err := s.getEntity(entityID)
+	if err != nil {
+		return SignalType{}, err
+	}
+
+	sigType.SetName(newName)
+
+	return s.converterFn(sigType), nil
+}
+
+func (s *SignalTypeService) UpdateDesc(entityID string, newDesc string) (SignalType, error) {
+	sigType, err := s.getEntity(entityID)
+	if err != nil {
+		return SignalType{}, err
+	}
+
+	sigType.SetDesc(newDesc)
+
+	return s.converterFn(sigType), nil
+}

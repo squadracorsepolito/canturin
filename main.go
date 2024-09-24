@@ -36,13 +36,8 @@ func main() {
 
 	// Initialize the services
 	msgServ := newMessageService(messageCh)
-	defer close(messageCh)
-
 	sigTypeServ := newSignalTypeService(sigTypeCh)
-	defer close(sigTypeCh)
-
 	sigUnitServ := newSignalUnitService(sigUnitCh)
-	defer close(sigUnitCh)
 
 	// Create a new Wails application by providing the necessary options.
 	// Variables 'Name' and 'Description' are for application metadata.
@@ -95,11 +90,6 @@ func main() {
 	// 		time.Sleep(time.Second)
 	// 	}
 	// }()
-
-	// Run the services
-	go msgServ.run()
-	go sigTypeServ.run()
-	go sigUnitServ.run()
 
 	// Run the application. This blocks until the application has been exited.
 	// If an error occurred while running the application, log it and exit.

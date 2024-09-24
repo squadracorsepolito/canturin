@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { type SignalType } from '$lib/api/canturin';
 	import { SignalTypeKind } from '$lib/api/github.com/squadracorsepolito/acmelib';
+	import NameInput from '$lib/components/input/name-input.svelte';
+	import TextInput from '$lib/components/input/text-input.svelte';
 	import Summary from '$lib/components/summary/summary.svelte';
 	import ReferenceTree from '$lib/components/tree/reference-tree.svelte';
 	import { useSignalType } from '$lib/state/signal-type-state.svelte';
@@ -13,10 +15,10 @@
 
 	let { entityId }: Props = $props();
 
-	let state = useSignalType(entityId);
+	let signalType = useSignalType(entityId);
 
 	$effect(() => {
-		state.reload(entityId);
+		signalType.reload(entityId);
 	});
 
 	function getKindString(kind: SignalTypeKind) {
@@ -79,9 +81,25 @@
 
 		return res;
 	}
+
+	let test = $state(['pippo', 'negro']);
 </script>
 
 {#snippet sigTypePanel(sigType: SignalType)}
+	<section>
+		<NameInput
+			prefixName="signal_type"
+			initialValue={sigType.name}
+			onsubmitname={(n) => {
+				if (signalType.entity) {
+					signalType.entity.name = n;
+				}
+			}}
+			invalidNames={test}
+		/>
+		<!-- <TextInput /> -->
+	</section>
+
 	<section>
 		<h3>{sigType.name}</h3>
 		<p>{sigType.desc}</p>
@@ -101,7 +119,7 @@
 {/snippet}
 
 <Panel>
-	{#if !state.isLoading && state.signalType}
-		{@render sigTypePanel(state.signalType)}
+	{#if !signalType.isLoading && signalType.entity}
+		{@render sigTypePanel(signalType.entity)}
 	{/if}
 </Panel>

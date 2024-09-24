@@ -28,3 +28,13 @@ export function Open(entityID: string): Promise<void> & { cancel(): void } {
     let $resultPromise = $Call.ByID(2916965113, entityID) as any;
     return $resultPromise;
 }
+
+export function UpdateDesc(entityID: string, newDesc: string): Promise<$models.SignalType> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3391491109, entityID, newDesc) as any;
+    return $resultPromise;
+}
+
+export function UpdateName(entityID: string, newName: string): Promise<$models.SignalType> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(470311103, entityID, newName) as any;
+    return $resultPromise;
+}

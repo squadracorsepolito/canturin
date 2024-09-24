@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"sync"
 
 	"github.com/squadracorsepolito/acmelib"
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 type serviceConverterFn[T entity, M any] func(T) M
@@ -17,6 +19,8 @@ type service[T entity, M any] struct {
 	opened map[acmelib.EntityID]T
 
 	converterFn serviceConverterFn[T, M]
+
+	stopCh chan struct{}
 }
 
 func newService[T entity, M any](poolInsCh chan T, converterFn serviceConverterFn[T, M]) *service[T, M] {
@@ -27,6 +31,8 @@ func newService[T entity, M any](poolInsCh chan T, converterFn serviceConverterF
 		opened: make(map[acmelib.EntityID]T),
 
 		converterFn: converterFn,
+
+		stopCh: make(chan struct{}),
 	}
 }
 
@@ -37,8 +43,22 @@ func (s *service[T, M]) run() {
 			s.mux.Lock()
 			s.pool[item.EntityID()] = item
 			s.mux.Unlock()
+
+		case <-s.stopCh:
+			return
 		}
 	}
+}
+
+func (s *service[T, M]) OnStartup(_ context.Context, _ application.ServiceOptions) error {
+	go s.run()
+
+	return nil
+}
+
+func (s *service[T, M]) OnShutdown() {
+	s.stopCh <- struct{}{}
+	close(s.poolInsCh)
 }
 
 func (s *service[T, M]) Open(entityID string) error {
@@ -62,13 +82,22 @@ func (s *service[T, M]) Close(entityID string) {
 	delete(s.opened, acmelib.EntityID(entityID))
 }
 
-func (s *service[T, M]) Get(entityID string) (dummyRes M, _ error) {
+func (s *service[T, M]) getEntity(entityID string) (T, error) {
 	s.mux.RLock()
 	defer s.mux.RUnlock()
 
 	item, ok := s.pool[acmelib.EntityID(entityID)]
 	if !ok {
-		return dummyRes, errors.New("get: not found")
+		return item, errors.New("get: not found")
+	}
+
+	return item, nil
+}
+
+func (s *service[T, M]) Get(entityID string) (dummyRes M, _ error) {
+	item, err := s.getEntity(entityID)
+	if err != nil {
+		return dummyRes, err
 	}
 	return s.converterFn(item), nil
 }
