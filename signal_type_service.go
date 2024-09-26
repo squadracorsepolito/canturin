@@ -61,3 +61,19 @@ func (s *SignalTypeService) UpdateDesc(entityID string, newDesc string) (SignalT
 
 	return s.converterFn(sigType), nil
 }
+
+func (s *SignalTypeService) GetInvalidNames(entityID string) []string {
+	s.mux.RLock()
+	defer s.mux.RUnlock()
+
+	names := []string{}
+	for _, tmpSigType := range s.pool {
+		if tmpSigType.EntityID() == acmelib.EntityID(entityID) {
+			continue
+		}
+
+		names = append(names, tmpSigType.Name())
+	}
+
+	return names
+}

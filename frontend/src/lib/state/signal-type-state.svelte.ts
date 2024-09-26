@@ -69,6 +69,22 @@ class SignalTypeState extends EntityState<SignalType> {
 
 		this.update(SignalTypeService.UpdateDesc(this.entity.entityId, newDesc));
 	}
+
+	getInvalidNames() {
+		const names: string[] = [];
+
+		if (!this.entity) return names;
+
+		SignalTypeService.GetInvalidNames(this.entity.entityId).then((invalidNames) => {
+			if (invalidNames) {
+				for (const tmp of invalidNames) {
+					names.push(tmp);
+				}
+			}
+		});
+
+		return names;
+	}
 }
 
 export function useSignalType(entityId: string) {

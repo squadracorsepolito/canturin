@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { type SignalType } from '$lib/api/canturin';
 	import { SignalTypeKind } from '$lib/api/github.com/squadracorsepolito/acmelib';
+	import SignalTypeIcon from '$lib/components/icon/signal-type-icon.svelte';
 	import NameInput from '$lib/components/input/name-input.svelte';
-	import TextInput from '$lib/components/input/text-input.svelte';
 	import Summary from '$lib/components/summary/summary.svelte';
+	import DescTextarea from '$lib/components/textarea/desc-textarea.svelte';
 	import ReferenceTree from '$lib/components/tree/reference-tree.svelte';
 	import { useSignalType } from '$lib/state/signal-type-state.svelte';
 	import { getSignalReferenceTree } from '$lib/utils';
@@ -82,27 +83,28 @@
 		return res;
 	}
 
-	let test = $state(['pippo', 'negro']);
+	function handleDesc(desc: string) {
+		signalType.updateDesc(desc);
+	}
 </script>
 
 {#snippet sigTypePanel(sigType: SignalType)}
 	<section>
 		<NameInput
+			label="Signal Type Name"
 			prefixName="signal_type"
 			initialValue={sigType.name}
-			onsubmitname={(n) => {
-				if (signalType.entity) {
-					signalType.entity.name = n;
-				}
+			onSubmit={(n) => {
+				signalType.updateName(n);
 			}}
-			invalidNames={test}
-		/>
-		<!-- <TextInput /> -->
-	</section>
+			invalidNames={signalType.getInvalidNames()}
+		>
+			<SignalTypeIcon height="48" width="48" />
+		</NameInput>
 
-	<section>
-		<h3>{sigType.name}</h3>
-		<p>{sigType.desc}</p>
+		<div class="pt-5">
+			<DescTextarea initialDesc={sigType.desc} onSubmit={handleDesc} />
+		</div>
 	</section>
 
 	<section>

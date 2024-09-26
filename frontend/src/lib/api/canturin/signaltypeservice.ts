@@ -19,6 +19,11 @@ export function Get(entityID: string): Promise<$models.SignalType> & { cancel():
     return $resultPromise;
 }
 
+export function GetInvalidNames(entityID: string): Promise<string[] | null> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1761936154, entityID) as any;
+    return $resultPromise;
+}
+
 export function GetOpen(entityID: string): Promise<$models.SignalType> & { cancel(): void } {
     let $resultPromise = $Call.ByID(1647851851, entityID) as any;
     return $resultPromise;

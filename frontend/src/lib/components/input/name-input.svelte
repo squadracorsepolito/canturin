@@ -1,26 +1,32 @@
 <script lang="ts">
-	import { selectTextOnFocus } from '$lib/actions';
-	import type { Action } from 'svelte/action';
+	import { FiniteStateMachine } from 'runed';
+	import type { Snippet } from 'svelte';
 	import { z, ZodError } from 'zod';
 
 	type Props = {
+		label: string;
 		prefixName: string;
 		initialValue: string;
 		invalidNames: string[];
-		onsubmitname: (name: string) => void;
+		onSubmit: (name: string) => void;
+		children?: Snippet;
 	};
 
-	let { prefixName, initialValue, invalidNames, onsubmitname }: Props = $props();
+	let { label, prefixName, initialValue, invalidNames, onSubmit, children }: Props = $props();
 
 	const schema = z.object({
 		name: z
 			.string()
-			.min(1)
-			.refine((n) => !invalidNames.includes(n), { message: 'Duplicated name' })
+			.min(1, { message: `${label}: must contains at least 1 character` })
+			.refine((n) => !invalidNames.includes(n), { message: `${label}: is duplicated` })
 	});
 
-	let value = $state(initialValue);
+	const resettingTimeoutMs = 500;
+
 	let width = $state(0);
+
+	let value = $state(initialValue);
+
 	let error = $derived.by(() => {
 		try {
 			schema.parse({ name: value });
@@ -31,17 +37,17 @@
 		}
 	});
 
-	function resetValue() {
-		value = initialValue;
-	}
+	let canSubmit = $state(true);
 
 	function handleSubmit() {
-		if (value !== initialValue) {
-			onsubmitname(value);
+		if (value !== initialValue && canSubmit) {
+			onSubmit(value);
 		}
 	}
 
-	function onsubmit(e: SubmitEvent) {
+	function handleFormSubmit(e: SubmitEvent) {
+		f.send('SUBMIT');
+
 		if (error) {
 			e.preventDefault();
 			return;
@@ -50,66 +56,107 @@
 		handleSubmit();
 	}
 
-	const inputAction: Action<HTMLInputElement> = (node) => {
-		const handleBlur = () => {
-			if (!node) return;
+	let inputEl = $state() as HTMLInputElement;
 
-			if (error) {
-				resetValue();
-				return;
+	type State = 'idle' | 'typing' | 'resetting';
+	type Events = 'FOCUS' | 'SUBMIT' | 'BLUR' | 'ESCAPE' | 'TIMEOUT';
+
+	const f = new FiniteStateMachine<State, Events>('idle', {
+		idle: {
+			FOCUS: () => {
+				inputEl.select();
+				return 'typing';
 			}
+		},
+		typing: {
+			SUBMIT: () => {
+				if (!error) {
+					return 'idle';
+				}
+			},
+			BLUR: () => {
+				if (error) {
+					return 'resetting';
+				}
 
-			handleSubmit();
-		};
-
-		const handleKeydown = (e: KeyboardEvent) => {
-			if (!node) return;
-
-			if (e.key === 'Escape') {
-				resetValue();
-				node.blur();
+				handleSubmit();
+				return 'idle';
+			},
+			ESCAPE: () => {
+				canSubmit = false;
+				inputEl.blur();
+				return 'resetting';
 			}
-		};
-
-		const handleFocus = () => {
-			if (node && typeof node.select === 'function') {
-				node.select();
+		},
+		resetting: {
+			_enter: () => {
+				value = initialValue;
+				f.debounce(resettingTimeoutMs, 'TIMEOUT');
+			},
+			TIMEOUT: () => {
+				canSubmit = true;
+				return 'idle';
 			}
-		};
+		}
+	});
 
-		node.addEventListener('blur', handleBlur);
-		node.addEventListener('keydown', handleKeydown);
-		node.addEventListener('focus', handleFocus);
-
-		return {
-			destroy() {
-				node.removeEventListener('blur', handleBlur);
-				node.removeEventListener('keydown', handleKeydown);
-				node.removeEventListener('focus', handleFocus);
-			}
-		};
+	const handleInputFocus = () => {
+		f.send('FOCUS');
 	};
+
+	const handleInputBlur = () => {
+		f.send('BLUR');
+	};
+
+	const handleInputKeydown = (e: KeyboardEvent) => {
+		if (e.key === 'Escape') {
+			f.send('ESCAPE');
+		}
+	};
+
+	function getInputClass() {
+		switch (f.current) {
+			case 'typing':
+				if (error) {
+					return 'input-error bg-error text-error-content';
+				}
+				return 'input-primary';
+			case 'resetting':
+				return 'bg-warning text-warning-content';
+			default:
+				return '';
+		}
+	}
 </script>
 
-<form class="relative" {onsubmit}>
-	<input
-		type="text"
-		name={prefixName + '_name'}
-		bind:value
-		class="input {error
-			? 'input-error'
-			: 'input-primary'} font-medium text-xl border-transparent focus:border-solid"
-		style:width={`${width + 2 + 1}px`}
-		use:inputAction
-	/>
+<form class="relative" onsubmit={handleFormSubmit}>
+	<label for={prefixName + '_name'} class="hidden">{label}</label>
 
-	{#if error}
-		<span class="text-sm text-error">{error}</span>
-	{/if}
+	<div class="flex items-center gap-3">
+		{#if children}
+			{@render children()}
+		{/if}
+
+		<input
+			type="text"
+			name={prefixName + '_name'}
+			bind:value
+			bind:this={inputEl}
+			onfocus={handleInputFocus}
+			onblur={handleInputBlur}
+			onkeydown={handleInputKeydown}
+			class="{getInputClass()} input input-sm px-2 font-medium text-xl transition-colors"
+			style:width={`${width + 2 + 1}px`}
+		/>
+
+		{#if error}
+			<span class="text-xs text-error">{error}</span>
+		{/if}
+	</div>
 
 	<div
 		bind:clientWidth={width}
-		class="px-4 inline-block absolute left-0 break-all top-12 font-medium text-xl invisible"
+		class="px-2 inline-block absolute left-0 break-all top-12 font-medium text-xl invisible"
 	>
 		{value}
 	</div>
