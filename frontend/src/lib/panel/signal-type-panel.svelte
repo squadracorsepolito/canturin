@@ -2,6 +2,7 @@
 	import { type SignalType } from '$lib/api/canturin';
 	import { SignalTypeKind } from '$lib/api/github.com/squadracorsepolito/acmelib';
 	import SignalTypeIcon from '$lib/components/icon/signal-type-icon.svelte';
+	import AttributeInput from '$lib/components/input/attribute-input.svelte';
 	import NameInput from '$lib/components/input/name-input.svelte';
 	import Summary from '$lib/components/summary/summary.svelte';
 	import DescTextarea from '$lib/components/textarea/desc-textarea.svelte';
@@ -109,6 +110,10 @@
 
 	<section>
 		<Summary infos={getSummaryInfos(sigType)} />
+
+		<div>
+			<AttributeInput initialAttribute={sigType.size} onSubmit={(a) => console.log('got ', a)} />
+		</div>
 	</section>
 
 	{#if sigType.references}

@@ -15,3 +15,7 @@ export const selectTextOnFocus: Action<HTMLInputElement> = (node) => {
 		}
 	};
 };
+
+export const focusOnDisplay: Action<HTMLElement> = (el) => {
+	el.focus();
+};

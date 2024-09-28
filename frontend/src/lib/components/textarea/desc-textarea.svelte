@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { FiniteStateMachine } from 'runed';
 	import { AddIcon } from '../icon';
+	import type { Action } from 'svelte/action';
 
 	type Props = {
 		initialDesc: string;
@@ -20,9 +21,6 @@
 			DBLCLICK: 'typing'
 		},
 		typing: {
-			_enter: () => {
-				textareaEl.focus();
-			},
 			BLUR: () => {
 				onSubmit(desc);
 				return 'idle';
@@ -37,7 +35,9 @@
 		}
 	});
 
-	let textareaEl = $state() as HTMLTextAreaElement;
+	const textareaAction: Action<HTMLTextAreaElement> = (el) => {
+		el.focus();
+	};
 </script>
 
 {#if f.current === 'idle'}
@@ -48,15 +48,15 @@
 	{:else}
 		<p ondblclick={() => f.send('DBLCLICK')}>{initialDesc}</p>
 	{/if}
+{:else if f.current === 'typing'}
+	<textarea
+		bind:value={desc}
+		onblur={() => f.current === 'typing' && f.send('BLUR')}
+		onkeydown={(e) => {
+			if (e.key == 'Escape') f.send('ESCAPE');
+		}}
+		use:textareaAction
+		rows="8"
+		class="textarea textarea-primary w-full"
+	></textarea>
 {/if}
-
-<textarea
-	bind:this={textareaEl}
-	bind:value={desc}
-	onblur={() => f.current === 'typing' && f.send('BLUR')}
-	onkeydown={(e) => {
-		if (e.key == 'Escape') f.send('ESCAPE');
-	}}
-	rows="8"
-	class="{f.current === 'idle' && 'hidden'} textarea textarea-primary w-full"
-></textarea>
