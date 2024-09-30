@@ -13,17 +13,17 @@
 
 	type Props = {
 		hidePlaceholder?: boolean;
-		placeholder: Snippet;
-		input: Snippet<[InputSnippetProps]>;
 		schema: T;
 		initialValues: Values;
 		onsubmit: (values: Values) => void;
+		placeholder: Snippet;
+		input: Snippet<[InputSnippetProps]>;
 	};
 
 	let { hidePlaceholder, placeholder, input, initialValues, schema, onsubmit }: Props = $props();
 
 	type State = 'idle' | 'editing' | 'resetting';
-	type Events = 'DBLCLICK' | 'ESCAPE' | 'BLUR' | 'SUBMIT' | 'TIMEOUT';
+	type Events = 'DBLCLICK' | 'ESCAPE' | 'BLUR' | 'TIMEOUT';
 	const fsm = new FiniteStateMachine<State, Events>('idle', {
 		idle: {
 			DBLCLICK: 'editing'
@@ -33,22 +33,24 @@
 				if (hasErrors()) {
 					return 'resetting';
 				}
-
-				onsubmit(values);
+				if (!isSubmitting) {
+					onsubmit(values);
+				}
 				return 'idle';
 			},
-			// SUBMIT: () => {
-			// 	if (!hasErrors()) {
-			// 		return 'idle';
-			// 	}
-			// },
-			ESCAPE: 'resetting'
+			ESCAPE: 'resetting',
+			_exit: () => {
+				isSubmitting = false;
+			}
 		},
 		resetting: {
 			_enter: () => {
 				fsm.debounce(100, 'TIMEOUT');
 			},
-			TIMEOUT: 'idle'
+			TIMEOUT: () => {
+				values = initialValues;
+				return 'idle';
+			}
 		}
 	});
 
@@ -60,6 +62,7 @@
 		}
 		return res.error.flatten().fieldErrors;
 	});
+	let isSubmitting = $state(false);
 
 	function hasErrors() {
 		return Object.keys(errors).length > 0;
@@ -71,7 +74,7 @@
 			return;
 		}
 
-		// fsm.send('SUBMIT');
+		isSubmitting = true;
 		onsubmit(values);
 	}
 </script>
@@ -83,7 +86,7 @@
 	</div>
 {/if}
 
-{#if fsm.current === 'editing'}
+{#if fsm.current !== 'idle'}
 	<form onsubmit={handleSubmit}>
 		{@render input({ fsm, values, errors })}
 	</form>
