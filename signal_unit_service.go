@@ -31,3 +31,41 @@ func newSignalUnitService(sigUnitCh chan *acmelib.SignalUnit) *SignalUnitService
 		}),
 	}
 }
+
+func (s *SignalUnitService) UpdateName(entityID string, newName string) (SignalUnit, error) {
+	sigUnit, err := s.getEntity(entityID)
+	if err != nil {
+		return SignalUnit{}, err
+	}
+
+	sigUnit.SetName(newName)
+
+	return s.converterFn(sigUnit), nil
+}
+
+func (s *SignalUnitService) UpdateDesc(entityID string, newDesc string) (SignalUnit, error) {
+	sigUnit, err := s.getEntity(entityID)
+	if err != nil {
+		return SignalUnit{}, err
+	}
+
+	sigUnit.SetDesc(newDesc)
+
+	return s.converterFn(sigUnit), nil
+}
+
+func (s *SignalUnitService) GetInvalidNames(entityID string) []string {
+	s.mux.RLock()
+	defer s.mux.RUnlock()
+
+	names := []string{}
+	for _, tmpSigUnit := range s.pool {
+		if tmpSigUnit.EntityID() == acmelib.EntityID(entityID) {
+			continue
+		}
+
+		names = append(names, tmpSigUnit.Name())
+	}
+
+	return names
+}

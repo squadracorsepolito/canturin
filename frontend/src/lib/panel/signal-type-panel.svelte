@@ -42,7 +42,7 @@
 			{
 				title: 'Kind',
 				value: getKindString(sigType.kind),
-				desc: 'The of the type'
+				desc: 'The kind of the type'
 			},
 			{
 				title: 'Size',

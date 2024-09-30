@@ -21,6 +21,40 @@ class SignalUnitState extends AsyncState {
 	reload(entityId: string) {
 		loadSignalUnit(this, entityId);
 	}
+	
+	async updateName(newName: string) {
+		if (!this.signalUnit) return;
+
+		try {
+			const updatedSignalUnit = await SignalUnitService.UpdateName(this.signalUnit.entityId, newName);
+			this.signalUnit = updatedSignalUnit;
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	async updateDesc(newDesc: string) {
+		if (!this.signalUnit) return;
+
+		try {
+			const updatedSignalUnit = await SignalUnitService.UpdateDesc(this.signalUnit.entityId, newDesc);
+			this.signalUnit = updatedSignalUnit;
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	async getInvalidNames(): Promise<string[]> {
+		if (!this.signalUnit) return [];
+
+		try {
+			const invalidNames = await SignalUnitService.GetInvalidNames(this.signalUnit.entityId);
+			return invalidNames || [];
+		} catch (error) {
+			console.error(error);
+			return [];
+		}
+	}
 }
 
 export function useSignalUnit(entityId: string) {

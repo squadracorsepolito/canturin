@@ -1,6 +1,8 @@
 package main
 
-import "github.com/squadracorsepolito/acmelib"
+import (
+	"github.com/squadracorsepolito/acmelib"
+)
 
 type SignalType struct {
 	base
