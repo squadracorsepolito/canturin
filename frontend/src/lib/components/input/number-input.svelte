@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { InputProps } from './types';
+	import type { NumberInputProps } from './types';
 	import Input from './input.svelte';
 
-	let { value = $bindable(), ...restProps }: Omit<InputProps<number>, 'type'> = $props();
+	let { value = $bindable(), ...restProps }: NumberInputProps = $props();
 </script>
 
 <Input bind:value type="number" {...restProps} />

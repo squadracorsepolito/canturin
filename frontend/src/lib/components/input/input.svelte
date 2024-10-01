@@ -9,6 +9,10 @@
 		label,
 		errors,
 		focusOnDiplay,
+		size = 'md',
+		width,
+		min,
+		max,
 		onblur,
 		onescape
 	}: InputProps<T> = $props();
@@ -30,6 +34,25 @@
 			el.focus();
 		}
 	};
+
+	function getInputClass() {
+		let s = '';
+		switch (size) {
+			case 'md':
+				s = 'input-md';
+				break;
+			case 'sm':
+				s = 'input-sm';
+				break;
+		}
+
+		let color = 'input-primary';
+		if (errors) {
+			color = 'input-error bg-error text-error-content';
+		}
+
+		return `input ${s} ${color}`;
+	}
 </script>
 
 <label for={name} class="form-control max-w-xs">
@@ -45,10 +68,13 @@
 		bind:value
 		{type}
 		{name}
+		{min}
+		{max}
 		onblur={handleBlur}
 		onkeydown={handleKeydown}
 		use:action
-		class="input {errors ? 'input-error bg-error text-error-content' : 'input-primary'}"
+		class={getInputClass()}
+		style:width={width && `${width}px`}
 	/>
 
 	<div class="label h-8">

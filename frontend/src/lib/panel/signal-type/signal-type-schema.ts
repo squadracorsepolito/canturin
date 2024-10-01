@@ -9,14 +9,8 @@ export function nameSchema(invalidNames: string[]) {
 	});
 }
 
-export const sizeSchema = z.object({
-	size: z.number().min(1).max(64)
-});
-
-export const minSchema = z.object({
-	min: z.number()
-});
-
-export const maxSchema = z.object({
-	max: z.number()
-});
+export const sizeSchema = z.number().min(1).max(64);
+export const minSchema = z.number();
+export const maxSchema = z.number();
+export const scaleSchema = z.number();
+export const offsetSchema = z.number();

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Input from './input.svelte';
-	import type { InputProps } from './types';
+	import type { TextInputProps } from './types';
 
-	let { value = $bindable(), ...restProps }: Omit<InputProps<string>, 'type'> = $props();
+	let { value = $bindable(), ...restProps }: TextInputProps = $props();
 </script>
 
 <Input bind:value type="text" {...restProps} />
