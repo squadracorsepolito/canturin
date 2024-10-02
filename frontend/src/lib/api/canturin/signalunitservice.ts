@@ -19,6 +19,11 @@ export function Get(entityID: string): Promise<$models.SignalUnit> & { cancel():
     return $resultPromise;
 }
 
+export function GetInvalidNames(entityID: string): Promise<string[] | null> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(593412272, entityID) as any;
+    return $resultPromise;
+}
+
 export function GetOpen(entityID: string): Promise<$models.SignalUnit> & { cancel(): void } {
     let $resultPromise = $Call.ByID(2383998009, entityID) as any;
     return $resultPromise;
@@ -26,5 +31,15 @@ export function GetOpen(entityID: string): Promise<$models.SignalUnit> & { cance
 
 export function Open(entityID: string): Promise<void> & { cancel(): void } {
     let $resultPromise = $Call.ByID(3212172551, entityID) as any;
+    return $resultPromise;
+}
+
+export function UpdateDesc(entityID: string, newDesc: string): Promise<$models.SignalUnit> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3797493755, entityID, newDesc) as any;
+    return $resultPromise;
+}
+
+export function UpdateName(entityID: string, newName: string): Promise<$models.SignalUnit> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1637602753, entityID, newName) as any;
     return $resultPromise;
 }
