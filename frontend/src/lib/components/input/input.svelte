@@ -8,7 +8,7 @@
 		type,
 		label,
 		errors,
-		focusOnDiplay,
+		focusOnDisplay,
 		size = 'md',
 		width,
 		min,
@@ -30,7 +30,7 @@
 	}
 
 	const action: Action<HTMLInputElement> = (el) => {
-		if (focusOnDiplay) {
+		if (focusOnDisplay) {
 			el.focus();
 		}
 	};

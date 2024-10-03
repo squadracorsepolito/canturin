@@ -6,7 +6,7 @@ export type InputProps<T> = {
 	label?: string;
 	width?: number;
 	errors?: string[];
-	focusOnDiplay?: boolean;
+	focusOnDisplay?: boolean;
 	min?: number;
 	max?: number;
 	onblur?: () => void;

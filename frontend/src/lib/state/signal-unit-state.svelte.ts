@@ -5,7 +5,7 @@ async function loadSignalUnit(state: SignalUnitState, entityId: string) {
 	state.isLoading = true;
 
 	try {
-		const sigUnit = await SignalUnitService.GetOpen(entityId);
+		const sigUnit = await SignalUnitService.Get(entityId);
 		state.signalUnit = sigUnit;
 	} catch (error) {
 		state.signalUnit = undefined;

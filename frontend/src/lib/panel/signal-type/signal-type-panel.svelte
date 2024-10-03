@@ -1,10 +1,9 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import { type SignalType } from '$lib/api/canturin';
 	import { SignalTypeKind } from '$lib/api/github.com/squadracorsepolito/acmelib';
 	import Summary from '$lib/components/summary/summary.svelte';
 	import DescTextarea from '$lib/components/textarea/desc-textarea.svelte';
 	import ReferenceTree from '$lib/components/tree/reference-tree.svelte';
-	import { useSignalType } from '$lib/state/signal-type-state.svelte';
 	import { getSignalReferenceTree } from '$lib/utils';
 	import Panel from '../panel.svelte';
 	import { createSignalTypeContext } from './signal-type-context.svelte';
@@ -90,13 +89,7 @@
 </script>
 
 {#snippet sigTypePanel(sigType: SignalType)}
-	<SignalTypeHeading {entityId} invalidNames={signalType.getInvalidNames()} />
-
-	<section>
-		<div class="pt-5">
-			<DescTextarea initialDesc={sigType.desc} onSubmit={handleDesc} />
-		</div>
-	</section>
+	<SignalTypeHeading {entityId} />
 
 	<section>
 		<Summary infos={getSummaryInfos(sigType)} />
@@ -118,4 +111,4 @@
 		{@const _ = createSignalTypeContext(signalType.entity)}
 		{@render sigTypePanel(signalType.entity)}
 	{/if}
-</Panel>
+</Panel> -->

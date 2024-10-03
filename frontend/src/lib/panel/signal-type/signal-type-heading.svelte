@@ -1,19 +1,39 @@
 <script lang="ts">
+	import { Button, IconButton, SubmitButton } from '$lib/components/button';
 	import { EditableForm } from '$lib/components/form';
-	import { SignalTypeIcon } from '$lib/components/icon';
+	import { AddIcon, SignalTypeIcon } from '$lib/components/icon';
 	import { ResizeableTextInput } from '$lib/components/input';
+	import { Textarea } from '$lib/components/textarea';
 	import type { PanelSectionProps } from '../types';
-	import { getSignalTypeContext } from './signal-type-context.svelte';
-	import { nameSchema } from './signal-type-schema';
+	import { getSignalTypeState } from '../../state/signal-type-state.svelte';
+	import { descSchema, nameSchema } from './signal-type-schema';
+	import { type SignalType } from '$lib/api/canturin';
 
-	let { entityId, invalidNames }: PanelSectionProps & { invalidNames: string[] } = $props();
+	let { entityId }: PanelSectionProps = $props();
 
-	const { signalType } = getSignalTypeContext(entityId);
+	let sts = getSignalTypeState(entityId);
 
-	function handleName(name: string) {}
+	let invalidNames = $state<string[]>([]);
+
+	async function loadInvalidNames() {
+		const res = await sts.getInvalidNames();
+		invalidNames = res;
+	}
+
+	$effect(() => {
+		loadInvalidNames();
+	});
+
+	function handleName(name: string) {
+		sts.updateName(name);
+	}
+
+	function handleDesc(desc: string) {
+		sts.updateDesc(desc);
+	}
 </script>
 
-<section>
+{#snippet section(signalType: SignalType)}
 	<div class="flex h-24 gap-3 items-center">
 		<SignalTypeIcon width="48" height="48" />
 
@@ -35,7 +55,7 @@
 						name="signal-type-name"
 						bind:value={values.name}
 						errors={errors.name}
-						focusOnDiplay
+						focusOnDisplay
 						onescape={() => fsm.send('ESCAPE')}
 						onblur={() => fsm.send('BLUR')}
 					/>
@@ -43,4 +63,46 @@
 			</EditableForm>
 		</div>
 	</div>
+
+	<div>
+		<EditableForm
+			schema={descSchema}
+			initialValues={{ desc: signalType.desc }}
+			onsubmit={({ desc }) => handleDesc(desc)}
+			hidePlaceholder
+			blurOnSubmit
+		>
+			{#snippet placeholder(fsm)}
+				{#if signalType.desc}
+					<p>{signalType.desc}</p>
+				{:else}
+					<IconButton onclick={() => fsm.send('DBLCLICK')} label="Add Description">
+						{#snippet icon()}
+							<AddIcon />
+						{/snippet}
+					</IconButton>
+				{/if}
+			{/snippet}
+
+			{#snippet input({ fsm, values })}
+				<Textarea
+					bind:value={values.desc}
+					name="signal-type-desc"
+					onescape={() => fsm.send('ESCAPE')}
+					focusOnDisplay
+					label="Description"
+					rows={20}
+				/>
+
+				<div class="flex justify-end gap-3 pt-5">
+					<Button label="Cancel" onclick={() => fsm.send('ESCAPE')} />
+					<SubmitButton label="Save" />
+				</div>
+			{/snippet}
+		</EditableForm>
+	</div>
+{/snippet}
+
+<section>
+	{@render section(sts.entity)}
 </section>

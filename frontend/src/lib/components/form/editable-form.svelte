@@ -13,20 +13,30 @@
 
 	type Props = {
 		hidePlaceholder?: boolean;
+		blurOnSubmit?: boolean;
 		schema: T;
 		initialValues: Values;
 		onsubmit: (values: Values) => void;
-		placeholder: Snippet;
+		placeholder: Snippet<[typeof fsm]>;
 		input: Snippet<[InputSnippetProps]>;
 	};
 
-	let { hidePlaceholder, placeholder, input, initialValues, schema, onsubmit }: Props = $props();
+	let {
+		hidePlaceholder,
+		blurOnSubmit,
+		placeholder,
+		input,
+		initialValues,
+		schema,
+		onsubmit
+	}: Props = $props();
 
 	type State = 'idle' | 'editing' | 'resetting';
 	type Events = 'DBLCLICK' | 'ESCAPE' | 'BLUR' | 'TIMEOUT';
 	const fsm = new FiniteStateMachine<State, Events>('idle', {
 		idle: {
-			DBLCLICK: 'editing'
+			DBLCLICK: 'editing',
+			BLUR: () => {}
 		},
 		editing: {
 			BLUR: () => {
@@ -50,7 +60,8 @@
 			TIMEOUT: () => {
 				values = initialValues;
 				return 'idle';
-			}
+			},
+			BLUR: () => {}
 		}
 	});
 
@@ -76,13 +87,17 @@
 
 		isSubmitting = true;
 		onsubmit(values);
+
+		if (blurOnSubmit) {
+			fsm.send('BLUR');
+		}
 	}
 </script>
 
 {#if (hidePlaceholder && fsm.current === 'idle') || !hidePlaceholder}
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div ondblclick={() => fsm.send('DBLCLICK')}>
-		{@render placeholder()}
+		{@render placeholder(fsm)}
 	</div>
 {/if}
 

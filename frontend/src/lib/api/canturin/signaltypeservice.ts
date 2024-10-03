@@ -9,11 +9,6 @@ import {Call as $Call} from "@wailsio/runtime";
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
-export function Close(entityID: string): Promise<void> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(312713075, entityID) as any;
-    return $resultPromise;
-}
-
 export function Get(entityID: string): Promise<$models.SignalType> & { cancel(): void } {
     let $resultPromise = $Call.ByID(2443930791, entityID) as any;
     return $resultPromise;
@@ -24,22 +19,32 @@ export function GetInvalidNames(entityID: string): Promise<string[] | null> & { 
     return $resultPromise;
 }
 
-export function GetOpen(entityID: string): Promise<$models.SignalType> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(1647851851, entityID) as any;
+export function UpdateDesc(entityID: string, desc: string): Promise<$models.SignalType> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3391491109, entityID, desc) as any;
     return $resultPromise;
 }
 
-export function Open(entityID: string): Promise<void> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(2916965113, entityID) as any;
+export function UpdateMax(entityID: string, max: number): Promise<$models.SignalType> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1547565842, entityID, max) as any;
     return $resultPromise;
 }
 
-export function UpdateDesc(entityID: string, newDesc: string): Promise<$models.SignalType> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(3391491109, entityID, newDesc) as any;
+export function UpdateMin(entityID: string, min: number): Promise<$models.SignalType> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1177178296, entityID, min) as any;
     return $resultPromise;
 }
 
-export function UpdateName(entityID: string, newName: string): Promise<$models.SignalType> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(470311103, entityID, newName) as any;
+export function UpdateName(entityID: string, name: string): Promise<$models.SignalType> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(470311103, entityID, name) as any;
+    return $resultPromise;
+}
+
+export function UpdateOffset(entityID: string, offset: number): Promise<$models.SignalType> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(226325631, entityID, offset) as any;
+    return $resultPromise;
+}
+
+export function UpdateScale(entityID: string, scale: number): Promise<$models.SignalType> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3856836030, entityID, scale) as any;
     return $resultPromise;
 }

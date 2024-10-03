@@ -40,28 +40,6 @@ func newSignalTypeService(sigTypeCh chan *acmelib.SignalType) *SignalTypeService
 	}
 }
 
-func (s *SignalTypeService) UpdateName(entityID string, newName string) (SignalType, error) {
-	sigType, err := s.getEntity(entityID)
-	if err != nil {
-		return SignalType{}, err
-	}
-
-	sigType.SetName(newName)
-
-	return s.converterFn(sigType), nil
-}
-
-func (s *SignalTypeService) UpdateDesc(entityID string, newDesc string) (SignalType, error) {
-	sigType, err := s.getEntity(entityID)
-	if err != nil {
-		return SignalType{}, err
-	}
-
-	sigType.SetDesc(newDesc)
-
-	return s.converterFn(sigType), nil
-}
-
 func (s *SignalTypeService) GetInvalidNames(entityID string) []string {
 	s.mux.RLock()
 	defer s.mux.RUnlock()
@@ -76,4 +54,70 @@ func (s *SignalTypeService) GetInvalidNames(entityID string) []string {
 	}
 
 	return names
+}
+
+func (s *SignalTypeService) UpdateName(entityID string, name string) (SignalType, error) {
+	sigType, err := s.getEntity(entityID)
+	if err != nil {
+		return SignalType{}, err
+	}
+
+	sigType.SetName(name)
+
+	return s.converterFn(sigType), nil
+}
+
+func (s *SignalTypeService) UpdateDesc(entityID string, desc string) (SignalType, error) {
+	sigType, err := s.getEntity(entityID)
+	if err != nil {
+		return SignalType{}, err
+	}
+
+	sigType.SetDesc(desc)
+
+	return s.converterFn(sigType), nil
+}
+
+func (s *SignalTypeService) UpdateMin(entityID string, min float64) (SignalType, error) {
+	sigType, err := s.getEntity(entityID)
+	if err != nil {
+		return SignalType{}, err
+	}
+
+	sigType.SetMin(min)
+
+	return s.converterFn(sigType), nil
+}
+
+func (s *SignalTypeService) UpdateMax(entityID string, max float64) (SignalType, error) {
+	sigType, err := s.getEntity(entityID)
+	if err != nil {
+		return SignalType{}, err
+	}
+
+	sigType.SetMax(max)
+
+	return s.converterFn(sigType), nil
+}
+
+func (s *SignalTypeService) UpdateScale(entityID string, scale float64) (SignalType, error) {
+	sigType, err := s.getEntity(entityID)
+	if err != nil {
+		return SignalType{}, err
+	}
+
+	sigType.SetScale(scale)
+
+	return s.converterFn(sigType), nil
+}
+
+func (s *SignalTypeService) UpdateOffset(entityID string, offset float64) (SignalType, error) {
+	sigType, err := s.getEntity(entityID)
+	if err != nil {
+		return SignalType{}, err
+	}
+
+	sigType.SetOffset(offset)
+
+	return s.converterFn(sigType), nil
 }

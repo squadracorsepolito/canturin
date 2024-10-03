@@ -1,37 +1,17 @@
-export class EntityState<
-	T extends {
-		entityId: string;
-	}
-> {
-	loadFn: (entityId: string) => Promise<T>;
+export type Entity = {
+	entityId: string;
+};
 
-	isLoading = $state(false);
-	entity = $state<T>();
+export class EntityState<E extends Entity> {
+	entity = $state() as E;
 
-	constructor(loadFn: (entityId: string) => Promise<T>) {
-		this.loadFn = loadFn;
+	constructor(entity: E) {
+		this.entity = entity;
 	}
 
-	async load(entityId: string) {
-		this.isLoading = true;
-
+	async update(promise: Promise<E>) {
 		try {
-			this.entity = await this.loadFn(entityId);
-		} catch (error) {
-			this.entity = undefined;
-			console.error(error);
-		} finally {
-			this.isLoading = false;
-		}
-	}
-
-	reload(entityId: string) {
-		this.load(entityId);
-	}
-
-	async update(updatePromise: Promise<T>) {
-		try {
-			this.entity = await updatePromise;
+			this.entity = await promise;
 		} catch (error) {
 			console.error(error);
 		}

@@ -1,94 +1,54 @@
 import { SignalTypeService, type SignalType } from '$lib/api/canturin';
-
 import { EntityState } from './entity-state.svelte';
+import { StateProvider } from './state-provider.svelte';
 
-// async function loadSignalType(state: SignalTypeState, entityId: string) {
-// 	state.isLoading = true;
+const provider = new StateProvider((signalType: SignalType) => new SignalTypeState(signalType));
 
-// 	try {
-// 		const sigType = await SignalTypeService.GetOpen(entityId);
-// 		state.signalType = sigType;
-// 	} catch (error) {
-// 		state.signalType = undefined;
-// 		console.error(error);
-// 	}
-
-// 	state.isLoading = false;
-// }
-
-// class SignalTypeState extends AsyncState {
-// 	signalType = $state<SignalType>();
-
-// 	reload(entityId: string) {
-// 		loadSignalType(this, entityId);
-// 	}
-
-// 	async update(promise: Promise<SignalType>) {
-// 		try {
-// 			const sigType = await promise;
-// 			this.signalType = sigType;
-// 		} catch (error) {
-// 			console.error(error);
-// 		}
-// 	}
-
-// 	async updateName(newName: string) {
-// 		if (!this.signalType) return;
-
-// 		await this.update(SignalTypeService.UpdateName(this.signalType.entityId, newName));
-// 	}
-
-// 	async updateDesc(newDesc: string) {
-// 		if (!this.signalType) return;
-
-// 		await this.update(SignalTypeService.UpdateDesc(this.signalType.entityId, newDesc));
-// 	}
-// }
-
-// export function useSignalType(entityId: string) {
-// 	const state = new SignalTypeState();
-
-// 	loadSignalType(state, entityId);
-
-// 	return state;
-// }
-
-class SignalTypeState extends EntityState<SignalType> {
-	constructor() {
-		super(SignalTypeService.GetOpen);
-	}
-
-	updateName(newName: string) {
-		if (!this.entity) return;
-
-		this.update(SignalTypeService.UpdateName(this.entity.entityId, newName));
-	}
-
-	updateDesc(newDesc: string) {
-		if (!this.entity) return;
-
-		this.update(SignalTypeService.UpdateDesc(this.entity.entityId, newDesc));
-	}
-
-	getInvalidNames() {
-		const names: string[] = [];
-
-		if (!this.entity) return names;
-
-		SignalTypeService.GetInvalidNames(this.entity.entityId).then((invalidNames) => {
-			if (invalidNames) {
-				for (const tmp of invalidNames) {
-					names.push(tmp);
-				}
-			}
-		});
-
-		return names;
-	}
+export function getSignalTypeState(entityId: string) {
+	return provider.get(entityId);
 }
 
-export function useSignalType(entityId: string) {
-	const state = new SignalTypeState();
-	state.load(entityId);
-	return state;
+export async function loadSignalType(entityId: string) {
+	const signalType = await SignalTypeService.Get(entityId);
+	provider.add(signalType);
+}
+
+class SignalTypeState extends EntityState<SignalType> {
+	constructor(signalType: SignalType) {
+		super(signalType);
+	}
+
+	async getInvalidNames() {
+		const invalidNames = await SignalTypeService.GetInvalidNames(this.entity.entityId);
+
+		if (invalidNames) {
+			return invalidNames;
+		}
+
+		return [];
+	}
+
+	updateName(name: string) {
+		this.update(SignalTypeService.UpdateName(this.entity.entityId, name));
+	}
+
+	updateDesc(desc: string) {
+		this.update(SignalTypeService.UpdateDesc(this.entity.entityId, desc));
+	}
+
+	updateMin(min: number) {
+		this.update(SignalTypeService.UpdateMin(this.entity.entityId, min));
+	}
+
+	updateMax(max: number) {
+		this.update(SignalTypeService.UpdateMax(this.entity.entityId, max));
+	}
+
+	updateScale(scale: number) {
+		this.update(SignalTypeService.UpdateScale(this.entity.entityId, scale));
+	}
+
+	updateOffset(offset: number) {
+		this.update(SignalTypeService.UpdateOffset(this.entity.entityId, offset));
+	}
 }

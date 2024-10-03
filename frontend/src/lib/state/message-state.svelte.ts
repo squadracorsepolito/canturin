@@ -5,7 +5,7 @@ async function loadMessage(state: MessageState, entityId: string) {
 	state.isLoading = true;
 
 	try {
-		const msg = await MessageService.GetOpen(entityId);
+		const msg = await MessageService.Get(entityId);
 		state.message = msg;
 	} catch (error) {
 		state.message = undefined;
