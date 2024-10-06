@@ -73,3 +73,7 @@ export function getSignalReferenceTree(sigRefs: SignalReference[]): ReferenceTre
 
 	return res;
 }
+
+export function uniqueId() {
+	return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}

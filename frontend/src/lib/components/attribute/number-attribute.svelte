@@ -2,6 +2,7 @@
 	import { z } from 'zod';
 	import EditableForm from '../form/editable-form.svelte';
 	import { NumberInput } from '../input';
+	import AttributePlaceholder from './attribute-placeholder.svelte';
 
 	type Props = {
 		prefix: string;
@@ -9,10 +10,10 @@
 		value: number;
 		schema: z.ZodNumber;
 		onchange: (value: number) => void;
-		description?: string;
+		desc?: string;
 	};
 
-	let { name, prefix, value, schema, description, onchange }: Props = $props();
+	let { name, prefix, value, schema, desc, onchange }: Props = $props();
 
 	let min = $derived.by<number | undefined>(() => {
 		const match = schema._def.checks.find(({ kind }) => kind === 'min');
@@ -40,21 +41,10 @@
 		})}
 		initialValues={{ [name]: value }}
 		onsubmit={(values) => onchange(values[name])}
+		submitOnClickOutside
 	>
 		{#snippet placeholder(fsm)}
-			<div
-				class="flex flex-col items-center p-3 rounded-t-box {fsm.current === 'editing'
-					? 'bg-primary text-primary-content'
-					: 'hover:bg-base-200 rounded-b-box'}"
-			>
-				<div class="opacity-90">{name}</div>
-
-				<div class="text-3xl font-extrabold">{value}</div>
-
-				{#if description}
-					<div class="opacity-90 text-xs">{description}</div>
-				{/if}
-			</div>
+			<AttributePlaceholder {value} title={name} {desc} isEditing={fsm.current === 'editing'} />
 		{/snippet}
 
 		{#snippet input({ fsm, values, errors })}
@@ -64,7 +54,6 @@
 					name={prefix + '-' + name.toLocaleLowerCase()}
 					errors={errors[name]}
 					focusOnDisplay
-					onblur={() => fsm.send('BLUR')}
 					onescape={() => fsm.send('ESCAPE')}
 					label={name}
 					{min}

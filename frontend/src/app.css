@@ -7,6 +7,20 @@ main {
 	@apply h-screen w-screen;
 }
 
-#drag-handle {
-	--wails-draggable: drag;
+@layer utilities {
+	.text-dimmed {
+		@apply opacity-85;
+	}
+
+	.bg-primary-ghost {
+		@apply bg-primary/5;
+	}
+
+	.bg-secondary-ghost {
+		@apply bg-secondary/5;
+	}
+
+	.focus-ring-primary {
+		@apply ring-2 ring-primary/25;
+	}
 }

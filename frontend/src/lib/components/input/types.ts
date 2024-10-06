@@ -16,3 +16,11 @@ export type InputProps<T> = {
 export type TextInputProps = Omit<InputProps<string>, 'type' | 'width' | 'min' | 'max'>;
 export type ResizeableTextInputProps = TextInputProps;
 export type NumberInputProps = Omit<InputProps<number>, 'type' | 'width'>;
+
+export type RadioInputOption = {
+	id: number;
+	name: string;
+	label: string;
+	desc?: string;
+	disabled?: boolean;
+};

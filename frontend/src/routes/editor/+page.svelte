@@ -1,7 +1,6 @@
 <script lang="ts">
+	import { SignalTypePanel } from '$lib/panel';
 	import MessagePanel from '$lib/panel/message-panel.svelte';
-	import SignalTypePanel from '$lib/panel/signal-type/signal-type-panel.svelte';
-	import SignalTypeProxy from '$lib/panel/signal-type/signal-type-proxy.svelte';
 	import SignalUnitPanel from '$lib/panel/signal-unit-panel.svelte';
 	import { getLayoutState } from '$lib/state/layout-state.svelte';
 
@@ -11,7 +10,7 @@
 {#if layout.openPanelType === 'message'}
 	<MessagePanel entityId={layout.openPanelId} />
 {:else if layout.openPanelType === 'signal_type'}
-	<SignalTypeProxy entityId={layout.openPanelId} />
+	<SignalTypePanel entityId={layout.openPanelId} />
 {:else if layout.openPanelType === 'signal_unit'}
 	<SignalUnitPanel entityId={layout.openPanelId} />
 {/if}

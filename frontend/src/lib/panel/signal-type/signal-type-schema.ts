@@ -13,6 +13,7 @@ export const descSchema = z.object({
 	desc: z.string()
 });
 
+export const kindSchema = z.number().min(1).max(4);
 export const sizeSchema = z.number().min(1).max(64);
 export const minSchema = z.number();
 export const maxSchema = z.number();

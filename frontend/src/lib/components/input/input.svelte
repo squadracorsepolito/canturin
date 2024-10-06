@@ -75,6 +75,7 @@
 		use:action
 		class={getInputClass()}
 		style:width={width && `${width}px`}
+		step="any"
 	/>
 
 	<div class="label h-8">

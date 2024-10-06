@@ -78,6 +78,28 @@ func (s *SignalTypeService) UpdateDesc(entityID string, desc string) (SignalType
 	return s.converterFn(sigType), nil
 }
 
+func (s *SignalTypeService) UpdateKind(entityID string, kind acmelib.SignalTypeKind) (SignalType, error) {
+	sigType, err := s.getEntity(entityID)
+	if err != nil {
+		return SignalType{}, err
+	}
+
+	// TODO: updateKind in acmelib
+
+	return s.converterFn(sigType), nil
+}
+
+func (s *SignalTypeService) UpdateSize(entityID string, size int) (SignalType, error) {
+	sigType, err := s.getEntity(entityID)
+	if err != nil {
+		return SignalType{}, err
+	}
+
+	// TODO: updateSize in acmelib
+
+	return s.converterFn(sigType), nil
+}
+
 func (s *SignalTypeService) UpdateMin(entityID string, min float64) (SignalType, error) {
 	sigType, err := s.getEntity(entityID)
 	if err != nil {

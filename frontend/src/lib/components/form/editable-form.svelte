@@ -1,4 +1,5 @@
 <script lang="ts" generics="T extends AnyZodObject">
+	import { clickOutside } from '$lib/actions';
 	import { FiniteStateMachine } from 'runed';
 	import type { Snippet } from 'svelte';
 	import type { AnyZodObject, z } from 'zod';
@@ -14,6 +15,7 @@
 	type Props = {
 		hidePlaceholder?: boolean;
 		blurOnSubmit?: boolean;
+		submitOnClickOutside?: boolean;
 		schema: T;
 		initialValues: Values;
 		onsubmit: (values: Values) => void;
@@ -24,6 +26,7 @@
 	let {
 		hidePlaceholder,
 		blurOnSubmit,
+		submitOnClickOutside,
 		placeholder,
 		input,
 		initialValues,
@@ -92,17 +95,25 @@
 			fsm.send('BLUR');
 		}
 	}
+
+	function handleClickOutside() {
+		if (submitOnClickOutside) {
+			fsm.send('BLUR');
+		}
+	}
 </script>
 
-{#if (hidePlaceholder && fsm.current === 'idle') || !hidePlaceholder}
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div ondblclick={() => fsm.send('DBLCLICK')}>
-		{@render placeholder(fsm)}
-	</div>
-{/if}
+<div use:clickOutside={handleClickOutside}>
+	{#if (hidePlaceholder && fsm.current === 'idle') || !hidePlaceholder}
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div ondblclick={() => fsm.send('DBLCLICK')}>
+			{@render placeholder(fsm)}
+		</div>
+	{/if}
 
-{#if fsm.current !== 'idle'}
-	<form onsubmit={handleSubmit}>
-		{@render input({ fsm, values, errors })}
-	</form>
-{/if}
+	{#if fsm.current !== 'idle'}
+		<form onsubmit={handleSubmit}>
+			{@render input({ fsm, values, errors })}
+		</form>
+	{/if}
+</div>
