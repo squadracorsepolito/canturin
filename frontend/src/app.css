@@ -7,6 +7,10 @@ main {
 	@apply h-screen w-screen;
 }
 
+h4{
+	@apply font-medium;
+}
+
 @layer utilities {
 	.text-dimmed {
 		@apply opacity-85;

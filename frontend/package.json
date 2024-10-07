@@ -20,6 +20,7 @@
 		"@types/eslint": "^9.6.1",
 		"@types/randomcolor": "^0.5.9",
 		"@wailsio/runtime": "^3.0.0-alpha.27",
+		"@zag-js/number-input": "^0.73.1",
 		"@zag-js/radio-group": "^0.73.1",
 		"@zag-js/svelte": "^0.73.1",
 		"autoprefixer": "^10.4.20",

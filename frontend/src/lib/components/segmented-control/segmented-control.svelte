@@ -3,30 +3,24 @@
 	import { useMachine, normalizeProps } from '@zag-js/svelte';
 	import { TickIcon } from '../icon';
 	import { uniqueId } from '$lib/utils';
-
-	type Option = {
-		label: string;
-		value: string;
-		desc?: string;
-	};
+	import type { SegmentedControlOption } from './types';
 
 	type Props = {
 		selectedValue: string;
 		name: string;
-		options: Option[];
-		initialValue: string;
-		disabled?: boolean;
+		options: SegmentedControlOption[];
+		readOnly?: boolean;
 	};
 
-	let { selectedValue = $bindable(), name, options, initialValue, disabled }: Props = $props();
+	let { selectedValue = $bindable(), name, options, readOnly }: Props = $props();
 
 	const [snapshot, send] = useMachine(
 		radioGroup.machine({
 			id: uniqueId(),
 			name,
 			orientation: 'horizontal',
-			value: options.find((o) => o.value === initialValue)?.value,
-			disabled,
+			value: selectedValue,
+			readOnly,
 			onValueChange: (details) => {
 				selectedValue = details.value;
 			}
@@ -71,13 +65,13 @@
 		.item {
 			@apply grid row-span-2 grid-rows-subgrid border-2 py-1 px-2 rounded-btn gap-1 transition-colors;
 
-			&[data-disabled] {
+			&[data-readonly] {
 				&:not([data-state='checked']) {
 					@apply bg-base-300 border-base-300 opacity-80;
 				}
 			}
 
-			&:not([data-disabled]) {
+			&:not([data-readonly]) {
 				@apply border-base-300 cursor-pointer;
 
 				&:not([data-state='checked']) {

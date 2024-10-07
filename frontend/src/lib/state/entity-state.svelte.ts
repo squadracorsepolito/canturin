@@ -4,6 +4,7 @@ export type Entity = {
 
 export class EntityState<E extends Entity> {
 	entity = $state() as E;
+	isDraft = $state(false);
 
 	constructor(entity: E) {
 		this.entity = entity;
