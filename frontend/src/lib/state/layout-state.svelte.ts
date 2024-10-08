@@ -7,18 +7,6 @@ class LayoutState {
 	openPanelId = $state('');
 
 	async openPanel(typ: PanelType, panelId: string) {
-		// switch (typ) {
-		// 	case 'message':
-		// 		await MessageService.Open(panelId);
-		// 		break;
-		// 	case 'signal_type':
-		// 		await SignalTypeService.Open(panelId);
-		// 		break;
-		// 	case 'signal_unit':
-		// 		await SignalUnitService.Open(panelId);
-		// 		break;
-		// }
-
 		this.openPanelType = typ;
 		this.openPanelId = panelId;
 	}

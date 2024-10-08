@@ -6,7 +6,8 @@
 		NodeIcon,
 		MessageIcon,
 		SignalUnitIcon,
-		SignalTypeIcon
+		SignalTypeIcon,
+		AddIcon
 	} from '$lib/components/icon';
 	import Tree from '$lib/components/tree/tree.svelte';
 	import type { TreeNode } from '$lib/components/tree/types';
@@ -44,6 +45,13 @@
 				onclick: () => console.log('signal types')
 			};
 
+			sigTypes.childNodes.push({
+				name: 'Add Signal Type',
+				icon: AddIcon,
+				childNodes: [],
+				onclick: () => layout.openPanel('signal_type', 'draft')
+			});
+
 			for (let sigType of network.signalTypes) {
 				let sigTypeNode: TreeNode = {
 					name: sigType.name,
@@ -64,6 +72,13 @@
 				childNodes: [],
 				onclick: () => console.log('signal units')
 			};
+
+			sigUnits.childNodes.push({
+				name: 'Add Signal Unit',
+				icon: AddIcon,
+				childNodes: [],
+				onclick: () => layout.openPanel('signal_unit', 'draft')
+			});
 
 			for (let sigUnit of network.signalUnits) {
 				let sigUnitNode: TreeNode = {

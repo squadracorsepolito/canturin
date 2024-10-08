@@ -60,33 +60,3 @@ export enum SignalKind {
      */
     SignalKindMultiplexer = 2,
 };
-
-/**
- * SignalTypeKind represents the kind of a [SignalType].
- */
-export enum SignalTypeKind {
-    /**
-     * The Go zero value for the underlying type of the enum.
-     */
-    $zero = 0,
-
-    /**
-     * SignalTypeKindCustom defines a signal of type custom.
-     */
-    SignalTypeKindCustom = 0,
-
-    /**
-     * SignalTypeKindFlag defines a signal of type flag (1 bit).
-     */
-    SignalTypeKindFlag = 1,
-
-    /**
-     * SignalTypeKindInteger defines a signal of type integer.
-     */
-    SignalTypeKindInteger = 2,
-
-    /**
-     * SignalTypeKindDecimal defines a signal of type float.
-     */
-    SignalTypeKindDecimal = 3,
-};

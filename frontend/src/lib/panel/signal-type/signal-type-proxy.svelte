@@ -3,9 +3,9 @@
 	import { loadSignalType } from '../../state/signal-type-state.svelte';
 	import Panel from '../panel.svelte';
 	import SignalTypeHeading from './signal-type-heading.svelte';
-	import SignalTypeAttributes from './signal-type-attributes.svelte';
 	import SignalTypeRefs from './signal-type-refs.svelte';
-	import Attributesv2 from './attributesv2.svelte';
+	import SignalTypeDraft from './signal-type-draft.svelte';
+	import SignalTypeAttributes from './signal-type-attributes.svelte';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -13,13 +13,15 @@
 </script>
 
 <Panel>
-	{#await promise then}
-		<SignalTypeHeading {entityId} />
+	{#if entityId === 'draft'}
+		<SignalTypeDraft />
+	{:else}
+		{#await promise then}
+			<SignalTypeHeading {entityId} />
 
-		<SignalTypeAttributes {entityId} />
+			<SignalTypeAttributes {entityId} />
 
-		<Attributesv2 {entityId} />
-
-		<SignalTypeRefs {entityId} />
-	{/await}
+			<SignalTypeRefs {entityId} />
+		{/await}
+	{/if}
 </Panel>

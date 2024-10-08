@@ -1,5 +1,4 @@
 import { SignalTypeService, type SignalType } from '$lib/api/canturin';
-import { SignalTypeKind } from '$lib/api/github.com/squadracorsepolito/acmelib';
 import { EntityState } from './entity-state.svelte';
 import { StateProvider } from './state-provider.svelte';
 
@@ -35,33 +34,6 @@ class SignalTypeState extends EntityState<SignalType> {
 
 	updateDesc(desc: string) {
 		this.update(SignalTypeService.UpdateDesc(this.entity.entityId, desc));
-	}
-
-	updateKind(kindId: number) {
-		let kind = SignalTypeKind.SignalTypeKindCustom;
-
-		switch (kindId) {
-			case 1:
-				kind = SignalTypeKind.SignalTypeKindFlag;
-				break;
-			case 2:
-				kind = SignalTypeKind.SignalTypeKindInteger;
-				break;
-			case 3:
-				kind = SignalTypeKind.SignalTypeKindDecimal;
-				break;
-			case 4:
-				kind = SignalTypeKind.SignalTypeKindCustom;
-				break;
-			default:
-				break;
-		}
-
-		this.update(SignalTypeService.UpdateKind(this.entity.entityId, kind));
-	}
-
-	updateSize(size: number) {
-		this.update(SignalTypeService.UpdateSize(this.entity.entityId, size));
 	}
 
 	updateMin(min: number) {

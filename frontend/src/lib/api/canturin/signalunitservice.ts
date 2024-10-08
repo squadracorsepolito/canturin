@@ -13,3 +13,8 @@ export function Get(entityID: string): Promise<$models.SignalUnit> & { cancel():
     let $resultPromise = $Call.ByID(3658353397, entityID) as any;
     return $resultPromise;
 }
+
+export function GetNames(): Promise<string[] | null> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(2566933599) as any;
+    return $resultPromise;
+}

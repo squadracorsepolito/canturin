@@ -1,169 +1,57 @@
 <script lang="ts">
-	import { SignalTypeKind } from '$lib/api/github.com/squadracorsepolito/acmelib';
-
-	import AttributeGroup from '$lib/components/attribute/attribute-group.svelte';
-	import NumberAttribute from '$lib/components/attribute/number-attribute.svelte';
+	import type { SignalType } from '$lib/api/canturin';
+	import { Attribute } from '$lib/components/attribute';
+	import Divider from '$lib/components/divider/divider.svelte';
+	import { NumberInput } from '$lib/components/input';
+	import SegmentedControl from '$lib/components/segmented-control/segmented-control.svelte';
+	import { getSignalTypeState } from '$lib/state/signal-type-state.svelte';
 	import type { PanelSectionProps } from '../types';
-	import {
-		kindSchema,
-		maxSchema,
-		minSchema,
-		offsetSchema,
-		scaleSchema,
-		sizeSchema
-	} from './signal-type-schema';
-	import { getSignalTypeState } from '../../state/signal-type-state.svelte';
-	import { type SignalType } from '$lib/api/canturin';
-	import { RadioAttribute } from '$lib/components/attribute';
-	import type { RadioInputOption } from '$lib/components/input/types';
+	import { data } from './signal-type-data';
 
 	let { entityId }: PanelSectionProps = $props();
 
 	const sts = getSignalTypeState(entityId);
-
-	function handleKind(kindId: number) {
-		sts.updateKind(kindId);
-	}
-
-	function handleSize(size: number) {
-		sts.updateSize(size);
-	}
-
-	function handleMin(min: number) {
-		sts.updateMin(min);
-	}
-
-	function handleMax(max: number) {
-		sts.updateMax(max);
-	}
-
-	function handleScale(scale: number) {
-		sts.updateScale(scale);
-	}
-
-	function handleOffset(offset: number) {
-		sts.updateOffset(offset);
-	}
-
-	function getSelectedKindId(kind: SignalTypeKind) {
-		switch (kind) {
-			case SignalTypeKind.SignalTypeKindFlag:
-				return 1;
-			case SignalTypeKind.SignalTypeKindInteger:
-				return 2;
-			case SignalTypeKind.SignalTypeKindDecimal:
-				return 3;
-			case SignalTypeKind.SignalTypeKindCustom:
-				return 4;
-			default:
-				return 4;
-		}
-	}
-
-	let kindOptions = $derived.by(() => {
-		const opts: RadioInputOption[] = [
-			{
-				id: getSelectedKindId(SignalTypeKind.SignalTypeKindFlag),
-				label: 'Flag',
-				name: 'flag'
-			},
-			{
-				id: getSelectedKindId(SignalTypeKind.SignalTypeKindInteger),
-				label: 'Integer',
-				name: 'integer'
-			},
-			{
-				id: getSelectedKindId(SignalTypeKind.SignalTypeKindDecimal),
-				label: 'Decimal',
-				name: 'decimal'
-			},
-			{
-				id: getSelectedKindId(SignalTypeKind.SignalTypeKindCustom),
-				label: 'Custom',
-				name: 'custom'
-			}
-		];
-
-		const size = sts.entity.size;
-		if (size > 1) {
-			opts[0].disabled = true;
-		}
-
-		const min = sts.entity.min;
-		const max = sts.entity.min;
-		const scale = sts.entity.scale;
-		const offset = sts.entity.offset;
-		if (
-			!Number.isInteger(min) ||
-			!Number.isInteger(max) ||
-			!Number.isInteger(scale) ||
-			!Number.isInteger(offset)
-		) {
-			opts[1].disabled = true;
-		}
-		return opts;
-	});
 </script>
 
 {#snippet section(signalType: SignalType)}
-	<AttributeGroup>
-		{#snippet attributes()}
-			<RadioAttribute
-				prefix="signal-type"
-				name="Kind"
-				selected={getSelectedKindId(signalType.kind)}
-				schema={kindSchema}
-				options={kindOptions}
-				onchange={handleKind}
-				desc="The kind of the type"
-			/>
+	<Attribute label="Kind" desc="The kind of the type">
+		<SegmentedControl
+			name="signal-type-kind"
+			options={data.kind.options}
+			bind:selectedValue={sts.entity.kind}
+			readOnly
+		/>
+	</Attribute>
 
-			<NumberAttribute
-				prefix="signal-type"
-				name="Size"
-				value={signalType.size}
-				schema={sizeSchema}
-				onchange={handleSize}
-				desc="The size in bits"
-			/>
+	<Divider />
 
-			<NumberAttribute
-				prefix="signal-type"
-				name="Min"
-				value={signalType.min}
-				schema={minSchema}
-				onchange={handleMin}
-				desc="The minimum value"
-			/>
+	<Attribute label="Size" desc="The size in bits">
+		<NumberInput name="signal-type-size" bind:value={signalType.size} />
+	</Attribute>
 
-			<NumberAttribute
-				prefix="signal-type"
-				name="Max"
-				value={signalType.max}
-				schema={maxSchema}
-				onchange={handleMax}
-				desc="The maximum value"
-			/>
+	<Divider />
 
-			<NumberAttribute
-				prefix="signal-type"
-				name="Scale"
-				value={signalType.scale}
-				schema={scaleSchema}
-				onchange={handleScale}
-				desc="The scale value"
-			/>
+	<div class="grid grid-cols-2 gap-5">
+		<Attribute label="Min" desc="The minimum value">
+			<NumberInput name="signal-type-min" bind:value={signalType.min} />
+		</Attribute>
 
-			<NumberAttribute
-				prefix="signal-type"
-				name="Offset"
-				value={signalType.offset}
-				schema={offsetSchema}
-				onchange={handleOffset}
-				desc="The offset value"
-			/>
-		{/snippet}
-	</AttributeGroup>
+		<Attribute label="Max" desc="The maximum value">
+			<NumberInput name="signal-type-max" bind:value={signalType.max} />
+		</Attribute>
+	</div>
+
+	<Divider />
+
+	<div class="grid grid-cols-2 gap-5">
+		<Attribute label="Scale" desc="The scale value">
+			<NumberInput name="signal-type-scale" bind:value={signalType.scale} />
+		</Attribute>
+
+		<Attribute label="Offset" desc="The offset value">
+			<NumberInput name="signal-type-offset" bind:value={signalType.offset} />
+		</Attribute>
+	</div>
 {/snippet}
 
 <section>

@@ -2,15 +2,28 @@ package main
 
 import "github.com/squadracorsepolito/acmelib"
 
+type SignalTypeKind string
+
+const (
+	SignalTypeKindCustom  SignalTypeKind = "custom"
+	SignalTypeKindFlag    SignalTypeKind = "flag"
+	SignalTypeKindInteger SignalTypeKind = "integer"
+	SignalTypeKindDecimal SignalTypeKind = "decimal"
+)
+
+func newSignalTypeKind(kind acmelib.SignalTypeKind) SignalTypeKind {
+	return SignalTypeKind(kind.String())
+}
+
 type SignalType struct {
 	base
 
-	Kind   acmelib.SignalTypeKind `json:"kind"`
-	Size   int                    `json:"size"`
-	Min    float64                `json:"min"`
-	Max    float64                `json:"max"`
-	Scale  float64                `json:"scale"`
-	Offset float64                `json:"offset"`
+	Kind   SignalTypeKind `json:"kind"`
+	Size   int            `json:"size"`
+	Min    float64        `json:"min"`
+	Max    float64        `json:"max"`
+	Scale  float64        `json:"scale"`
+	Offset float64        `json:"offset"`
 
 	ReferenceCount int               `json:"referenceCount"`
 	References     []SignalReference `json:"references"`
@@ -20,24 +33,70 @@ type SignalTypeService struct {
 	*service[*acmelib.SignalType, SignalType]
 }
 
+func signalTypeConverter(sigType *acmelib.SignalType) SignalType {
+	return SignalType{
+		base: getBase(sigType),
+
+		Kind:   newSignalTypeKind(sigType.Kind()),
+		Size:   int(sigType.Size()),
+		Min:    sigType.Min(),
+		Max:    sigType.Max(),
+		Scale:  sigType.Scale(),
+		Offset: sigType.Offset(),
+
+		ReferenceCount: sigType.ReferenceCount(),
+		References:     getSignalReferences(sigType),
+	}
+}
+
 func newSignalTypeService(sigTypeCh chan *acmelib.SignalType) *SignalTypeService {
 	return &SignalTypeService{
-		service: newService(sigTypeCh, func(st *acmelib.SignalType) SignalType {
-			return SignalType{
-				base: getBase(st),
-
-				Kind:   st.Kind(),
-				Size:   st.Size(),
-				Min:    st.Min(),
-				Max:    st.Max(),
-				Scale:  st.Scale(),
-				Offset: st.Offset(),
-
-				ReferenceCount: st.ReferenceCount(),
-				References:     getSignalReferences(st),
-			}
-		}),
+		service: newService(sigTypeCh, signalTypeConverter),
 	}
+}
+
+func (s *SignalTypeService) Create(kind SignalTypeKind, name, desc string, size int, signed bool, min, max, scale, offset float64) (SignalType, error) {
+	sigType := &acmelib.SignalType{}
+	switch kind {
+	case SignalTypeKindCustom:
+		tmpSigType, err := acmelib.NewCustomSignalType(name, size, signed, min, max, scale, offset)
+		if err != nil {
+			return SignalType{}, err
+		}
+		sigType = tmpSigType
+
+	case SignalTypeKindFlag:
+		sigType = acmelib.NewFlagSignalType(name)
+
+	case SignalTypeKindInteger:
+		tmpSigType, err := acmelib.NewIntegerSignalType(name, size, signed)
+		if err != nil {
+			return SignalType{}, err
+		}
+		sigType = tmpSigType
+
+	case SignalTypeKindDecimal:
+		tmpSigType, err := acmelib.NewDecimalSignalType(name, size, signed)
+		if err != nil {
+			return SignalType{}, err
+		}
+		sigType = tmpSigType
+	}
+
+	if len(desc) > 0 {
+		sigType.SetDesc(desc)
+	}
+
+	sigType.SetMin(min)
+	sigType.SetMax(max)
+	sigType.SetScale(scale)
+	sigType.SetOffset(offset)
+
+	s.mux.Lock()
+	defer s.mux.Unlock()
+	s.pool[sigType.EntityID()] = sigType
+
+	return s.converterFn(sigType), nil
 }
 
 func (s *SignalTypeService) GetInvalidNames(entityID string) []string {
@@ -74,28 +133,6 @@ func (s *SignalTypeService) UpdateDesc(entityID string, desc string) (SignalType
 	}
 
 	sigType.SetDesc(desc)
-
-	return s.converterFn(sigType), nil
-}
-
-func (s *SignalTypeService) UpdateKind(entityID string, kind acmelib.SignalTypeKind) (SignalType, error) {
-	sigType, err := s.getEntity(entityID)
-	if err != nil {
-		return SignalType{}, err
-	}
-
-	// TODO: updateKind in acmelib
-
-	return s.converterFn(sigType), nil
-}
-
-func (s *SignalTypeService) UpdateSize(entityID string, size int) (SignalType, error) {
-	sigType, err := s.getEntity(entityID)
-	if err != nil {
-		return SignalType{}, err
-	}
-
-	// TODO: updateSize in acmelib
 
 	return s.converterFn(sigType), nil
 }

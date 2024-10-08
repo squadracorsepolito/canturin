@@ -30,14 +30,13 @@
 	const api = $derived(radioGroup.connect(snapshot, send, normalizeProps));
 </script>
 
-<div
-	{...api.getRootProps()}
-	class="root"
-	style:grid-template-columns="repeat({options.length}, minmax(0, 1fr))"
->
+<div {...api.getRootProps()} style:grid-template-columns="repeat({options.length}, minmax(0, 1fr))">
 	{#each options as opt}
-		<label {...api.getItemProps({ value: opt.value })} class="item">
-			<div {...api.getItemTextProps({ value: opt.value })} class="label">
+		<label {...api.getItemProps({ value: opt.value })}>
+			<div
+				{...api.getItemTextProps({ value: opt.value })}
+				class="font-medium flex items-center gap-1 justify-between"
+			>
 				<span>
 					{opt.label}
 				</span>
@@ -50,7 +49,7 @@
 			</div>
 
 			{#if opt.desc}
-				<span class="desc">{opt.desc}</span>
+				<span class="text-sm text-dimmed">{opt.desc}</span>
 			{/if}
 
 			<input {...api.getItemHiddenInputProps({ value: opt.value })} />
@@ -59,43 +58,35 @@
 </div>
 
 <style lang="postcss">
-	.root {
+	[data-part='root'] {
 		@apply grid gap-x-2;
+	}
 
-		.item {
-			@apply grid row-span-2 grid-rows-subgrid border-2 py-1 px-2 rounded-btn gap-1 transition-colors;
+	[data-part='item'] {
+		@apply grid row-span-2 grid-rows-subgrid border-2 py-1 px-2 rounded-btn gap-1 transition-colors;
 
-			&[data-readonly] {
-				&:not([data-state='checked']) {
-					@apply bg-base-300 border-base-300 opacity-80;
+		&[data-readonly] {
+			&:not([data-state='checked']) {
+				@apply bg-base-300 border-base-300 opacity-80;
+			}
+		}
+
+		&:not([data-readonly]) {
+			@apply border-base-300 cursor-pointer;
+
+			&:not([data-state='checked']) {
+				&:hover {
+					@apply border-secondary text-secondary bg-secondary-ghost;
 				}
 			}
+		}
 
-			&:not([data-readonly]) {
-				@apply border-base-300 cursor-pointer;
+		&[data-state='checked'] {
+			@apply border-primary text-primary bg-primary-ghost;
+		}
 
-				&:not([data-state='checked']) {
-					&:hover {
-						@apply border-secondary text-secondary bg-secondary-ghost;
-					}
-				}
-
-				&[data-focus] {
-					@apply focus-ring-primary;
-				}
-			}
-
-			&[data-state='checked'] {
-				@apply border-primary text-primary bg-primary-ghost;
-			}
-
-			.label {
-				@apply font-medium flex items-center gap-1 justify-between;
-			}
-
-			.desc {
-				@apply text-sm text-dimmed;
-			}
+		&[data-focus] {
+			@apply focus-ring-primary;
 		}
 	}
 </style>

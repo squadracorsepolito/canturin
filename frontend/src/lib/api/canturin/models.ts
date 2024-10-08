@@ -99,7 +99,7 @@ export interface SignalType {
     "name": string;
     "desc": string;
     "createTime": time$0.Time;
-    "kind": acmelib$0.SignalTypeKind;
+    "kind": SignalTypeKind;
     "size": number;
     "min": number;
     "max": number;
@@ -108,6 +108,18 @@ export interface SignalType {
     "referenceCount": number;
     "references": SignalReference[] | null;
 }
+
+export enum SignalTypeKind {
+    /**
+     * The Go zero value for the underlying type of the enum.
+     */
+    $zero = "",
+
+    SignalTypeKindCustom = "custom",
+    SignalTypeKindFlag = "flag",
+    SignalTypeKindInteger = "integer",
+    SignalTypeKindDecimal = "decimal",
+};
 
 export interface SignalTypeStub {
     "entityId": string;
