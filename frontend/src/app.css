@@ -31,4 +31,8 @@ h4 {
 	.focus-ring-primary {
 		@apply ring-2 ring-primary/25;
 	}
+
+	.focus-ring-error {
+		@apply ring-2 ring-error/25;
+	}
 }

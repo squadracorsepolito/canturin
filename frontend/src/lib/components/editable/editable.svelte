@@ -1,59 +1,83 @@
 <script lang="ts">
-	import type { Action } from 'svelte/action';
+	import { uniqueId } from '$lib/utils';
+	import * as editable from '@zag-js/editable';
+	import { useMachine, normalizeProps } from '@zag-js/svelte';
+	import { z } from 'zod';
 
 	type Props = {
 		initialValue: string;
-		onsubmit: (value: string) => void;
+		validator: z.AnyZodObject;
+		placeholder?: string;
+		onSubmit: (value: string) => void;
 	};
 
-	let { initialValue, onsubmit }: Props = $props();
+	let { initialValue, validator, placeholder, onSubmit }: Props = $props();
 
-	let value = $state(initialValue);
-	$effect(() => {
-		value = initialValue;
-	});
+	let errors = $state<string[]>();
 
-	let isEditing = $state(false);
-	let canSubmit = $state(true);
-
-	const focus: Action<HTMLElement> = (node) => {
-		node.focus();
-		return {
-			destroy() {
-				if (canSubmit && value !== initialValue) {
-					onsubmit(value);
-				} else {
-					value = initialValue;
+	const [snpshot, send] = useMachine(
+		editable.machine({
+			id: uniqueId(),
+			value: initialValue,
+			activationMode: 'dblclick',
+			placeholder: placeholder,
+			autoResize: true,
+			submitMode: 'both',
+			onValueCommit: (details) => {
+				if (errors) {
+					api.setValue(initialValue);
+					errors = undefined;
+					return;
 				}
-				canSubmit = true;
+
+				onSubmit(details.value);
+			},
+			onValueChange: (details) => {
+				const res = validator.safeParse({ name: details.value });
+				if (!res.success) {
+					errors = res.error.flatten().fieldErrors['name'];
+				} else {
+					errors = undefined;
+				}
 			}
-		};
-	};
+		})
+	);
+
+	const api = $derived(editable.connect(snpshot, send, normalizeProps));
 </script>
 
-<div>
-	{#if isEditing}
-		<input
-			use:focus
-			bind:value
-			type="text"
-			onkeydown={(e) => {
-				if (e.key === 'Enter') {
-					isEditing = false;
-				} else if (e.key === 'Escape') {
-					canSubmit = false;
-					isEditing = false;
-				}
-			}}
-			onblur={() => {
-				isEditing = false;
-			}}
-			class="w-full input input-sm"
-		/>
-	{:else}
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<span ondblclick={() => (isEditing = true)}>
-			{value}
+<div {...api.getRootProps()}>
+	<div {...api.getAreaProps()} data-error={errors ? true : undefined}>
+		<input {...api.getInputProps()} />
+
+		<span {...api.getPreviewProps()}>
+			{api.valueText}
 		</span>
-	{/if}
+	</div>
 </div>
+
+{#if errors}
+	<div class="absolute pt-1 text-error text-xs">
+		{#each errors as err}
+			<span>{err}</span>
+		{/each}
+	</div>
+{/if}
+
+<style lang="postcss">
+	[data-part='area'] {
+		@apply rounded-btn border-2 border-transparent px-3 py-1 font-medium text-xl;
+
+		&[data-error] {
+			&[data-focus] {
+				@apply focus-ring-error border-error;
+			}
+		}
+
+		&:not([data-error]) {
+			&[data-focus] {
+				@apply focus-ring-primary border-primary;
+			}
+		}
+	}
+</style>

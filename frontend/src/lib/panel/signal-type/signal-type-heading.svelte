@@ -8,6 +8,8 @@
 	import { getSignalTypeState } from '../../state/signal-type-state.svelte';
 	import { descSchema, nameSchema } from './signal-type-schema';
 	import { type SignalType } from '$lib/api/canturin';
+	import { Editable } from '$lib/components/editable';
+	import { z } from 'zod';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -101,6 +103,13 @@
 			{/snippet}
 		</EditableForm>
 	</div>
+
+	<Editable
+		validator={nameSchema(invalidNames)}
+		initialValue={signalType.name}
+		onSubmit={handleName}
+		placeholder="Name"
+	/>
 {/snippet}
 
 <section>
