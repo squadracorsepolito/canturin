@@ -46,7 +46,7 @@ func main() {
 	// 'Mac' options tailor the application when running an macOS.
 	app = application.New(application.Options{
 		Name:        "canturin",
-		Description: "A demo of using raw HTML & CSS",
+		Description: "",
 		Services: []application.Service{
 			application.NewService(networkService),
 
@@ -61,6 +61,8 @@ func main() {
 			ApplicationShouldTerminateAfterLastWindowClosed: true,
 		},
 	})
+
+	initMenus()
 
 	// Create a new window with the necessary options.
 	// 'Title' is the title of the window.

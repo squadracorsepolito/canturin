@@ -20,6 +20,7 @@ type SignalType struct {
 
 	Kind   SignalTypeKind `json:"kind"`
 	Size   int            `json:"size"`
+	Signed bool           `json:"signed"`
 	Min    float64        `json:"min"`
 	Max    float64        `json:"max"`
 	Scale  float64        `json:"scale"`
@@ -39,6 +40,7 @@ func signalTypeConverter(sigType *acmelib.SignalType) SignalType {
 
 		Kind:   newSignalTypeKind(sigType.Kind()),
 		Size:   int(sigType.Size()),
+		Signed: sigType.Signed(),
 		Min:    sigType.Min(),
 		Max:    sigType.Max(),
 		Scale:  sigType.Scale(),

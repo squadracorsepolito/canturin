@@ -77,12 +77,12 @@
 		style:width={width && `${width}px`}
 		step="any"
 	/>
-
-	<div class="label h-8">
-		{#if errors}
-			{#each errors as err}
-				<span class="label-text-alt text-error">{err}</span>
-			{/each}
-		{/if}
-	</div>
 </label>
+
+{#if errors}
+	<div class="pt-1 absolute">
+		{#each errors as err}
+			<span class="label-text-alt text-error">{err}</span>
+		{/each}
+	</div>
+{/if}

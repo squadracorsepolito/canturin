@@ -1,6 +1,6 @@
 import { SignalTypeKind } from '$lib/api/canturin';
 
-export const data = {
+export const text = {
 	name: {
 		label: 'Name'
 	},
@@ -59,10 +59,15 @@ export const data = {
 	},
 
 	headings: {
-		draft: 'Create new Signal Type'
+		draft: 'Create new Signal Type',
+		attributes: 'Attributes',
+		refs: 'References'
 	},
 
 	buttons: {
+		heading: {
+			descTriggerLabel: 'Add Description'
+		},
 		draft: {
 			submit: 'Create Signal Type'
 		}

@@ -101,6 +101,7 @@ export interface SignalType {
     "createTime": time$0.Time;
     "kind": SignalTypeKind;
     "size": number;
+    "signed": boolean;
     "min": number;
     "max": number;
     "scale": number;

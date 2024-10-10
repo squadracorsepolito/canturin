@@ -8,7 +8,7 @@
 	import NumberInput from '$lib/components/input/number-input.svelte';
 	import SubmitButton from '$lib/components/button/submit-button.svelte';
 	import FormField from '$lib/components/form-field/form-field.svelte';
-	import { data } from './signal-type-data';
+	import { text } from './signal-type-text';
 	import Divider from '$lib/components/divider/divider.svelte';
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';
@@ -72,23 +72,23 @@
 	<div class="flex gap-3 items-center pb-8">
 		<SignalTypeIcon height="48" width="48" />
 
-		<h2>{data.headings.draft}</h2>
+		<h2>{text.headings.draft}</h2>
 	</div>
 
-	<FormField {...data.name} cols={4}>
+	<FormField {...text.name} cols={4}>
 		<TextInput name="signal-type-name" bind:value={$form.name} errors={$errors.name} />
 	</FormField>
 
 	<div class="py-5">
-		<FormField {...data.desc} cols={4}>
+		<FormField {...text.desc} cols={4}>
 			<Textarea name="signal-type-desc" bind:value={$form.desc} />
 		</FormField>
 	</div>
 
-	<FormField {...data.kind}>
+	<FormField {...text.kind}>
 		<SegmentedControl
 			name="signal-type-kind"
-			options={data.kind.options}
+			options={text.kind.options}
 			bind:selectedValue={$form.kind}
 		/>
 	</FormField>
@@ -96,11 +96,11 @@
 	<Divider />
 
 	<div class="grid grid-cols-2 gap-5">
-		<FormField {...data.size}>
+		<FormField {...text.size}>
 			<NumberInput name="signal-type-size" bind:value={$form.size} errors={$errors.size} />
 		</FormField>
 
-		<FormField {...data.signed}>
+		<FormField {...text.signed}>
 			<ToggleInput name="signal-type-signed" bind:checked={$form.signed} />
 		</FormField>
 	</div>
@@ -108,11 +108,11 @@
 	<Divider />
 
 	<div class="grid grid-cols-2 gap-5">
-		<FormField {...data.min}>
+		<FormField {...text.min}>
 			<NumberInput name="signal-type-min" bind:value={$form.min} errors={$errors.min} />
 		</FormField>
 
-		<FormField {...data.max}>
+		<FormField {...text.max}>
 			<NumberInput name="signal-type-max" bind:value={$form.max} errors={$errors.max} />
 		</FormField>
 	</div>
@@ -120,16 +120,16 @@
 	<Divider />
 
 	<div class="grid grid-cols-2 gap-5">
-		<FormField {...data.scale}>
+		<FormField {...text.scale}>
 			<NumberInput name="signal-type-scale" bind:value={$form.scale} errors={$errors.scale} />
 		</FormField>
 
-		<FormField {...data.offset}>
+		<FormField {...text.offset}>
 			<NumberInput name="signal-type-offset" bind:value={$form.offset} errors={$errors.offset} />
 		</FormField>
 	</div>
 
 	<div class="flex justify-end">
-		<SubmitButton label={data.buttons.draft.submit} />
+		<SubmitButton label={text.buttons.draft.submit} />
 	</div>
 </form>

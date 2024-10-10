@@ -2,22 +2,88 @@
 	import type { SignalType } from '$lib/api/canturin';
 	import { Attribute } from '$lib/components/attribute';
 	import Divider from '$lib/components/divider/divider.svelte';
-	import { NumberInput } from '$lib/components/input';
+	import NumberEditable from '$lib/components/editable/number-editable.svelte';
+	import { Readonly, ToggleReadonly } from '$lib/components/readonly';
 	import SegmentedControl from '$lib/components/segmented-control/segmented-control.svelte';
 	import { getSignalTypeState } from '$lib/state/signal-type-state.svelte';
+	import { z } from 'zod';
 	import type { PanelSectionProps } from '../types';
-	import { data } from './signal-type-data';
+	import { text } from './signal-type-text';
 
 	let { entityId }: PanelSectionProps = $props();
 
 	const sts = getSignalTypeState(entityId);
+
+	const minSchema = z.object({
+		min: z.number()
+	});
+
+	function validateMin(min: number) {
+		const res = minSchema.safeParse({ min });
+		if (res.success) {
+			return undefined;
+		}
+		return res.error.flatten().fieldErrors.min;
+	}
+
+	function handleMin(min: number) {
+		sts.updateMin(min);
+	}
+
+	const maxSchema = z.object({
+		max: z.number()
+	});
+
+	function validateMax(max: number) {
+		const res = maxSchema.safeParse({ max });
+		if (res.success) {
+			return undefined;
+		}
+		return res.error.flatten().fieldErrors.max;
+	}
+
+	function handleMax(max: number) {
+		sts.updateMax(max);
+	}
+
+	const scaleSchema = z.object({
+		scale: z.number()
+	});
+
+	function validateScale(scale: number) {
+		const res = scaleSchema.safeParse({ scale });
+		if (res.success) {
+			return undefined;
+		}
+		return res.error.flatten().fieldErrors.scale;
+	}
+
+	function handleScale(scale: number) {
+		sts.updateScale(scale);
+	}
+
+	const offsetSchema = z.object({
+		offset: z.number()
+	});
+
+	function validateOffset(offset: number) {
+		const res = offsetSchema.safeParse({ offset });
+		if (res.success) {
+			return undefined;
+		}
+		return res.error.flatten().fieldErrors.offset;
+	}
+
+	function handleOffset(offset: number) {
+		sts.updateOffset(offset);
+	}
 </script>
 
 {#snippet section(signalType: SignalType)}
 	<Attribute label="Kind" desc="The kind of the type">
 		<SegmentedControl
 			name="signal-type-kind"
-			options={data.kind.options}
+			options={text.kind.options}
 			bind:selectedValue={sts.entity.kind}
 			readOnly
 		/>
@@ -25,35 +91,71 @@
 
 	<Divider />
 
-	<Attribute label="Size" desc="The size in bits">
-		<NumberInput name="signal-type-size" bind:value={signalType.size} />
-	</Attribute>
-
-	<Divider />
-
 	<div class="grid grid-cols-2 gap-5">
-		<Attribute label="Min" desc="The minimum value">
-			<NumberInput name="signal-type-min" bind:value={signalType.min} />
+		<Attribute {...text.size}>
+			<Readonly>
+				<span class="font-medium">
+					{signalType.size}
+				</span>
+			</Readonly>
 		</Attribute>
 
-		<Attribute label="Max" desc="The maximum value">
-			<NumberInput name="signal-type-max" bind:value={signalType.max} />
+		<Attribute {...text.signed}>
+			<ToggleReadonly checked={signalType.signed} />
 		</Attribute>
 	</div>
 
 	<Divider />
 
 	<div class="grid grid-cols-2 gap-5">
-		<Attribute label="Scale" desc="The scale value">
-			<NumberInput name="signal-type-scale" bind:value={signalType.scale} />
+		<Attribute {...text.min}>
+			<NumberEditable
+				validator={validateMin}
+				initialValue={signalType.min}
+				name="signal-type-min"
+				onsubmit={handleMin}
+				placeholder={text.min.label}
+			/>
 		</Attribute>
 
-		<Attribute label="Offset" desc="The offset value">
-			<NumberInput name="signal-type-offset" bind:value={signalType.offset} />
+		<Attribute {...text.max}>
+			<NumberEditable
+				validator={validateMax}
+				initialValue={signalType.max}
+				name="signal-type-max"
+				onsubmit={handleMax}
+				placeholder={text.max.label}
+			/>
+		</Attribute>
+	</div>
+
+	<Divider />
+
+	<div class="grid grid-cols-2 gap-5">
+		<Attribute {...text.scale}>
+			<NumberEditable
+				validator={validateScale}
+				initialValue={signalType.scale}
+				name="signal-type-scale"
+				onsubmit={handleScale}
+				placeholder={text.scale.label}
+			/>
+		</Attribute>
+
+		<Attribute {...text.offset}>
+			<NumberEditable
+				validator={validateOffset}
+				initialValue={signalType.offset}
+				name="signal-type-offset"
+				onsubmit={handleOffset}
+				placeholder={text.offset.label}
+			/>
 		</Attribute>
 	</div>
 {/snippet}
 
 <section>
+	<h3 class="pb-5">{text.headings.attributes}</h3>
+
 	{@render section(sts.entity)}
 </section>

@@ -63,7 +63,7 @@
 	}
 
 	[data-part='item'] {
-		@apply grid row-span-2 grid-rows-subgrid border-2 py-1 px-2 rounded-btn gap-1 transition-colors;
+		@apply grid row-span-2 grid-rows-subgrid border-2 py-2 px-3 rounded-btn gap-1 transition-colors;
 
 		&[data-readonly] {
 			&:not([data-state='checked']) {

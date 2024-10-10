@@ -2,16 +2,16 @@
 	import { uniqueId } from '$lib/utils';
 	import * as editable from '@zag-js/editable';
 	import { useMachine, normalizeProps } from '@zag-js/svelte';
-	import { z } from 'zod';
 
 	type Props = {
 		initialValue: string;
-		validator: z.AnyZodObject;
+		name: string;
 		placeholder?: string;
-		onSubmit: (value: string) => void;
+		validator: (value: string) => string[] | undefined;
+		onsubmit: (value: string) => void;
 	};
 
-	let { initialValue, validator, placeholder, onSubmit }: Props = $props();
+	let { initialValue, name, placeholder, validator, onsubmit }: Props = $props();
 
 	let errors = $state<string[]>();
 
@@ -19,6 +19,7 @@
 		editable.machine({
 			id: uniqueId(),
 			value: initialValue,
+			name: name,
 			activationMode: 'dblclick',
 			placeholder: placeholder,
 			autoResize: true,
@@ -30,15 +31,10 @@
 					return;
 				}
 
-				onSubmit(details.value);
+				onsubmit(details.value);
 			},
 			onValueChange: (details) => {
-				const res = validator.safeParse({ name: details.value });
-				if (!res.success) {
-					errors = res.error.flatten().fieldErrors['name'];
-				} else {
-					errors = undefined;
-				}
+				errors = validator(details.value);
 			}
 		})
 	);
@@ -66,7 +62,7 @@
 
 <style lang="postcss">
 	[data-part='area'] {
-		@apply rounded-btn border-2 border-transparent px-3 py-1 font-medium text-xl;
+		@apply rounded-btn border-2 border-transparent px-2 py-1 text-h2 transition-colors;
 
 		&[data-error] {
 			&[data-focus] {
@@ -78,6 +74,10 @@
 			&[data-focus] {
 				@apply focus-ring-primary border-primary;
 			}
+		}
+
+		&[data-placeholder-shown] {
+			@apply text-dimmed;
 		}
 	}
 </style>

@@ -1,1 +1,2 @@
-export { default as Editable } from './editable.svelte';
+export { default as TextEditable } from './text-editable.svelte';
+export { default as TextareaEditable } from './textarea-editable.svelte';

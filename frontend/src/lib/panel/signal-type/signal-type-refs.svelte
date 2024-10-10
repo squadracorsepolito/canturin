@@ -4,6 +4,7 @@
 	import type { PanelSectionProps } from '../types';
 	import { getSignalTypeState } from '../../state/signal-type-state.svelte';
 	import { type SignalType } from '$lib/api/canturin';
+	import { text } from './signal-type-text';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -13,7 +14,7 @@
 {#snippet section(signalType: SignalType)}
 	{#if signalType.references}
 		<section>
-			<h4>References</h4>
+			<h3>{text.headings.refs}</h3>
 
 			<ReferenceTree siblingNodes={getSignalReferenceTree(signalType.references)} depth={4} />
 		</section>

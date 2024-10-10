@@ -1,15 +1,12 @@
 <script lang="ts">
-	import { Button, IconButton, SubmitButton } from '$lib/components/button';
-	import { EditableForm } from '$lib/components/form';
-	import { AddIcon, SignalTypeIcon } from '$lib/components/icon';
-	import { ResizeableTextInput } from '$lib/components/input';
-	import { Textarea } from '$lib/components/textarea';
+	import { SignalTypeIcon } from '$lib/components/icon';
 	import type { PanelSectionProps } from '../types';
 	import { getSignalTypeState } from '../../state/signal-type-state.svelte';
-	import { descSchema, nameSchema } from './signal-type-schema';
 	import { type SignalType } from '$lib/api/canturin';
-	import { Editable } from '$lib/components/editable';
+	import { TextEditable } from '$lib/components/editable';
 	import { z } from 'zod';
+	import TextareaEditable from '$lib/components/editable/textarea-editable.svelte';
+	import { text } from './signal-type-text';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -30,86 +27,47 @@
 		sts.updateName(name);
 	}
 
+	const nameSchema = z.object({
+		name: z
+			.string()
+			.min(1)
+			.refine((n) => !invalidNames.includes(n), { message: 'Duplicated' })
+	});
+
+	function validateName(name: string) {
+		const res = nameSchema.safeParse({ name: name });
+		if (res.success) {
+			return undefined;
+		}
+		return res.error.flatten().fieldErrors.name;
+	}
+
 	function handleDesc(desc: string) {
 		sts.updateDesc(desc);
 	}
 </script>
 
 {#snippet section(signalType: SignalType)}
-	<div class="flex h-24 gap-3 items-center">
+	<div class="flex gap-2 items-center">
 		<SignalTypeIcon width="48" height="48" />
 
-		<div class="flex-1">
-			<EditableForm
-				schema={nameSchema(invalidNames)}
-				initialValues={{ name: signalType.name }}
-				hidePlaceholder
-				onsubmit={({ name }) => handleName(name)}
-			>
-				{#snippet placeholder()}
-					<div class="text-xl font-bold break-all">{signalType.name}</div>
-				{/snippet}
-
-				{#snippet input({ fsm, values, errors })}
-					<ResizeableTextInput
-						size="sm"
-						label="Name"
-						name="signal-type-name"
-						bind:value={values.name}
-						errors={errors.name}
-						focusOnDisplay
-						onescape={() => fsm.send('ESCAPE')}
-						onblur={() => fsm.send('BLUR')}
-					/>
-				{/snippet}
-			</EditableForm>
-		</div>
+		<TextEditable
+			validator={validateName}
+			name="signal-type-name"
+			initialValue={signalType.name}
+			onsubmit={handleName}
+			placeholder="Name"
+		/>
 	</div>
 
-	<div>
-		<EditableForm
-			schema={descSchema}
-			initialValues={{ desc: signalType.desc }}
-			onsubmit={({ desc }) => handleDesc(desc)}
-			hidePlaceholder
-			blurOnSubmit
-		>
-			{#snippet placeholder(fsm)}
-				{#if signalType.desc}
-					<p>{signalType.desc}</p>
-				{:else}
-					<IconButton onclick={() => fsm.send('DBLCLICK')} label="Add Description">
-						{#snippet icon()}
-							<AddIcon />
-						{/snippet}
-					</IconButton>
-				{/if}
-			{/snippet}
-
-			{#snippet input({ fsm, values })}
-				<Textarea
-					bind:value={values.desc}
-					name="signal-type-desc"
-					onescape={() => fsm.send('ESCAPE')}
-					focusOnDisplay
-					label="Description"
-					rows={20}
-				/>
-
-				<div class="flex justify-end gap-3 pt-5">
-					<Button label="Cancel" onclick={() => fsm.send('ESCAPE')} />
-					<SubmitButton label="Save" />
-				</div>
-			{/snippet}
-		</EditableForm>
+	<div class="pt-5">
+		<TextareaEditable
+			initialValue={signalType.desc}
+			name="signal-type-desc"
+			triggerLabel={text.buttons.heading.descTriggerLabel}
+			onsubmit={handleDesc}
+		/>
 	</div>
-
-	<Editable
-		validator={nameSchema(invalidNames)}
-		initialValue={signalType.name}
-		onSubmit={handleName}
-		placeholder="Name"
-	/>
 {/snippet}
 
 <section>
