@@ -49,7 +49,6 @@ func (s *service[T, M]) run() {
 
 func (s *service[T, M]) OnStartup(_ context.Context, _ application.ServiceOptions) error {
 	go s.run()
-
 	return nil
 }
 

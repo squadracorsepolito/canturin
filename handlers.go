@@ -6,123 +6,66 @@ import (
 	"github.com/squadracorsepolito/acmelib"
 )
 
-type NetworkService struct {
-	network *acmelib.Network
-}
-
-func newNetworkService() (*NetworkService, error) {
+func loadNetwork() {
 	wireFile, err := os.Open("./testdata/SC24.binpb")
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 	defer wireFile.Close()
 
 	net, err := acmelib.LoadNetwork(wireFile, acmelib.SaveEncodingWire)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
-	return &NetworkService{
-		network: net,
-	}, nil
-}
+	proxy.pushSidebarLoad(net)
 
-func (ns *NetworkService) GetNetworkStub() NetworkStub {
-	res := NetworkStub{
-		entityStub: getEntityStub(ns.network),
-
-		Buses:       []BusStub{},
-		SignalUnits: []SignalUnitStub{},
-		SignalTypes: []SignalTypeStub{},
-	}
-
-	sigUnits := make(map[acmelib.EntityID]*acmelib.SignalUnit)
 	sigTypes := make(map[acmelib.EntityID]*acmelib.SignalType)
+	sigUnits := make(map[acmelib.EntityID]*acmelib.SignalUnit)
+	sigEnums := make(map[acmelib.EntityID]*acmelib.SignalEnum)
 
-	for _, tmpBus := range ns.network.Buses() {
-		bus := BusStub{
-			entityStub: getEntityStub(tmpBus),
+	for _, bus := range net.Buses() {
 
-			Nodes: []NodeStub{},
-		}
+		for _, nodeInt := range bus.NodeInterfaces() {
 
-		for _, tmpNodeInt := range tmpBus.NodeInterfaces() {
-			node := NodeStub{
-				entityStub: getEntityStub(tmpNodeInt.Node()),
-			}
+			for _, msg := range nodeInt.Messages() {
+				proxy.pushMessage(msg)
 
-			for _, tmpSendMsg := range tmpNodeInt.Messages() {
-				node.SendedMessages = append(node.SendedMessages, MessageStub{
-					entityStub: getEntityStub(tmpSendMsg),
-				})
-
-				for _, tmpSig := range tmpSendMsg.Signals() {
-					if tmpSig.Kind() == acmelib.SignalKindStandard {
-						tmpStdSig, err := tmpSig.ToStandard()
+				for _, sig := range msg.Signals() {
+					switch sig.Kind() {
+					case acmelib.SignalKindStandard:
+						stdSig, err := sig.ToStandard()
 						if err != nil {
 							panic(err)
 						}
+						sigTypes[stdSig.Type().EntityID()] = stdSig.Type()
 
-						tmpSigUnit := tmpStdSig.Unit()
-						if tmpSigUnit != nil {
-							sigUnits[tmpSigUnit.EntityID()] = tmpSigUnit
+						if stdSig.Unit() != nil {
+							sigUnits[stdSig.Unit().EntityID()] = stdSig.Unit()
 						}
 
-						tmpSigType := tmpStdSig.Type()
-						sigTypes[tmpSigType.EntityID()] = tmpSigType
+					case acmelib.SignalKindEnum:
+						enumSig, err := sig.ToEnum()
+						if err != nil {
+							panic(err)
+						}
+						sigEnums[enumSig.Enum().EntityID()] = enumSig.Enum()
 					}
 				}
-
-				messageCh <- tmpSendMsg
 			}
-
-			bus.Nodes = append(bus.Nodes, node)
 		}
-
-		res.Buses = append(res.Buses, bus)
 	}
 
-	for _, tmpSigUnit := range sigUnits {
-		res.SignalUnits = append(res.SignalUnits, SignalUnitStub{entityStub: getEntityStub(tmpSigUnit)})
-
-		sigUnitCh <- tmpSigUnit
+	for _, sigType := range sigTypes {
+		proxy.pushSignalType(sigType)
 	}
 
-	for _, tmpSigType := range sigTypes {
-		res.SignalTypes = append(res.SignalTypes, SignalTypeStub{entityStub: getEntityStub(tmpSigType)})
-
-		sigTypeCh <- tmpSigType
+	for _, sigUnit := range sigUnits {
+		proxy.pushSignalUnit(sigUnit)
 	}
 
-	return res
-}
+	// for _, sigEnum := range sigEnums {
+	// 	proxy.pushSignalEnum(sigEnum)
+	// }
 
-func (ns *NetworkService) GetNetwork() Network {
-	net := Network{
-		base: getBase(ns.network),
-	}
-
-	for _, tmpBus := range ns.network.Buses() {
-		bus := Bus{
-			base: getBase(tmpBus),
-		}
-
-		for _, tmpNodeInt := range tmpBus.NodeInterfaces() {
-			node := Node{
-				base: getBase(tmpNodeInt.Node()),
-			}
-
-			for _, tmpSendMsg := range tmpNodeInt.Messages() {
-				node.SendedMessages = append(node.SendedMessages, Message{
-					base: getBase(tmpSendMsg),
-				})
-			}
-
-			bus.Nodes = append(bus.Nodes, node)
-		}
-
-		net.Buses = append(net.Buses, bus)
-	}
-
-	return net
 }

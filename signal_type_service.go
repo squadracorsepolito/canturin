@@ -51,9 +51,9 @@ func signalTypeConverter(sigType *acmelib.SignalType) SignalType {
 	}
 }
 
-func newSignalTypeService(sigTypeCh chan *acmelib.SignalType) *SignalTypeService {
+func newSignalTypeService() *SignalTypeService {
 	return &SignalTypeService{
-		service: newService(sigTypeCh, signalTypeConverter),
+		service: newService(proxy.sigTypeCh, signalTypeConverter),
 	}
 }
 
@@ -124,6 +124,8 @@ func (s *SignalTypeService) UpdateName(entityID string, name string) (SignalType
 	}
 
 	sigType.SetName(name)
+
+	proxy.pushSidebarUpdate(sigType.EntityID(), name)
 
 	return s.converterFn(sigType), nil
 }

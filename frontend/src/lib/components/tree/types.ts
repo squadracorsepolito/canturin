@@ -5,7 +5,7 @@ export type TreeNode = {
 	name: string;
 	icon: Component<IconProps>;
 	childNodes: TreeNode[];
-	onclick: () => void;
+	onclick?: () => void;
 };
 
 export type ReferenceTreeNode = {

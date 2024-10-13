@@ -2,9 +2,7 @@
 	import { SignalTypePanel } from '$lib/panel';
 	import MessagePanel from '$lib/panel/message-panel.svelte';
 	import SignalUnitPanel from '$lib/panel/signal-unit-panel.svelte';
-	import { getLayoutState } from '$lib/state/layout-state.svelte';
-
-	const layout = getLayoutState();
+	import layout from '$lib/state/layout-state.svelte';
 </script>
 
 {#if layout.openPanelType === 'message'}

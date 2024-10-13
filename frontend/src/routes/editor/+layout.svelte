@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { NetworkService, type NetworkStub } from '$lib/api/canturin';
+	import { SidebarNodeKind, type SidebarNode } from '$lib/api/canturin';
 	import {
 		NetworkIcon,
 		BusIcon,
@@ -11,167 +11,108 @@
 	} from '$lib/components/icon';
 	import Tree from '$lib/components/tree/tree.svelte';
 	import type { TreeNode } from '$lib/components/tree/types';
-	import { setLayoutState } from '$lib/state/layout-state.svelte';
-	import { onMount } from 'svelte';
+	import layout from '$lib/state/layout-state.svelte';
+	import sidebarState from '$lib/state/sidebar-state.svelte';
 
 	let { children } = $props();
 
-	let net: NetworkStub | undefined = $state();
-
-	onMount(async () => {
-		try {
-			const res = await NetworkService.GetNetworkStub();
-			net = res;
-		} catch (error) {
-			console.error(error);
-		}
-	});
-
-	const layout = setLayoutState();
-
-	function getTreeNodes(network: NetworkStub) {
-		let rootNode: TreeNode = {
-			name: network.name,
+	function getNetTree(currNode: SidebarNode) {
+		const n: TreeNode = {
+			name: currNode.name,
 			icon: NetworkIcon,
-			childNodes: [],
-			onclick: () => console.log('network')
+			childNodes: []
 		};
 
-		if (network.signalTypes) {
-			let sigTypes: TreeNode = {
-				name: 'Signal Types',
-				icon: SignalTypeIcon,
-				childNodes: [],
-				onclick: () => console.log('signal types')
-			};
-
-			sigTypes.childNodes.push({
-				name: 'Add Signal Type',
-				icon: AddIcon,
-				childNodes: [],
-				onclick: () => layout.openPanel('signal_type', 'draft')
-			});
-
-			for (let sigType of network.signalTypes) {
-				let sigTypeNode: TreeNode = {
-					name: sigType.name,
-					icon: SignalTypeIcon,
-					childNodes: [],
-					onclick: () => layout.openPanel('signal_type', sigType.entityId)
-				};
-				sigTypes.childNodes.push(sigTypeNode);
-			}
-
-			rootNode.childNodes.push(sigTypes);
-		}
-
-		if (network.signalUnits) {
-			let sigUnits: TreeNode = {
-				name: 'Signal Units',
-				icon: SignalUnitIcon,
-				childNodes: [],
-				onclick: () => console.log('signal units')
-			};
-
-			sigUnits.childNodes.push({
-				name: 'Add Signal Unit',
-				icon: AddIcon,
-				childNodes: [],
-				onclick: () => layout.openPanel('signal_unit', 'draft')
-			});
-
-			for (let sigUnit of network.signalUnits) {
-				let sigUnitNode: TreeNode = {
-					name: sigUnit.name,
-					icon: SignalUnitIcon,
-					childNodes: [],
-					onclick: () => layout.openPanel('signal_unit', sigUnit.entityId)
-				};
-				sigUnits.childNodes.push(sigUnitNode);
-			}
-
-			rootNode.childNodes.push(sigUnits);
-		}
-
-		if (network.buses) {
-			for (let bus of network.buses) {
-				if (bus?.nodes) {
-					let busNode: TreeNode = {
-						name: bus.name,
-						icon: BusIcon,
-						childNodes: [],
-						onclick: () => console.log('bus')
-					};
-
-					for (let node of bus.nodes) {
-						if (node?.sendedMessages) {
-							let nodeNode: TreeNode = {
-								name: node.name,
-								icon: NodeIcon,
+		switch (currNode.kind) {
+			case SidebarNodeKind.SidebarNodeKindNetwork:
+				n.childNodes.push(
+					{
+						name: 'Signal Types',
+						icon: SignalTypeIcon,
+						childNodes: [
+							{
+								name: 'Add Signal Type',
+								icon: AddIcon,
 								childNodes: [],
-								onclick: () => console.log('node')
-							};
-
-							for (let sendMsg of node.sendedMessages) {
-								if (sendMsg) {
-									nodeNode.childNodes.push({
-										name: sendMsg.name,
-										icon: MessageIcon,
-										childNodes: [],
-										onclick: () => layout.openPanel('message', sendMsg.entityId)
-									});
-								}
+								onclick: () => layout.openPanel('signal_type', 'draft')
 							}
-
-							busNode.childNodes.push(nodeNode);
-						}
+						]
+					},
+					{
+						name: 'Signal Units',
+						icon: SignalUnitIcon,
+						childNodes: [
+							{
+								name: 'Add Signal Unit',
+								icon: AddIcon,
+								childNodes: [],
+								onclick: () => layout.openPanel('signal_unit', 'draft')
+							}
+						]
+					},
+					{
+						name: 'Signal Enums',
+						icon: NetworkIcon,
+						childNodes: []
 					}
+				);
+				break;
 
-					rootNode.childNodes.push(busNode);
+			case SidebarNodeKind.SidebarNodeKindBus:
+				n.icon = BusIcon;
+				break;
+
+			case SidebarNodeKind.SidebarNodeKindNode:
+				n.icon = NodeIcon;
+				break;
+
+			case SidebarNodeKind.SidebarNodeKindMessage:
+				n.icon = MessageIcon;
+				n.onclick = () => layout.openPanel('message', currNode.entityId);
+				break;
+
+			case SidebarNodeKind.SidebarNodeKindSignalType:
+				n.icon = SignalTypeIcon;
+				n.onclick = () => layout.openPanel('signal_type', currNode.entityId);
+				break;
+
+			case SidebarNodeKind.SidebarNodeKindSignalUnit:
+				n.icon = SignalUnitIcon;
+				n.onclick = () => layout.openPanel('signal_unit', currNode.entityId);
+				break;
+
+			case SidebarNodeKind.SidebarNodeKindSignalEnum:
+				break;
+		}
+
+		if (currNode.children) {
+			for (const child of currNode.children) {
+				const childNode = getNetTree(child);
+
+				switch (child.kind) {
+					case SidebarNodeKind.SidebarNodeKindSignalType:
+						n.childNodes[0].childNodes.push(childNode);
+						break;
+
+					case SidebarNodeKind.SidebarNodeKindSignalUnit:
+						n.childNodes[1].childNodes.push(childNode);
+						break;
+
+					case SidebarNodeKind.SidebarNodeKindSignalEnum:
+						n.childNodes[2].childNodes.push(childNode);
+						break;
+
+					default:
+						n.childNodes.push(childNode);
+						break;
 				}
 			}
 		}
 
-		return rootNode;
+		return n;
 	}
 
-	// async function openSignalUnit(sigEntId: string) {
-	// 	try {
-	// 		await SignalUnitService.Open(sigEntId);
-	// 		entityId = sigEntId;
-	// 		openPanel = 'signal_unit';
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 	}
-	// }
-
-	// async function openSignalType(sigTypeEntityId: string) {
-	// 	try {
-	// 		await SignalTypeService.Open(sigTypeEntityId);
-	// 		entityId = sigTypeEntityId;
-	// 		openPanel = 'signal_type';
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 	}
-	// }
-
-	// async function registerMessage(busEntID: string, nodeEntID: string, msgEntID: string) {
-	// 	try {
-	// 		await MessageService.Register(busEntID, nodeEntID, msgEntID);
-	// 		const msg = await MessageService.Get();
-	// 		message = msg;
-	// 		entityId = msgEntID;
-
-	// 		openPanel = 'message';
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 	}
-	// }
-
-	// let message: Message | undefined = $state();
-
-	// let openPanel: 'signal_type' | 'signal_unit' | 'message' | 'none' = $state('none');
-	// let entityId = $state('');
+	$inspect(sidebarState.tree);
 </script>
 
 <div class="flex h-full w-full">
@@ -179,8 +120,8 @@
 		<div class="h-12 block bg-base-300 sticky top-0"></div>
 
 		<div class="flex-1 overflow-y-auto overflow-x-hidden">
-			{#if net}
-				<Tree rootNode={getTreeNodes(net)} defaultOpen />
+			{#if sidebarState.tree}
+				<Tree rootNode={getNetTree(sidebarState.tree)} defaultOpen />
 			{/if}
 		</div>
 	</div>
@@ -189,13 +130,5 @@
 		<div class="h-12 block bg-base-300 sticky top-0"></div>
 
 		{@render children()}
-
-		<!-- {#if openPanel === 'message' && message}
-			<MessagePanel {message} />
-		{:else if openPanel === 'signal_unit'}
-			<SignalUnitPanel {entityId} />
-		{:else if openPanel === 'signal_type'}
-			<SignalTypePanel {entityId} />
-		{/if} -->
 	</div>
 </div>

@@ -399,6 +399,18 @@ tasks:
     cmds:
       # For a complete list of options, run `wails3 generate bindings -help`
       - wails3 generate bindings -ts -i -d frontend/src/lib/api -f '{{.BUILD_FLAGS}}'
+      - wails3 generate constants -f events.go -o frontend/src/lib/api/events.ts
+
+  generate:constants:
+    summary: Generates constants for the frontend
+    sources:
+      - "**/*.go"
+      - go.mod
+      - go.sum
+    generates:
+      - "frontend/src/lib/api/**/*"
+    cmds:
+      - wails3 generate constants -f events.go -o frontend/src/lib/api/events.ts
 
   go:mod:tidy:
     summary: Runs `go mod tidy`

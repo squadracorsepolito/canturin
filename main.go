@@ -5,8 +5,8 @@ import (
 	_ "embed"
 	"log"
 
-	"github.com/squadracorsepolito/acmelib"
 	"github.com/wailsapp/wails/v3/pkg/application"
+	"github.com/wailsapp/wails/v3/pkg/events"
 )
 
 // Wails uses Go's `embed` package to embed the frontend files into the binary.
@@ -19,27 +19,22 @@ var assets embed.FS
 
 var app *application.App
 
-var (
-	messageCh chan *acmelib.Message    = make(chan *acmelib.Message)
-	sigTypeCh chan *acmelib.SignalType = make(chan *acmelib.SignalType)
-	sigUnitCh chan *acmelib.SignalUnit = make(chan *acmelib.SignalUnit)
-)
+var proxy *appProxy
 
 // main function serves as the application's entry point. It initializes the application, creates a window,
 // and starts a goroutine that emits a time-based event every second. It subsequently runs the application and
 // logs any error that might occur.
 func main() {
-	networkService, err := newNetworkService()
-	if err != nil {
-		log.Fatal(err)
-	}
+	proxy = newAppProxy()
 
 	// Initialize the services
-	msgServ := newMessageService(messageCh)
-	sigTypeServ := newSignalTypeService(sigTypeCh)
-	sigUnitServ := newSignalUnitService(sigUnitCh)
+	sidebarSrv := newSidebarService()
 
-	// Create a new Wails application by providing the necessary options.
+	msgServ := newMessageService()
+	sigTypeServ := newSignalTypeService()
+	sigUnitServ := newSignalUnitService()
+
+	// Create a new Wails application by providing the necesvar (sary options.
 	// Variables 'Name' and 'Description' are for application metadata.
 	// 'Assets' configures the asset server with the 'FS' variable pointing to the frontend files.
 	// 'Bind' is a list of Go struct instances. The frontend has access to the methods of these instances.
@@ -48,7 +43,8 @@ func main() {
 		Name:        "canturin",
 		Description: "",
 		Services: []application.Service{
-			application.NewService(networkService),
+
+			application.NewService(sidebarSrv),
 
 			application.NewService(msgServ),
 			application.NewService(sigTypeServ),
@@ -70,7 +66,7 @@ func main() {
 	// 'BackgroundColour' is the background colour of the window.
 	// 'URL' is the URL that will be loaded into the webview.
 	app.NewWebviewWindowWithOptions(application.WebviewWindowOptions{
-		Title: networkService.network.Name(),
+		Title: "canturin",
 		Mac: application.MacWindow{
 			InvisibleTitleBarHeight: 50,
 			Backdrop:                application.MacBackdropTranslucent,
@@ -92,6 +88,10 @@ func main() {
 	// 		time.Sleep(time.Second)
 	// 	}
 	// }()
+
+	app.OnApplicationEvent(events.Common.ApplicationStarted, func(_ *application.ApplicationEvent) {
+		loadNetwork()
+	})
 
 	// Run the application. This blocks until the application has been exited.
 	// If an error occurred while running the application, log it and exit.

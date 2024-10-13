@@ -35,8 +35,8 @@ func convertMessage(m *acmelib.Message) Message {
 	return msg
 }
 
-func newMessageService(messageCh chan *acmelib.Message) *MessageService {
+func newMessageService() *MessageService {
 	return &MessageService{
-		newService(messageCh, convertMessage),
+		newService(proxy.messageCh, convertMessage),
 	}
 }

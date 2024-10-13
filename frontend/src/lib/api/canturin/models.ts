@@ -13,20 +13,6 @@ import * as time$0 from "../time/models.js";
 // @ts-ignore: Unused imports
 import * as $internal from "./internal.js";
 
-export interface Bus {
-    "entityId": string;
-    "name": string;
-    "desc": string;
-    "createTime": time$0.Time;
-    "nodes": Node[] | null;
-}
-
-export interface BusStub {
-    "entityId": string;
-    "name": string;
-    "nodes": NodeStub[] | null;
-}
-
 export interface Message {
     "entityId": string;
     "name": string;
@@ -41,28 +27,6 @@ export interface Message {
     "receivers": Node[] | null;
 }
 
-export interface MessageStub {
-    "entityId": string;
-    "name": string;
-    "signals": $internal.entityStub[] | null;
-}
-
-export interface Network {
-    "entityId": string;
-    "name": string;
-    "desc": string;
-    "createTime": time$0.Time;
-    "buses": Bus[] | null;
-}
-
-export interface NetworkStub {
-    "entityId": string;
-    "name": string;
-    "buses": BusStub[] | null;
-    "signalUnits": SignalUnitStub[] | null;
-    "signalTypes": SignalTypeStub[] | null;
-}
-
 export interface Node {
     "entityId": string;
     "name": string;
@@ -71,11 +35,27 @@ export interface Node {
     "sendedMessages": Message[] | null;
 }
 
-export interface NodeStub {
-    "entityId": string;
+export interface SidebarNode {
+    "kind": SidebarNodeKind;
     "name": string;
-    "sendedMessages": MessageStub[] | null;
+    "entityId": string;
+    "children": SidebarNode[] | null;
 }
+
+export enum SidebarNodeKind {
+    /**
+     * The Go zero value for the underlying type of the enum.
+     */
+    $zero = "",
+
+    SidebarNodeKindNetwork = "network",
+    SidebarNodeKindBus = "bus",
+    SidebarNodeKindNode = "node",
+    SidebarNodeKindMessage = "message",
+    SidebarNodeKindSignalType = "signal-type",
+    SidebarNodeKindSignalUnit = "signal-unit",
+    SidebarNodeKindSignalEnum = "signal-enum",
+};
 
 export interface Signal {
     "entityId": string;
@@ -122,11 +102,6 @@ export enum SignalTypeKind {
     SignalTypeKindDecimal = "decimal",
 };
 
-export interface SignalTypeStub {
-    "entityId": string;
-    "name": string;
-}
-
 export interface SignalUnit {
     "entityId": string;
     "name": string;
@@ -135,9 +110,4 @@ export interface SignalUnit {
     "symbol": string;
     "referenceCount": number;
     "references": SignalReference[] | null;
-}
-
-export interface SignalUnitStub {
-    "entityId": string;
-    "name": string;
 }

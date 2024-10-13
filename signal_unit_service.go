@@ -17,9 +17,9 @@ type SignalUnitService struct {
 	*service[*acmelib.SignalUnit, SignalUnit]
 }
 
-func newSignalUnitService(sigUnitCh chan *acmelib.SignalUnit) *SignalUnitService {
+func newSignalUnitService() *SignalUnitService {
 	return &SignalUnitService{
-		service: newService(sigUnitCh, func(su *acmelib.SignalUnit) SignalUnit {
+		service: newService(proxy.sigUnitCh, func(su *acmelib.SignalUnit) SignalUnit {
 			return SignalUnit{
 				base: getBase(su),
 

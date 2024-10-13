@@ -1,5 +1,3 @@
-import { getContext, setContext } from 'svelte';
-
 type PanelType = 'none' | 'message' | 'signal_type' | 'signal_unit';
 
 class LayoutState {
@@ -12,12 +10,4 @@ class LayoutState {
 	}
 }
 
-const LAYOUT_KEY = Symbol('LAYOUT');
-
-export function setLayoutState() {
-	return setContext(LAYOUT_KEY, new LayoutState());
-}
-
-export function getLayoutState() {
-	return getContext<ReturnType<typeof setLayoutState>>(LAYOUT_KEY);
-}
+export default new LayoutState();

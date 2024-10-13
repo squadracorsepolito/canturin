@@ -62,6 +62,7 @@ type base struct {
 }
 
 type entity interface {
+	EntityKind() acmelib.EntityKind
 	EntityID() acmelib.EntityID
 	Name() string
 	Desc() string

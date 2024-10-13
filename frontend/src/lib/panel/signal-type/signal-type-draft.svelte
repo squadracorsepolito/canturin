@@ -14,7 +14,7 @@
 	import { zod } from 'sveltekit-superforms/adapters';
 	import { SignalTypeIcon } from '$lib/components/icon';
 	import ToggleInput from '$lib/components/input/toggle-input.svelte';
-	import { getLayoutState } from '$lib/state/layout-state.svelte';
+	import layout from '$lib/state/layout-state.svelte';
 
 	let invalidNames = $state<string[]>([]);
 
@@ -24,8 +24,6 @@
 			invalidNames = res;
 		}
 	});
-
-	const layout = getLayoutState();
 
 	const schema = z.object({
 		name: z
