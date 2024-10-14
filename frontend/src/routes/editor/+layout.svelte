@@ -111,8 +111,6 @@
 
 		return n;
 	}
-
-	$inspect(sidebarState.tree);
 </script>
 
 <div class="flex h-full w-full">

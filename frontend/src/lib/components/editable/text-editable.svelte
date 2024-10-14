@@ -42,23 +42,25 @@
 	const api = $derived(editable.connect(snpshot, send, normalizeProps));
 </script>
 
-<div {...api.getRootProps()}>
-	<div {...api.getAreaProps()} data-error={errors ? true : undefined}>
-		<input {...api.getInputProps()} />
+<div>
+	<div {...api.getRootProps()}>
+		<div {...api.getAreaProps()} data-error={errors ? true : undefined}>
+			<input {...api.getInputProps()} />
 
-		<span {...api.getPreviewProps()}>
-			{api.valueText}
-		</span>
+			<span {...api.getPreviewProps()}>
+				{api.valueText}
+			</span>
+		</div>
 	</div>
+
+	{#if errors}
+		<div class="absolute pt-1 text-error text-xs">
+			{#each errors as err}
+				<span>{err}</span>
+			{/each}
+		</div>
+	{/if}
 </div>
-
-{#if errors}
-	<div class="absolute pt-1 text-error text-xs">
-		{#each errors as err}
-			<span>{err}</span>
-		{/each}
-	</div>
-{/if}
 
 <style lang="postcss">
 	[data-part='area'] {

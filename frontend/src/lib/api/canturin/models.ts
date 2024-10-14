@@ -39,6 +39,7 @@ export interface SidebarNode {
     "kind": SidebarNodeKind;
     "name": string;
     "entityId": string;
+    "parentEntityIds": string[] | null;
     "children": SidebarNode[] | null;
 }
 

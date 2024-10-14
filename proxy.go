@@ -9,6 +9,7 @@ type appProxy struct {
 
 	sidebarLoadCh   chan *sidebarLoadReq
 	sidebarUpdateCh chan *sidebarUpdateReq
+	sidebarAddCh    chan *sidebarAddReq
 	sidebarRemoveCh chan *sidebarRemoveReq
 
 	messageCh chan *acmelib.Message
@@ -22,6 +23,7 @@ func newAppProxy() *appProxy {
 	return &appProxy{
 		sidebarLoadCh:   make(chan *sidebarLoadReq),
 		sidebarUpdateCh: make(chan *sidebarUpdateReq),
+		sidebarAddCh:    make(chan *sidebarAddReq),
 		sidebarRemoveCh: make(chan *sidebarRemoveReq),
 
 		messageCh: make(chan *acmelib.Message),
@@ -42,6 +44,15 @@ func (p *appProxy) pushSidebarUpdate(entID acmelib.EntityID, name string) {
 	p.sidebarUpdateCh <- &sidebarUpdateReq{
 		entityID: entID,
 		name:     name,
+	}
+}
+
+func (p *appProxy) pushSidebarAdd(kind SidebarNodeKind, entID, parentID acmelib.EntityID, name string) {
+	p.sidebarAddCh <- &sidebarAddReq{
+		kind:     kind,
+		entityID: entID,
+		name:     name,
+		parentID: parentID,
 	}
 }
 

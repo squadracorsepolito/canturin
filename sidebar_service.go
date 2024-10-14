@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"log"
+	"slices"
+	"strings"
 	"sync"
 
 	"github.com/squadracorsepolito/acmelib"
@@ -16,6 +18,13 @@ type sidebarLoadReq struct {
 type sidebarUpdateReq struct {
 	entityID acmelib.EntityID
 	name     string
+}
+
+type sidebarAddReq struct {
+	kind     SidebarNodeKind
+	entityID acmelib.EntityID
+	name     string
+	parentID acmelib.EntityID
 }
 
 type sidebarRemoveReq struct {
@@ -35,35 +44,40 @@ const (
 )
 
 type SidebarNode struct {
-	Kind     SidebarNodeKind `json:"kind"`
-	Name     string          `json:"name"`
-	EntityID string          `json:"entityId"`
-	Children []SidebarNode   `json:"children"`
+	Kind            SidebarNodeKind `json:"kind"`
+	Name            string          `json:"name"`
+	EntityID        string          `json:"entityId"`
+	ParentEntityIDs []string        `json:"parentEntityIds"`
+	Children        []SidebarNode   `json:"children"`
 }
 
 type sidebarNode struct {
 	kind     SidebarNodeKind
 	name     string
 	entityID acmelib.EntityID
+	parent   *sidebarNode
 	children []*sidebarNode
 }
 
-func (sn *sidebarNode) Convert() SidebarNode {
+func (sn *sidebarNode) Convert(parentsIDs ...string) SidebarNode {
 	res := SidebarNode{
-		Kind:     sn.kind,
-		Name:     sn.name,
-		EntityID: sn.entityID.String(),
+		Kind:            sn.kind,
+		Name:            sn.name,
+		EntityID:        sn.entityID.String(),
+		ParentEntityIDs: parentsIDs,
 	}
 
+	parentsIDs = append(parentsIDs, sn.entityID.String())
+	slices.SortFunc(sn.children, func(a, b *sidebarNode) int { return strings.Compare(a.name, b.name) })
 	for _, child := range sn.children {
-		res.Children = append(res.Children, child.Convert())
+		res.Children = append(res.Children, child.Convert(parentsIDs...))
 	}
 
 	return res
 }
 
 type SidebarService struct {
-	tree  *sidebarNode
+	root  *sidebarNode
 	nodes map[acmelib.EntityID]*sidebarNode
 
 	mux sync.RWMutex
@@ -89,8 +103,12 @@ func (s *SidebarService) run() {
 		case req := <-proxy.sidebarUpdateCh:
 			s.update(req)
 
+		case req := <-proxy.sidebarAddCh:
+			log.Print(req)
+			s.add(req)
+
 		case req := <-proxy.sidebarRemoveCh:
-			log.Print(req.entityID.String())
+			s.remove(req)
 
 		case <-s.stopCh:
 			return
@@ -119,6 +137,8 @@ func (s *SidebarService) load(req *sidebarLoadReq) {
 		entityID: req.network.EntityID(),
 	}
 
+	s.nodes[req.network.EntityID()] = netNode
+
 	sigTypes := make(map[acmelib.EntityID]*acmelib.SignalType)
 	sigUnits := make(map[acmelib.EntityID]*acmelib.SignalUnit)
 	sigEnums := make(map[acmelib.EntityID]*acmelib.SignalEnum)
@@ -128,6 +148,7 @@ func (s *SidebarService) load(req *sidebarLoadReq) {
 			kind:     SidebarNodeKindBus,
 			name:     bus.Name(),
 			entityID: bus.EntityID(),
+			parent:   netNode,
 		}
 
 		for _, nodeInt := range bus.NodeInterfaces() {
@@ -135,6 +156,7 @@ func (s *SidebarService) load(req *sidebarLoadReq) {
 				kind:     SidebarNodeKindNode,
 				name:     nodeInt.Node().Name(),
 				entityID: nodeInt.Node().EntityID(),
+				parent:   busNode,
 			}
 
 			for _, msg := range nodeInt.Messages() {
@@ -142,6 +164,7 @@ func (s *SidebarService) load(req *sidebarLoadReq) {
 					kind:     SidebarNodeKindMessage,
 					name:     msg.Name(),
 					entityID: msg.EntityID(),
+					parent:   nodeNode,
 				}
 
 				for _, sig := range msg.Signals() {
@@ -185,6 +208,7 @@ func (s *SidebarService) load(req *sidebarLoadReq) {
 			kind:     SidebarNodeKindSignalType,
 			name:     sigType.Name(),
 			entityID: sigType.EntityID(),
+			parent:   netNode,
 		}
 
 		netNode.children = append(netNode.children, sigTypeNode)
@@ -196,6 +220,7 @@ func (s *SidebarService) load(req *sidebarLoadReq) {
 			kind:     SidebarNodeKindSignalUnit,
 			name:     sigUnit.Name(),
 			entityID: sigUnit.EntityID(),
+			parent:   netNode,
 		}
 
 		netNode.children = append(netNode.children, sigUnitNode)
@@ -207,13 +232,14 @@ func (s *SidebarService) load(req *sidebarLoadReq) {
 			kind:     SidebarNodeKindSignalEnum,
 			name:     sigEnum.Name(),
 			entityID: sigEnum.EntityID(),
+			parent:   netNode,
 		}
 
 		netNode.children = append(netNode.children, sigEnumNode)
 		s.nodes[sigEnum.EntityID()] = sigEnumNode
 	}
 
-	s.tree = netNode
+	s.root = netNode
 
 	app.EmitEvent(SidebarLoad)
 }
@@ -222,15 +248,64 @@ func (s *SidebarService) update(req *sidebarUpdateReq) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
-	node := s.nodes[req.entityID]
+	node, ok := s.nodes[req.entityID]
+	if !ok {
+		return
+	}
+
 	node.name = req.name
 
 	app.EmitEvent(SidebarUpdate, node.Convert())
+}
+
+func (s *SidebarService) add(req *sidebarAddReq) {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	parent, ok := s.nodes[req.parentID]
+	if !ok {
+		return
+	}
+
+	parent.children = append(parent.children, &sidebarNode{
+		kind:     req.kind,
+		name:     req.name,
+		entityID: req.entityID,
+		parent:   parent,
+	})
+
+	s.nodes[req.entityID] = &sidebarNode{
+		kind:     req.kind,
+		name:     req.name,
+		entityID: req.entityID,
+		parent:   parent,
+	}
+
+	app.EmitEvent(SidebarAdd, parent.Convert())
+}
+
+func (s *SidebarService) remove(req *sidebarRemoveReq) {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	node, ok := s.nodes[req.entityID]
+	if !ok {
+		return
+	}
+
+	parent := node.parent
+	parent.children = slices.DeleteFunc(parent.children, func(child *sidebarNode) bool {
+		return child.entityID == req.entityID
+	})
+
+	delete(s.nodes, req.entityID)
+
+	app.EmitEvent(SidebarRemove, parent.Convert())
 }
 
 func (s *SidebarService) GetTree() SidebarNode {
 	s.mux.RLock()
 	defer s.mux.RUnlock()
 
-	return s.tree.Convert()
+	return s.root.Convert()
 }

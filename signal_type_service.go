@@ -1,6 +1,8 @@
 package main
 
-import "github.com/squadracorsepolito/acmelib"
+import (
+	"github.com/squadracorsepolito/acmelib"
+)
 
 type SignalTypeKind string
 
@@ -97,6 +99,8 @@ func (s *SignalTypeService) Create(kind SignalTypeKind, name, desc string, size 
 	s.mux.Lock()
 	defer s.mux.Unlock()
 	s.pool[sigType.EntityID()] = sigType
+
+	proxy.pushSidebarAdd(SidebarNodeKindSignalType, sigType.EntityID(), proxy.network.EntityID(), sigType.Name())
 
 	return s.converterFn(sigType), nil
 }

@@ -127,7 +127,7 @@
 		</FormField>
 	</div>
 
-	<div class="flex justify-end">
+	<div class="flex justify-end pt-5">
 		<SubmitButton label={text.buttons.draft.submit} />
 	</div>
 </form>

@@ -60,7 +60,7 @@
 		/>
 	</div>
 
-	<div class="pt-5">
+	<div class="pt-8">
 		<TextareaEditable
 			initialValue={signalType.desc}
 			name="signal-type-desc"

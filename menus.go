@@ -9,5 +9,7 @@ import (
 func initMenus() {
 	app := application.Get()
 
+	// open file acmelib.
+
 	log.Print(app.GetPID())
 }

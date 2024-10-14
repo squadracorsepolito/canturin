@@ -19,6 +19,7 @@ func loadNetwork() {
 	}
 
 	proxy.pushSidebarLoad(net)
+	proxy.network = net
 
 	sigTypes := make(map[acmelib.EntityID]*acmelib.SignalType)
 	sigUnits := make(map[acmelib.EntityID]*acmelib.SignalUnit)
