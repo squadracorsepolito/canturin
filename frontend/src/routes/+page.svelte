@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Sortable from 'sortablejs';
-	import { SortableList } from '@jhubbardsf/svelte-sortablejs';
 
 	let items = [
 		{ id: 1, name: 'one' },
@@ -12,17 +11,19 @@
 	function initSortable(list: HTMLElement) {
 		console.log(list);
 
-		new Sortable(list, {
-			group: 'pippo',
-			animation: 150
+		const sortable = Sortable.create(list, {
+			animation: 150,
+			group: 'pippo'
 		});
+
+		console.log(sortable);
+
+		return sortable.destroy();
 	}
 </script>
 
-<SortableList class="flex flex-col">
-	{#each items as item}
-		<div>
-			{item.name}
-		</div>
+<ul use:initSortable>
+	{#each items as item (item.id)}
+		<li>{item.name}</li>
 	{/each}
-</SortableList>
+</ul>
