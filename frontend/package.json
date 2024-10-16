@@ -12,6 +12,8 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
+		"@jhubbardsf/svelte-sortablejs": "^1.1.0",
+		"@melt-ui/svelte": "^0.83.0",
 		"@sveltejs/adapter-static": "^3.0.5",
 		"@sveltejs/kit": "^2.5.28",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
@@ -19,6 +21,7 @@
 		"@tailwindcss/typography": "^0.5.15",
 		"@types/eslint": "^9.6.1",
 		"@types/randomcolor": "^0.5.9",
+		"@types/sortablejs": "^1.15.8",
 		"@wailsio/runtime": "^3.0.0-alpha.27",
 		"@zag-js/editable": "^0.73.1",
 		"@zag-js/number-input": "^0.73.1",
@@ -46,6 +49,7 @@
 	"dependencies": {
 		"formsnap": "^1.0.1",
 		"runed": "^0.15.2",
+		"sortablejs": "^1.15.3",
 		"sveltekit-superforms": "^2.19.0",
 		"zod": "^3.23.8"
 	}

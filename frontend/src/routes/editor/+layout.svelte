@@ -7,7 +7,8 @@
 		MessageIcon,
 		SignalUnitIcon,
 		SignalTypeIcon,
-		AddIcon
+		AddIcon,
+		SignalEnumIcon
 	} from '$lib/components/icon';
 	import Tree from '$lib/components/tree/tree.svelte';
 	import type { TreeNode } from '$lib/components/tree/types';
@@ -52,8 +53,15 @@
 					},
 					{
 						name: 'Signal Enums',
-						icon: NetworkIcon,
-						childNodes: []
+						icon: SignalEnumIcon,
+						childNodes: [
+							{
+								name: 'Add Signal Enum',
+								icon: AddIcon,
+								childNodes: [],
+								onclick: () => layout.openPanel('signal_enum', 'draft')
+							}
+						]
 					}
 				);
 				break;
@@ -82,6 +90,8 @@
 				break;
 
 			case SidebarNodeKind.SidebarNodeKindSignalEnum:
+				n.icon = SignalEnumIcon;
+				n.onclick = () => layout.openPanel('signal_enum', currNode.entityId);
 				break;
 		}
 
@@ -119,7 +129,7 @@
 
 		<div class="flex-1 overflow-y-auto overflow-x-hidden">
 			{#if sidebarState.tree}
-				<Tree rootNode={getNetTree(sidebarState.tree)} defaultOpen />
+				<Tree rootNode={getNetTree(sidebarState.tree)} />
 			{/if}
 		</div>
 	</div>

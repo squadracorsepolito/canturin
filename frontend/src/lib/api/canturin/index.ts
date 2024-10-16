@@ -3,11 +3,13 @@
 
 import * as MessageService from "./messageservice.js";
 import * as SidebarService from "./sidebarservice.js";
+import * as SignalEnumService from "./signalenumservice.js";
 import * as SignalTypeService from "./signaltypeservice.js";
 import * as SignalUnitService from "./signalunitservice.js";
 export {
     MessageService,
     SidebarService,
+    SignalEnumService,
     SignalTypeService,
     SignalUnitService
 };

@@ -19,6 +19,10 @@
 		@apply ring-2 ring-primary/25;
 	}
 
+	.focus-ring-secondary {
+		@apply ring-2 ring-secondary/25;
+	}
+
 	.focus-ring-error {
 		@apply ring-2 ring-error/25;
 	}

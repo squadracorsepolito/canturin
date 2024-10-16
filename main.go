@@ -33,6 +33,7 @@ func main() {
 	msgServ := newMessageService()
 	sigTypeServ := newSignalTypeService()
 	sigUnitServ := newSignalUnitService()
+	signalEnumService := newSignalEnumService()
 
 	// Create a new Wails application by providing the necesvar (sary options.
 	// Variables 'Name' and 'Description' are for application metadata.
@@ -49,6 +50,7 @@ func main() {
 			application.NewService(msgServ),
 			application.NewService(sigTypeServ),
 			application.NewService(sigUnitServ),
+			application.NewService(signalEnumService),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),

@@ -12,13 +12,13 @@
 </script>
 
 {#snippet section(signalType: SignalType)}
-	{#if signalType.references}
-		<section>
-			<h3>{text.headings.refs}</h3>
+	{#if signalType.references && signalType.references.length > 0}
+		<h3 class="pb-5">{text.headings.refs}</h3>
 
-			<ReferenceTree siblingNodes={getSignalReferenceTree(signalType.references)} depth={4} />
-		</section>
+		<ReferenceTree siblingNodes={getSignalReferenceTree(signalType.references)} depth={4} />
 	{/if}
 {/snippet}
 
-{@render section(sts.entity)}
+<section>
+	{@render section(sts.entity)}
+</section>

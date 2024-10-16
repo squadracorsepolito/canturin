@@ -26,6 +26,7 @@
 			activationMode: 'dblclick',
 			placeholder: placeholder,
 			submitMode: 'both',
+			autoResize: true,
 			onValueCommit: (details) => {
 				if (errors) {
 					api.setValue(initialValue + '');

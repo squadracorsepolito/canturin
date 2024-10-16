@@ -68,6 +68,26 @@ export interface Signal {
     "size": number;
 }
 
+export interface SignalEnum {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+    "size": number;
+    "minSize": number;
+    "maxIndex": number;
+    "values": SignalEnumValue[] | null;
+    "references": SignalReference[] | null;
+}
+
+export interface SignalEnumValue {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+    "index": number;
+}
+
 export interface SignalReference {
     "bus": $internal.entityStub;
     "node": $internal.entityStub;
