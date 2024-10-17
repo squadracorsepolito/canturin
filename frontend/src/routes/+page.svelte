@@ -1,29 +1,36 @@
 <script lang="ts">
-	import Sortable from 'sortablejs';
+	import SortableItem from '$lib/components/sortable/sortable-item.svelte';
 
 	let items = [
-		{ id: 1, name: 'one' },
-		{ id: 2, name: 'two' },
-		{ id: 3, name: 'three' },
-		{ id: 4, name: 'four' }
+		{
+			id: 'item-1',
+			label: 'Item 1'
+		},
+		{
+			id: 'item-2',
+			label: 'Item 2'
+		},
+		{
+			id: 'item-3',
+			label: 'Item 3'
+		},
+		{
+			id: 'item-4',
+			label: 'Item 4'
+		},
+		{
+			id: 'item-5',
+			label: 'Item 5'
+		}
 	];
-
-	function initSortable(list: HTMLElement) {
-		console.log(list);
-
-		const sortable = Sortable.create(list, {
-			animation: 150,
-			group: 'pippo'
-		});
-
-		console.log(sortable);
-
-		return sortable.destroy();
-	}
 </script>
 
-<ul use:initSortable>
-	{#each items as item (item.id)}
-		<li>{item.name}</li>
+<div>
+	{#each items as item}
+		<SortableItem id={item.id}>
+			<div class="h-10 w-32 border-2">
+				{item.label}
+			</div>
+		</SortableItem>
 	{/each}
-</ul>
+</div>
