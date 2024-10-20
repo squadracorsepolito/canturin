@@ -46,11 +46,9 @@
 	};
 </script>
 
-<SortableItem id="item-0"><div class="w-32 border-2">test</div></SortableItem>
-
 <div use:dropTarget class="block border-2 h-96 w-96"></div>
 
-<!-- <div class="w-60 border-yellow-300 border">
+<div class="w-60 border-yellow-300 border">
 	{#each items as item}
 		<SortableItem id={item.id}>
 			<div class="w-32 border-2">
@@ -58,4 +56,4 @@
 			</div>
 		</SortableItem>
 	{/each}
-</div> -->
+</div>

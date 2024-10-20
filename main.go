@@ -14,7 +14,7 @@ import (
 // made available to the frontend.
 // See https://pkg.go.dev/embed for more information.
 
-//go:embed frontend/build
+//go:embed frontend/build/*
 var assets embed.FS
 
 var app *application.App
@@ -91,7 +91,7 @@ func main() {
 	// }()
 
 	app.OnApplicationEvent(events.Common.ApplicationStarted, func(_ *application.ApplicationEvent) {
-		loadNetwork()
+		// loadNetwork()
 	})
 
 	// Run the application. This blocks until the application has been exited.

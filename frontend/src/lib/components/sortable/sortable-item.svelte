@@ -21,12 +21,26 @@
 			// 		type: 'item',
 			// 		id: id
 			// 	};
-			// }
+			// },
+		});
+
+		const a = dropTargetForElements({
+			element: el,
+			onDrop: () => {
+				console.log('drop');
+			},
+			onDragEnter: () => {
+				console.log('drag enter');
+			},
+			onDragLeave: () => {
+				console.log('drag leave');
+			}
 		});
 
 		return {
 			destroy() {
 				cleanup();
+				a();
 			}
 		};
 	};
