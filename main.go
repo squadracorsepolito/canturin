@@ -91,7 +91,7 @@ func main() {
 	// }()
 
 	app.OnApplicationEvent(events.Common.ApplicationStarted, func(_ *application.ApplicationEvent) {
-		// loadNetwork()
+		loadNetwork("./testdata/SC24.binpb")
 	})
 
 	// Run the application. This blocks until the application has been exited.

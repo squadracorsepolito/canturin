@@ -6,8 +6,8 @@ import (
 	"github.com/squadracorsepolito/acmelib"
 )
 
-func loadNetwork() {
-	wireFile, err := os.Open("./testdata/SC24.binpb")
+func loadNetwork(path string) {
+	wireFile, err := os.Open(path)
 	if err != nil {
 		panic(err)
 	}

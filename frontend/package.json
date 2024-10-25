@@ -13,6 +13,7 @@
 	},
 	"devDependencies": {
 		"@atlaskit/pragmatic-drag-and-drop": "^1.4.0",
+		"@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
 		"@melt-ui/svelte": "^0.83.0",
 		"@sveltejs/adapter-static": "^3.0.5",
 		"@sveltejs/kit": "^2.5.28",
