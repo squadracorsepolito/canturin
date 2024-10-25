@@ -60,6 +60,26 @@ func main() {
 
 	initMenus()
 
+	// Add the menu bar to perform tasks like Edit, File, Help
+	menu := app.NewMenu()
+	menu.AddRole(application.AppMenu)
+	menu.AddRole(application.EditMenu)
+	menu.AddRole(application.HelpMenu)
+
+	openMenu := menu.AddSubmenu("File")
+	openMenu.Add("Open File").OnClick(func(ctx *application.Context) {
+		result, _ := application.OpenFileDialog().
+			CanChooseFiles(true).
+			PromptForSingleSelection()
+		if result != "" {
+			application.InfoDialog().SetMessage(result).Show()
+		} else {
+			application.InfoDialog().SetMessage("No file selected").Show()
+		}
+	})
+
+	app.SetMenu(menu)
+
 	// Create a new window with the necessary options.
 	// 'Title' is the title of the window.
 	// 'Mac' options tailor the window when running on macOS.
