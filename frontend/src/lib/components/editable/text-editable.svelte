@@ -2,16 +2,18 @@
 	import { uniqueId } from '$lib/utils';
 	import * as editable from '@zag-js/editable';
 	import { useMachine, normalizeProps } from '@zag-js/svelte';
+	import { untrack } from 'svelte';
 
 	type Props = {
 		initialValue: string;
 		name: string;
 		placeholder?: string;
+		size?: 'lg' | 'md';
 		validator: (value: string) => string[] | undefined;
 		onsubmit: (value: string) => void;
 	};
 
-	let { initialValue, name, placeholder, validator, onsubmit }: Props = $props();
+	let { initialValue, name, placeholder, size = 'lg', validator, onsubmit }: Props = $props();
 
 	let errors = $state<string[]>();
 
@@ -40,11 +42,25 @@
 	);
 
 	const api = $derived(editable.connect(snpshot, send, normalizeProps));
+
+	$effect(() => {
+		untrack(() => api.setValue)(initialValue);
+	});
+
+	function getFontSize() {
+		switch (size) {
+			case 'lg':
+				return 'text-h2';
+			case 'md':
+			default:
+				return 'text-h4';
+		}
+	}
 </script>
 
 <div>
 	<div {...api.getRootProps()}>
-		<div {...api.getAreaProps()} data-error={errors ? true : undefined}>
+		<div {...api.getAreaProps()} data-error={errors ? true : undefined} class={getFontSize()}>
 			<input {...api.getInputProps()} />
 
 			<span {...api.getPreviewProps()}>
@@ -64,7 +80,7 @@
 
 <style lang="postcss">
 	[data-part='area'] {
-		@apply rounded-btn border-2 border-transparent px-2 py-1 text-h2 transition-colors;
+		@apply rounded-btn border-2 border-transparent px-2 py-1 transition-colors;
 
 		&[data-error] {
 			&[data-focus] {

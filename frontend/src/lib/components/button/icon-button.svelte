@@ -3,14 +3,18 @@
 
 	type Props = {
 		onclick: () => void;
-		label: string;
-		icon: Snippet;
+		label?: string;
+		disabled?: boolean;
+		children: Snippet;
 	};
 
-	let { onclick, label, icon }: Props = $props();
+	let { onclick, label, disabled, children }: Props = $props();
 </script>
 
-<button {onclick} class="btn btn-sm btn-ghost">
-	{@render icon()}
-	{label}
+<button {onclick} class="btn btn-sm btn-ghost {!label && 'btn-square'}" {disabled}>
+	{@render children()}
+
+	{#if label}
+		{label}
+	{/if}
 </button>

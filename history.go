@@ -1,70 +1,70 @@
 package main
 
-import "github.com/squadracorsepolito/acmelib"
+// import "github.com/squadracorsepolito/acmelib"
 
-type operationKind int
+// type operationKind int
 
-const (
-	operationKindSetDesc operationKind = iota
-	operationKindUpdateName
-)
+// const (
+// 	operationKindSetDesc operationKind = iota
+// 	operationKindUpdateName
+// )
 
-type operationDomain int
+// type operationDomain int
 
-const (
-	operationDomainNetwork operationDomain = iota
-	operationDomainBus
-	operationDomainNode
-	operationDomainMessage
-)
+// const (
+// 	operationDomainNetwork operationDomain = iota
+// 	operationDomainBus
+// 	operationDomainNode
+// 	operationDomainMessage
+// )
 
-type messageOperationHandler struct{}
+// type messageOperationHandler struct{}
 
-func (h *messageOperationHandler) apply() any {
-	return nil
-}
+// func (h *messageOperationHandler) apply() any {
+// 	return nil
+// }
 
-type operation interface {
-	kind() operationKind
+// type operation interface {
+// 	kind() operationKind
 
-	entityID() acmelib.EntityID
-	before() any
-	after() any
-}
+// 	entityID() acmelib.EntityID
+// 	before() any
+// 	after() any
+// }
 
-type history struct {
-	operations []operation
-	currIdx    int
-}
+// type history struct {
+// 	operations []operation
+// 	currIdx    int
+// }
 
-func newHistory() *history {
-	return &history{
-		operations: []operation{},
-		currIdx:    -1,
-	}
-}
+// func newHistory() *history {
+// 	return &history{
+// 		operations: []operation{},
+// 		currIdx:    -1,
+// 	}
+// }
 
-func (h *history) push(op operation) {
-	if len(h.operations) > h.currIdx+1 {
-		h.operations = h.operations[:h.currIdx+1]
-	}
+// func (h *history) push(op operation) {
+// 	if len(h.operations) > h.currIdx+1 {
+// 		h.operations = h.operations[:h.currIdx+1]
+// 	}
 
-	h.operations = append(h.operations, op)
-	h.currIdx++
-}
+// 	h.operations = append(h.operations, op)
+// 	h.currIdx++
+// }
 
-func (h *history) undo() {
-	if h.currIdx == 0 {
-		return
-	}
+// func (h *history) undo() {
+// 	if h.currIdx == 0 {
+// 		return
+// 	}
 
-	h.currIdx--
-}
+// 	h.currIdx--
+// }
 
-func (h *history) redo() {
-	if h.currIdx == len(h.operations)-1 {
-		return
-	}
+// func (h *history) redo() {
+// 	if h.currIdx == len(h.operations)-1 {
+// 		return
+// 	}
 
-	h.currIdx++
-}
+// 	h.currIdx++
+// }

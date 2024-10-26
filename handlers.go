@@ -6,8 +6,8 @@ import (
 	"github.com/squadracorsepolito/acmelib"
 )
 
-func loadNetwork() {
-	wireFile, err := os.Open("./testdata/SC24.binpb")
+func loadNetwork(path string) {
+	wireFile, err := os.Open(path)
 	if err != nil {
 		panic(err)
 	}
@@ -65,8 +65,7 @@ func loadNetwork() {
 		proxy.pushSignalUnit(sigUnit)
 	}
 
-	// for _, sigEnum := range sigEnums {
-	// 	proxy.pushSignalEnum(sigEnum)
-	// }
-
+	for _, sigEnum := range sigEnums {
+		proxy.pushLoadSignalEnum(sigEnum)
+	}
 }

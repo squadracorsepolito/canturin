@@ -3,6 +3,7 @@
 	import * as editable from '@zag-js/editable';
 	import * as numberInput from '@zag-js/number-input';
 	import { useMachine, normalizeProps } from '@zag-js/svelte';
+	import { untrack } from 'svelte';
 
 	type Props = {
 		initialValue: number;
@@ -26,6 +27,7 @@
 			activationMode: 'dblclick',
 			placeholder: placeholder,
 			submitMode: 'both',
+			autoResize: true,
 			onValueCommit: (details) => {
 				if (errors) {
 					api.setValue(initialValue + '');
@@ -56,6 +58,10 @@
 
 	const api = $derived(editable.connect(snpshot, send, normalizeProps));
 	const inputApi = $derived(numberInput.connect(inputSnapshot, inputSend, normalizeProps));
+
+	$effect(() => {
+		untrack(() => api.setValue)(initialValue + '');
+	});
 </script>
 
 <div {...api.getRootProps()}>

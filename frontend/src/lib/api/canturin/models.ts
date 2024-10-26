@@ -13,6 +13,11 @@ import * as time$0 from "../time/models.js";
 // @ts-ignore: Unused imports
 import * as $internal from "./internal.js";
 
+export interface History {
+    "operationCount": number;
+    "currentIndex": number;
+}
+
 export interface Message {
     "entityId": string;
     "name": string;
@@ -66,6 +71,26 @@ export interface Signal {
     "kind": acmelib$0.SignalKind;
     "startPos": number;
     "size": number;
+}
+
+export interface SignalEnum {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+    "size": number;
+    "minSize": number;
+    "maxIndex": number;
+    "values": SignalEnumValue[] | null;
+    "references": SignalReference[] | null;
+}
+
+export interface SignalEnumValue {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+    "index": number;
 }
 
 export interface SignalReference {

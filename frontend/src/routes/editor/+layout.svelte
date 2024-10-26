@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { SidebarNodeKind, type SidebarNode } from '$lib/api/canturin';
+	import { HistoryService, SidebarNodeKind, type SidebarNode } from '$lib/api/canturin';
+	import { IconButton } from '$lib/components/button';
 	import {
 		NetworkIcon,
 		BusIcon,
@@ -7,12 +8,16 @@
 		MessageIcon,
 		SignalUnitIcon,
 		SignalTypeIcon,
-		AddIcon
+		AddIcon,
+		SignalEnumIcon,
+		UndoIcon,
+		RedoIcon
 	} from '$lib/components/icon';
 	import Tree from '$lib/components/tree/tree.svelte';
 	import type { TreeNode } from '$lib/components/tree/types';
 	import layout from '$lib/state/layout-state.svelte';
 	import sidebarState from '$lib/state/sidebar-state.svelte';
+	import history from '$lib/state/history-state.svelte';
 
 	let { children } = $props();
 
@@ -52,8 +57,15 @@
 					},
 					{
 						name: 'Signal Enums',
-						icon: NetworkIcon,
-						childNodes: []
+						icon: SignalEnumIcon,
+						childNodes: [
+							{
+								name: 'Add Signal Enum',
+								icon: AddIcon,
+								childNodes: [],
+								onclick: () => layout.openPanel('signal_enum', 'draft')
+							}
+						]
 					}
 				);
 				break;
@@ -82,6 +94,8 @@
 				break;
 
 			case SidebarNodeKind.SidebarNodeKindSignalEnum:
+				n.icon = SignalEnumIcon;
+				n.onclick = () => layout.openPanel('signal_enum', currNode.entityId);
 				break;
 		}
 
@@ -111,6 +125,16 @@
 
 		return n;
 	}
+
+	function handleUndo() {
+		history.undo();
+	}
+
+	function handleRedo() {
+		history.redo();
+	}
+
+	$inspect(history.history);
 </script>
 
 <div class="flex h-full w-full">
@@ -119,13 +143,23 @@
 
 		<div class="flex-1 overflow-y-auto overflow-x-hidden">
 			{#if sidebarState.tree}
-				<Tree rootNode={getNetTree(sidebarState.tree)} defaultOpen />
+				<Tree rootNode={getNetTree(sidebarState.tree)} />
 			{/if}
 		</div>
 	</div>
 
 	<div class="flex-1 flex flex-col">
-		<div class="h-12 block bg-base-300 sticky top-0"></div>
+		<div class="h-12 bg-base-200 sticky top-0 block">
+			<div class="flex items-center h-full px-5 gap-2">
+				<IconButton onclick={handleUndo} disabled={!history.canUndo}>
+					<UndoIcon />
+				</IconButton>
+
+				<IconButton onclick={handleRedo} disabled={!history.canRedo}>
+					<RedoIcon />
+				</IconButton>
+			</div>
+		</div>
 
 		{@render children()}
 	</div>

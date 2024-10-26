@@ -14,7 +14,7 @@ import (
 // made available to the frontend.
 // See https://pkg.go.dev/embed for more information.
 
-//go:embed frontend/build
+//go:embed frontend/build/*
 var assets embed.FS
 
 var app *application.App
@@ -29,10 +29,12 @@ func main() {
 
 	// Initialize the services
 	sidebarSrv := newSidebarService()
+	historySrv := newHistoryService()
 
 	msgServ := newMessageService()
 	sigTypeServ := newSignalTypeService()
 	sigUnitServ := newSignalUnitService()
+	signalEnumService := newSignalEnumService()
 
 	// Create a new Wails application by providing the necesvar (sary options.
 	// Variables 'Name' and 'Description' are for application metadata.
@@ -42,17 +44,33 @@ func main() {
 	app = application.New(application.Options{
 		Name:        "canturin",
 		Description: "",
+
 		Services: []application.Service{
 
 			application.NewService(sidebarSrv),
+			application.NewService(historySrv),
 
 			application.NewService(msgServ),
 			application.NewService(sigTypeServ),
 			application.NewService(sigUnitServ),
+			application.NewService(signalEnumService),
 		},
+
+		KeyBindings: map[string]func(window *application.WebviewWindow){
+			"ctrl+z": func(w *application.WebviewWindow) {
+				historySrv.Undo()
+				historySrv.emitHistoryChange()
+			},
+			"ctrl+y": func(w *application.WebviewWindow) {
+				historySrv.Redo()
+				historySrv.emitHistoryChange()
+			},
+		},
+
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
 		},
+
 		Mac: application.MacOptions{
 			ApplicationShouldTerminateAfterLastWindowClosed: true,
 		},
@@ -70,7 +88,6 @@ func main() {
 		Mac: application.MacWindow{
 			InvisibleTitleBarHeight: 50,
 			Backdrop:                application.MacBackdropTranslucent,
-			TitleBar:                application.MacTitleBarHiddenInset,
 		},
 		BackgroundColour: application.NewRGB(27, 38, 54),
 		URL:              "/",
@@ -90,7 +107,7 @@ func main() {
 	// }()
 
 	app.OnApplicationEvent(events.Common.ApplicationStarted, func(_ *application.ApplicationEvent) {
-		loadNetwork()
+		loadNetwork("./testdata/SC24.binpb")
 	})
 
 	// Run the application. This blocks until the application has been exited.

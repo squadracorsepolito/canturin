@@ -40,7 +40,7 @@ class SidebarState {
 	}
 
 	update(node: SidebarNode) {
-		console.log(node);
+		// console.log(node);
 
 		let idx: number;
 		switch (node.kind) {

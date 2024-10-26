@@ -12,11 +12,13 @@ type appProxy struct {
 	sidebarAddCh    chan *sidebarAddReq
 	sidebarRemoveCh chan *sidebarRemoveReq
 
+	historyOperationCh chan *operation
+
 	messageCh chan *acmelib.Message
 
-	sigTypeCh chan *acmelib.SignalType
-	sigUnitCh chan *acmelib.SignalUnit
-	sigEnumCh chan *acmelib.SignalEnum
+	sigTypeCh        chan *acmelib.SignalType
+	sigUnitCh        chan *acmelib.SignalUnit
+	loadSignalEnumCh chan *acmelib.SignalEnum
 }
 
 func newAppProxy() *appProxy {
@@ -26,11 +28,13 @@ func newAppProxy() *appProxy {
 		sidebarAddCh:    make(chan *sidebarAddReq),
 		sidebarRemoveCh: make(chan *sidebarRemoveReq),
 
+		historyOperationCh: make(chan *operation),
+
 		messageCh: make(chan *acmelib.Message),
 
-		sigTypeCh: make(chan *acmelib.SignalType),
-		sigUnitCh: make(chan *acmelib.SignalUnit),
-		sigEnumCh: make(chan *acmelib.SignalEnum),
+		sigTypeCh:        make(chan *acmelib.SignalType),
+		sigUnitCh:        make(chan *acmelib.SignalUnit),
+		loadSignalEnumCh: make(chan *acmelib.SignalEnum),
 	}
 }
 
@@ -62,6 +66,14 @@ func (p *appProxy) pushSidebarRemove(entID acmelib.EntityID) {
 	}
 }
 
+func (p *appProxy) pushHistoryOperation(domain operationDomain, undo, redo operationFunc) {
+	p.historyOperationCh <- &operation{
+		domain: domain,
+		undo:   undo,
+		redo:   redo,
+	}
+}
+
 func (p *appProxy) pushMessage(msg *acmelib.Message) {
 	p.messageCh <- msg
 }
@@ -74,6 +86,6 @@ func (p *appProxy) pushSignalUnit(sig *acmelib.SignalUnit) {
 	p.sigUnitCh <- sig
 }
 
-func (p *appProxy) pushSignalEnum(sig *acmelib.SignalEnum) {
-	p.sigEnumCh <- sig
+func (p *appProxy) pushLoadSignalEnum(sig *acmelib.SignalEnum) {
+	p.loadSignalEnumCh <- sig
 }

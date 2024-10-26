@@ -1,8 +1,12 @@
 import { SignalTypeService, type SignalType } from '$lib/api/canturin';
+import { HistorySignalTypeModify } from '$lib/api/events';
 import { EntityState } from './entity-state.svelte';
 import { StateProvider } from './state-provider.svelte';
 
-const provider = new StateProvider((signalType: SignalType) => new SignalTypeState(signalType));
+const provider = new StateProvider(
+	(signalType: SignalType) => new SignalTypeState(signalType),
+	HistorySignalTypeModify
+);
 
 export function getSignalTypeState(entityId: string) {
 	return provider.get(entityId);

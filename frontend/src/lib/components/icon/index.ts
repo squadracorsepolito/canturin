@@ -11,3 +11,7 @@ export { default as BackwardIcon } from './backward-icon.svelte';
 export { default as SignalUnitIcon } from './signal-unit-icon.svelte';
 export { default as SignalTypeIcon } from './signal-type-icon.svelte';
 export { default as TickIcon } from './tick-icon.svelte';
+export { default as SignalEnumIcon } from './signal-enum-icon.svelte';
+export { default as SortIcon } from './sort-icon.svelte';
+export { default as UndoIcon } from './undo-icon.svelte';
+export { default as RedoIcon } from './redo-icon.svelte';

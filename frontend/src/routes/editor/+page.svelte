@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { SignalTypePanel } from '$lib/panel';
+	import { SignalEnumPanel, SignalTypePanel } from '$lib/panel';
 	import MessagePanel from '$lib/panel/message-panel.svelte';
 	import SignalUnitPanel from '$lib/panel/signal-unit-panel.svelte';
 	import layout from '$lib/state/layout-state.svelte';
@@ -11,4 +11,6 @@
 	<SignalTypePanel entityId={layout.openPanelId} />
 {:else if layout.openPanelType === 'signal_unit'}
 	<SignalUnitPanel entityId={layout.openPanelId} />
+{:else if layout.openPanelType === 'signal_enum'}
+	<SignalEnumPanel entityId={layout.openPanelId} />
 {/if}

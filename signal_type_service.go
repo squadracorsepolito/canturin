@@ -127,9 +127,38 @@ func (s *SignalTypeService) UpdateName(entityID string, name string) (SignalType
 		return SignalType{}, err
 	}
 
-	sigType.SetName(name)
+	s.mux.Lock()
+	defer s.mux.Unlock()
 
+	oldName := sigType.Name()
+	if name == oldName {
+		return s.converterFn(sigType), nil
+	}
+
+	sigType.SetName(name)
 	proxy.pushSidebarUpdate(sigType.EntityID(), name)
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalType,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigType.SetName(oldName)
+			proxy.pushSidebarUpdate(sigType.EntityID(), oldName)
+
+			return s.converterFn(sigType), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigType.SetName(name)
+			proxy.pushSidebarUpdate(sigType.EntityID(), name)
+
+			return s.converterFn(sigType), nil
+		},
+	)
 
 	return s.converterFn(sigType), nil
 }
@@ -140,7 +169,35 @@ func (s *SignalTypeService) UpdateDesc(entityID string, desc string) (SignalType
 		return SignalType{}, err
 	}
 
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	oldDesc := sigType.Desc()
+	if desc == oldDesc {
+		return s.converterFn(sigType), nil
+	}
+
 	sigType.SetDesc(desc)
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalType,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigType.SetDesc(oldDesc)
+
+			return s.converterFn(sigType), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigType.SetDesc(desc)
+
+			return s.converterFn(sigType), nil
+		},
+	)
 
 	return s.converterFn(sigType), nil
 }
@@ -151,7 +208,35 @@ func (s *SignalTypeService) UpdateMin(entityID string, min float64) (SignalType,
 		return SignalType{}, err
 	}
 
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	oldMin := sigType.Min()
+	if min == oldMin {
+		return s.converterFn(sigType), nil
+	}
+
 	sigType.SetMin(min)
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalType,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigType.SetMin(oldMin)
+
+			return s.converterFn(sigType), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigType.SetMin(min)
+
+			return s.converterFn(sigType), nil
+		},
+	)
 
 	return s.converterFn(sigType), nil
 }
@@ -162,7 +247,35 @@ func (s *SignalTypeService) UpdateMax(entityID string, max float64) (SignalType,
 		return SignalType{}, err
 	}
 
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	oldMax := sigType.Max()
+	if max == oldMax {
+		return s.converterFn(sigType), nil
+	}
+
 	sigType.SetMax(max)
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalType,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigType.SetMax(oldMax)
+
+			return s.converterFn(sigType), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigType.SetMax(max)
+
+			return s.converterFn(sigType), nil
+		},
+	)
 
 	return s.converterFn(sigType), nil
 }
@@ -173,7 +286,35 @@ func (s *SignalTypeService) UpdateScale(entityID string, scale float64) (SignalT
 		return SignalType{}, err
 	}
 
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	oldScale := sigType.Scale()
+	if scale == oldScale {
+		return s.converterFn(sigType), nil
+	}
+
 	sigType.SetScale(scale)
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalType,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigType.SetScale(oldScale)
+
+			return s.converterFn(sigType), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigType.SetScale(scale)
+
+			return s.converterFn(sigType), nil
+		},
+	)
 
 	return s.converterFn(sigType), nil
 }
@@ -184,7 +325,35 @@ func (s *SignalTypeService) UpdateOffset(entityID string, offset float64) (Signa
 		return SignalType{}, err
 	}
 
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	oldOffset := sigType.Offset()
+	if offset == oldOffset {
+		return s.converterFn(sigType), nil
+	}
+
 	sigType.SetOffset(offset)
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalType,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigType.SetOffset(oldOffset)
+
+			return s.converterFn(sigType), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigType.SetOffset(offset)
+
+			return s.converterFn(sigType), nil
+		},
+	)
 
 	return s.converterFn(sigType), nil
 }
