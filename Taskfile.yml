@@ -398,7 +398,7 @@ tasks:
       - "frontend/src/lib/api/**/*"
     cmds:
       # For a complete list of options, run `wails3 generate bindings -help`
-      - wails3 generate bindings -ts -i -d frontend/src/lib/api -f '{{.BUILD_FLAGS}}'
+      - wails3 generate bindings -silent -ts -i -d frontend/src/lib/api -f '{{.BUILD_FLAGS}}'
       - wails3 generate constants -f events.go -o frontend/src/lib/api/events.ts
 
   generate:constants:

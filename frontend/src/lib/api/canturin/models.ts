@@ -13,6 +13,11 @@ import * as time$0 from "../time/models.js";
 // @ts-ignore: Unused imports
 import * as $internal from "./internal.js";
 
+export interface History {
+    "operationCount": number;
+    "currentIndex": number;
+}
+
 export interface Message {
     "entityId": string;
     "name": string;

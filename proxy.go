@@ -12,6 +12,8 @@ type appProxy struct {
 	sidebarAddCh    chan *sidebarAddReq
 	sidebarRemoveCh chan *sidebarRemoveReq
 
+	historyOperationCh chan *operation
+
 	messageCh chan *acmelib.Message
 
 	sigTypeCh        chan *acmelib.SignalType
@@ -25,6 +27,8 @@ func newAppProxy() *appProxy {
 		sidebarUpdateCh: make(chan *sidebarUpdateReq),
 		sidebarAddCh:    make(chan *sidebarAddReq),
 		sidebarRemoveCh: make(chan *sidebarRemoveReq),
+
+		historyOperationCh: make(chan *operation),
 
 		messageCh: make(chan *acmelib.Message),
 
@@ -59,6 +63,14 @@ func (p *appProxy) pushSidebarAdd(kind SidebarNodeKind, entID, parentID acmelib.
 func (p *appProxy) pushSidebarRemove(entID acmelib.EntityID) {
 	p.sidebarRemoveCh <- &sidebarRemoveReq{
 		entityID: entID,
+	}
+}
+
+func (p *appProxy) pushHistoryOperation(domain operationDomain, undo, redo operationFunc) {
+	p.historyOperationCh <- &operation{
+		domain: domain,
+		undo:   undo,
+		redo:   redo,
 	}
 }
 

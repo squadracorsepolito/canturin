@@ -29,6 +29,7 @@ func main() {
 
 	// Initialize the services
 	sidebarSrv := newSidebarService()
+	historySrv := newHistoryService()
 
 	msgServ := newMessageService()
 	sigTypeServ := newSignalTypeService()
@@ -43,18 +44,33 @@ func main() {
 	app = application.New(application.Options{
 		Name:        "canturin",
 		Description: "",
+
 		Services: []application.Service{
 
 			application.NewService(sidebarSrv),
+			application.NewService(historySrv),
 
 			application.NewService(msgServ),
 			application.NewService(sigTypeServ),
 			application.NewService(sigUnitServ),
 			application.NewService(signalEnumService),
 		},
+
+		KeyBindings: map[string]func(window *application.WebviewWindow){
+			"ctrl+z": func(w *application.WebviewWindow) {
+				historySrv.Undo()
+				historySrv.emitHistoryChange()
+			},
+			"ctrl+y": func(w *application.WebviewWindow) {
+				historySrv.Redo()
+				historySrv.emitHistoryChange()
+			},
+		},
+
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
 		},
+
 		Mac: application.MacOptions{
 			ApplicationShouldTerminateAfterLastWindowClosed: true,
 		},

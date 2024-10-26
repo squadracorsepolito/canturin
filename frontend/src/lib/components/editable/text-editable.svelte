@@ -2,6 +2,7 @@
 	import { uniqueId } from '$lib/utils';
 	import * as editable from '@zag-js/editable';
 	import { useMachine, normalizeProps } from '@zag-js/svelte';
+	import { untrack } from 'svelte';
 
 	type Props = {
 		initialValue: string;
@@ -41,6 +42,10 @@
 	);
 
 	const api = $derived(editable.connect(snpshot, send, normalizeProps));
+
+	$effect(() => {
+		untrack(() => api.setValue)(initialValue);
+	});
 
 	function getFontSize() {
 		switch (size) {
