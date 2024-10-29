@@ -1,39 +1,185 @@
 <script lang="ts" generics="T extends {id: string}">
-	import { dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 	import type { Snippet } from 'svelte';
 	import type { Action } from 'svelte/action';
 	import SortableItem from './sortable-item.svelte';
+	import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
+	import { onMount } from 'svelte';
+	import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
+	import { getReorderDestinationIndex } from '@atlaskit/pragmatic-drag-and-drop-hitbox/util/get-reorder-destination-index';
 
 	type Props = {
 		items: T[];
+		direction?: 'vertical' | 'horizontal';
+		reorder: (from: number, to: number) => void;
 		itemBody: Snippet<[T]>;
 	};
 
-	let { items, itemBody }: Props = $props();
+	let { items, direction = 'vertical', reorder, itemBody }: Props = $props();
 
-	// const listAction: Action<HTMLElement> = (el) => {
-	// 	const cleanup = dropTargetForElements({
-	// 		element: el,
-	// 		getData() {
-	// 			return { listId: 'list-1' };
-	// 		},
-	// 		getIsSticky() {
-	// 			return true;
-	// 		}
-	// 	});
+	let selectedItem = $state({
+		id: '',
+		index: -1
+	});
 
-	// 	return {
-	// 		destroy() {
-	// 			cleanup();
-	// 		}
-	// 	};
-	// };
+	let mode = $state<'drag' | 'keyboard'>('drag');
+
+	onMount(() => {
+		return monitorForElements({
+			canMonitor(args) {
+				return args.source.data.instanceId === 'instance';
+			},
+			onDrop({ source, location }) {
+				if (location.current.dropTargets.length === 0) return;
+
+				const itemId = source.data.id;
+				// const listId = location.initial.dropTargets[1].data.listId;
+
+				const itemIdx = items.findIndex((item) => item.id === itemId);
+				if (itemIdx === -1) return;
+
+				// console.log('onDrop', itemId, itemIdx);
+
+				// if (location.current.dropTargets.length === 1) {
+				// 	console.log(
+				// 		'dropTargets1',
+				// 		location.current.dropTargets,
+				// 		location.current.dropTargets.length
+				// 	);
+				// }
+
+				// if (location.current.dropTargets.length === 1) {
+				// Destructure and extract the destination card and column data from the drop targets
+				const [destItemRecord] = location.current.dropTargets;
+
+				// Find the index of the target card within the destination column's cards
+				const indexOfTarget = items.findIndex((item) => item.id === destItemRecord.data.id);
+
+				// Determine the closest edge of the target card: top or bottom
+				const closestEdgeOfTarget = extractClosestEdge(destItemRecord.data);
+
+				// Calculate the destination index for the card to be reordered within the same column
+				const destinationIndex = getReorderDestinationIndex({
+					startIndex: itemIdx,
+					indexOfTarget,
+					closestEdgeOfTarget,
+					axis: 'vertical'
+				});
+
+				// Perform the card reordering within the same column
+				reorder(itemIdx, destinationIndex);
+
+				return;
+				// }
+			}
+		});
+	});
+
+	const listAction: Action<HTMLUListElement> = (el) => {
+		function handleKeydown(e: KeyboardEvent) {
+			if (e.key === 'Escape') {
+				selectedItem = { id: '', index: -1 };
+
+				mode = 'drag';
+				el.blur();
+				return;
+			}
+
+			if (mode === 'drag') {
+				if (e.key === 'Enter') {
+					mode = 'keyboard';
+					selectedItem.index = 0;
+				}
+				return;
+			}
+
+			if (e.key === 'Enter') {
+				selectedItem = { id: '', index: -1 };
+				mode = 'drag';
+
+				return;
+			}
+
+			if (e.key === ' ') {
+				const targetId = items[selectedItem.index].id;
+				if (selectedItem.id === targetId) {
+					selectedItem.id = '';
+				} else {
+					selectedItem.id = targetId;
+				}
+
+				return;
+			}
+
+			if (
+				(direction === 'vertical' && e.key === 'ArrowUp') ||
+				(direction === 'horizontal' && e.key === 'ArrowLeft')
+			) {
+				if (selectedItem.id) {
+					reorder(selectedItem.index, selectedItem.index - 1);
+				}
+
+				if (selectedItem.index > 0) {
+					selectedItem.index--;
+				}
+
+				return;
+			}
+
+			if (
+				(direction === 'vertical' && e.key === 'ArrowDown') ||
+				(direction === 'horizontal' && e.key === 'ArrowRight')
+			) {
+				if (selectedItem.id) {
+					reorder(selectedItem.index, selectedItem.index + 1);
+				}
+
+				if (selectedItem.index < items.length - 1) {
+					selectedItem.index++;
+				}
+
+				return;
+			}
+		}
+
+		function handleBlur() {
+			selectedItem = { id: '', index: -1 };
+			mode = 'drag';
+		}
+
+		el.addEventListener('keydown', handleKeydown);
+		el.addEventListener('blur', handleBlur);
+
+		return {
+			destroy() {
+				el.removeEventListener('keydown', handleKeydown);
+				el.removeEventListener('blur', handleBlur);
+			}
+		};
+	};
 </script>
 
-<ul class="border border-yellow-500 flex flex-col">
-	{#each items as item (item.id)}
-		<SortableItem id={item.id}>
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+<ul use:listAction tabindex="0" class="sortable-list">
+	{#each items as item, idx (item.id)}
+		<SortableItem
+			id={item.id}
+			highlightState={selectedItem.index === idx
+				? selectedItem.id === item.id
+					? 'selected'
+					: 'highlighted'
+				: 'none'}
+		>
 			{@render itemBody(item)}
 		</SortableItem>
 	{/each}
 </ul>
+
+<style lang="postcss">
+	.sortable-list {
+		@apply flex flex-col p-3 rounded-box;
+
+		&:focus {
+			@apply outline-none focus-ring-primary;
+		}
+	}
+</style>

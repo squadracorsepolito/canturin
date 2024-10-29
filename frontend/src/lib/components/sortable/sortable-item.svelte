@@ -16,10 +16,11 @@
 
 	type Props = {
 		id: string;
+		highlightState: 'none' | 'highlighted' | 'selected';
 		children: Snippet;
 	};
 
-	let { id, children }: Props = $props();
+	let { id, highlightState, children }: Props = $props();
 
 	let closestEdge = $state<Edge | null>(null);
 	let isDragging = $state(false);
@@ -96,8 +97,12 @@
 	};
 </script>
 
-<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-<li use:itemAction tabindex="0" class="relative {isDragging && 'opacity-25'}">
+<li
+	use:itemAction
+	class="relative {isDragging && 'opacity-25'} {highlightState === 'highlighted'
+		? 'bg-base-200'
+		: highlightState === 'selected' && 'bg-accent text-accent-content'} "
+>
 	<div class="flex items-center gap-3 px-3">
 		<div bind:this={dragHandle}>
 			<DragHandleIcon />
