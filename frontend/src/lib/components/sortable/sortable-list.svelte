@@ -30,10 +30,10 @@
 	// };
 </script>
 
-<div class="border border-yellow-500 p-5 pb-20 flex flex-col">
-	{#each items as item}
+<ul class="border border-yellow-500 flex flex-col">
+	{#each items as item (item.id)}
 		<SortableItem id={item.id}>
 			{@render itemBody(item)}
 		</SortableItem>
 	{/each}
-</div>
+</ul>

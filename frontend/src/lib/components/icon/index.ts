@@ -15,3 +15,4 @@ export { default as SignalEnumIcon } from './signal-enum-icon.svelte';
 export { default as SortIcon } from './sort-icon.svelte';
 export { default as UndoIcon } from './undo-icon.svelte';
 export { default as RedoIcon } from './redo-icon.svelte';
+export { default as DragHandleIcon } from './drag-handle-icon.svelte';

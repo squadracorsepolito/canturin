@@ -12,6 +12,7 @@
 	import type { Edge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/dist/types/types';
 	import DropIndicator from './drop-indicator.svelte';
 	import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
+	import { DragHandleIcon } from '../icon';
 
 	type Props = {
 		id: string;
@@ -21,17 +22,33 @@
 	let { id, children }: Props = $props();
 
 	let closestEdge = $state<Edge | null>(null);
+	let isDragging = $state(false);
+
+	let dragHandle: HTMLElement;
 
 	const itemAction: Action<HTMLElement> = (el) => {
 		const cleanup = combine(
 			draggable({
 				element: el,
+				dragHandle: dragHandle,
 				getInitialData() {
 					return {
 						instanceId: 'instance',
 						type: 'item',
 						id: id
 					};
+				},
+				onDragStart() {
+					isDragging = true;
+				},
+				onDrop() {
+					isDragging = false;
+
+					el.animate([{ backgroundColor: '#37cdbe' }, {}], {
+						duration: 500,
+						easing: 'cubic-bezier(0.25, 0.1, 0.25, 1.0)',
+						iterations: 1
+					});
 				}
 			}),
 			dropTargetForElements({
@@ -79,10 +96,19 @@
 	};
 </script>
 
-<div use:itemAction class="relative">
-	{@render children()}
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+<li use:itemAction tabindex="0" class="relative {isDragging && 'opacity-25'}">
+	<div class="flex items-center gap-3 px-3">
+		<div bind:this={dragHandle}>
+			<DragHandleIcon />
+		</div>
+
+		<div class="flex-1">
+			{@render children()}
+		</div>
+	</div>
 
 	{#if closestEdge}
 		<DropIndicator edge={closestEdge} />
 	{/if}
-</div>
+</li>

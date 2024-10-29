@@ -45,8 +45,6 @@
 
 				// console.log('onDrop', itemId, itemIdx);
 
-				console.log(location.current.dropTargets);
-
 				// if (location.current.dropTargets.length === 1) {
 				// 	console.log(
 				// 		'dropTargets1',
@@ -75,6 +73,12 @@
 
 				// Perform the card reordering within the same column
 				reorderItems(itemIdx, destinationIndex);
+
+				// source.element.animate([{ backgroundColor: '#37cdbe' }, {}], {
+				// 	duration: 500,
+				// 	easing: 'cubic-bezier(0.25, 0.1, 0.25, 1.0)',
+				// 	iterations: 1
+				// });
 
 				return;
 				// }
