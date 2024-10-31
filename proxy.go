@@ -16,9 +16,9 @@ type appProxy struct {
 
 	messageCh chan *acmelib.Message
 
-	sigTypeCh        chan *acmelib.SignalType
-	sigUnitCh        chan *acmelib.SignalUnit
-	loadSignalEnumCh chan *acmelib.SignalEnum
+	sigTypeCh    chan *acmelib.SignalType
+	sigUnitCh    chan *acmelib.SignalUnit
+	signalEnumCh chan *acmelib.SignalEnum
 }
 
 func newAppProxy() *appProxy {
@@ -32,9 +32,9 @@ func newAppProxy() *appProxy {
 
 		messageCh: make(chan *acmelib.Message),
 
-		sigTypeCh:        make(chan *acmelib.SignalType),
-		sigUnitCh:        make(chan *acmelib.SignalUnit),
-		loadSignalEnumCh: make(chan *acmelib.SignalEnum),
+		sigTypeCh:    make(chan *acmelib.SignalType),
+		sigUnitCh:    make(chan *acmelib.SignalUnit),
+		signalEnumCh: make(chan *acmelib.SignalEnum),
 	}
 }
 
@@ -78,14 +78,14 @@ func (p *appProxy) pushMessage(msg *acmelib.Message) {
 	p.messageCh <- msg
 }
 
-func (p *appProxy) pushSignalType(sig *acmelib.SignalType) {
-	p.sigTypeCh <- sig
+func (p *appProxy) pushSignalType(sigType *acmelib.SignalType) {
+	p.sigTypeCh <- sigType
 }
 
-func (p *appProxy) pushSignalUnit(sig *acmelib.SignalUnit) {
-	p.sigUnitCh <- sig
+func (p *appProxy) pushSignalUnit(sigUnit *acmelib.SignalUnit) {
+	p.sigUnitCh <- sigUnit
 }
 
-func (p *appProxy) pushLoadSignalEnum(sig *acmelib.SignalEnum) {
-	p.loadSignalEnumCh <- sig
+func (p *appProxy) pushSignalEnum(sigEnum *acmelib.SignalEnum) {
+	p.signalEnumCh <- sigEnum
 }

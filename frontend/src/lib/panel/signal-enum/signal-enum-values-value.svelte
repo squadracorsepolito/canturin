@@ -59,7 +59,7 @@
 	}
 </script>
 
-<div class="py-5 col-span-8 grid grid-cols-subgrid">
+<div class="py-3 col-span-8 grid grid-cols-subgrid">
 	<div class="self-center">
 		<NumberEditable
 			validator={validateIndex}

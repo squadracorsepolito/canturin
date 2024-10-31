@@ -13,12 +13,12 @@
 	import DropIndicator from './drop-indicator.svelte';
 	import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 	import { DragHandleIcon, SortIcon } from '../icon';
-	import { getItem, isItem } from './types';
+	import { getItem, isItem, type HighlightState } from './types';
 
 	type Props = {
 		instanceId: string;
 		id: string;
-		highlightState: 'none' | 'selecting' | 'moving';
+		highlightState: HighlightState;
 		children: Snippet;
 	};
 
@@ -99,9 +99,9 @@
 	<div class="flex items-center gap-3 px-3">
 		<div bind:this={dragHandle} data-part="handle">
 			{#if highlightState === 'moving'}
-				<SortIcon height={20} width={20} />
+				<SortIcon />
 			{:else}
-				<DragHandleIcon height={20} width={20} />
+				<DragHandleIcon />
 			{/if}
 		</div>
 
@@ -137,6 +137,6 @@
 	}
 
 	[data-part='handle'] {
-		@apply p-1 rounded-btn cursor-grab;
+		@apply rounded-btn cursor-grab;
 	}
 </style>

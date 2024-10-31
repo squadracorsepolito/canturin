@@ -1,5 +1,7 @@
 const privateItemKey = Symbol('Item');
 
+export type HighlightState = 'none' | 'selecting' | 'moving';
+
 export type Item = {
 	[privateItemKey]: true;
 	instanceId: string;

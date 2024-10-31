@@ -7,13 +7,13 @@
 	import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 	import { getReorderDestinationIndex } from '@atlaskit/pragmatic-drag-and-drop-hitbox/util/get-reorder-destination-index';
 	import { flip } from 'svelte/animate';
-	import { isItem } from './types';
+	import { isItem, type HighlightState } from './types';
 
 	type Props = {
 		items: T[];
 		instanceId: string;
 		reorder: (from: number, to: number) => void;
-		itemBody: Snippet<[T]>;
+		itemBody: Snippet<[{ item: T; highlightState: HighlightState }]>;
 	};
 
 	let { items, instanceId, reorder, itemBody }: Props = $props();
@@ -169,17 +169,12 @@
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <ul use:listAction tabindex="0" class="sortable-list">
 	{#each items as item, idx (item.id)}
+		{@const hState =
+			idx === selectedItem.index ? (selectedItem.id === item.id ? 'moving' : 'selecting') : 'none'}
+
 		<li animate:flip={{ duration: 150 }}>
-			<SortableItem
-				id={item.id}
-				{instanceId}
-				highlightState={selectedItem.index === idx
-					? selectedItem.id === item.id
-						? 'moving'
-						: 'selecting'
-					: 'none'}
-			>
-				{@render itemBody(item)}
+			<SortableItem id={item.id} {instanceId} highlightState={hState}>
+				{@render itemBody({ item, highlightState: hState })}
 			</SortableItem>
 		</li>
 	{/each}
@@ -187,7 +182,7 @@
 
 <style lang="postcss">
 	.sortable-list {
-		@apply flex flex-col p-3 rounded-box;
+		@apply flex flex-col rounded-box;
 
 		&:focus {
 			@apply outline-none focus-ring-primary;

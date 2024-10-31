@@ -67,7 +67,7 @@ type SignalEnumService struct {
 
 func newSignalEnumService() *SignalEnumService {
 	return &SignalEnumService{
-		service: newService(proxy.loadSignalEnumCh, signalEnumConverter),
+		service: newService(proxy.signalEnumCh, signalEnumConverter),
 	}
 }
 
@@ -123,6 +123,59 @@ func (s *SignalEnumService) UpdateDesc(entityID string, desc string) (SignalEnum
 	}
 
 	sigEnum.SetDesc(desc)
+
+	return s.converterFn(sigEnum), nil
+}
+
+func (s *SignalEnumService) SortValue(enumEntID, valueEntID string, from, to int) (SignalEnum, error) {
+	if from == to {
+		return s.converterFn(nil), nil
+	}
+
+	sigEnum, err := s.getEntity(enumEntID)
+	if err != nil {
+		return SignalEnum{}, err
+	}
+
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	targetEnumVal := sigEnum.Values()[from]
+	if err := sigEnum.RemoveValue(targetEnumVal.EntityID()); err != nil {
+		return SignalEnum{}, err
+	}
+	lastValIdx := targetEnumVal.Index()
+
+	restValues := sigEnum.Values()
+	if to < from {
+		// move up
+		for i := from - 1; i >= to; i-- {
+			tmpVal := restValues[i]
+			tmpValIdx := tmpVal.Index()
+			if err := tmpVal.UpdateIndex(lastValIdx - 1); err != nil {
+				return SignalEnum{}, err
+			}
+			lastValIdx = tmpValIdx
+		}
+	} else {
+		// move down
+		for i := from; i < to; i++ {
+			tmpVal := restValues[i]
+			tmpValIdx := tmpVal.Index()
+			if err := tmpVal.UpdateIndex(lastValIdx + 1); err != nil {
+				return SignalEnum{}, err
+			}
+			lastValIdx = tmpValIdx
+		}
+	}
+
+	if err := targetEnumVal.UpdateIndex(lastValIdx); err != nil {
+		return SignalEnum{}, err
+	}
+
+	if err := sigEnum.AddValue(targetEnumVal); err != nil {
+		return SignalEnum{}, err
+	}
 
 	return s.converterFn(sigEnum), nil
 }

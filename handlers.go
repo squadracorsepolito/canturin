@@ -66,6 +66,6 @@ func loadNetwork(path string) {
 	}
 
 	for _, sigEnum := range sigEnums {
-		proxy.pushLoadSignalEnum(sigEnum)
+		proxy.pushSignalEnum(sigEnum)
 	}
 }

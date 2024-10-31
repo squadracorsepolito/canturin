@@ -5,7 +5,7 @@
 	import { getSignalEnumState } from '$lib/state/signal-enum-state.svelte';
 	import type { PanelSectionProps } from '../types';
 	import { text } from './signal-enum-text';
-	import SignalEnumVal from './signal-enum-val.svelte';
+	import SignalEnumValuesValue from './signal-enum-values-value.svelte';
 	import { SortableList } from '$lib/components/sortable';
 	import { reorder } from '@atlaskit/pragmatic-drag-and-drop/reorder';
 
@@ -37,9 +37,11 @@
 
 {#snippet section(signalEnum: SignalEnum)}
 	{#if signalEnum.values && signalEnum.values.length > 0}
-		<Toggle bind:toggled={sortToggled} name="signal-enum-values-sort">
-			<SortIcon />
-		</Toggle>
+		<div class="px-2 pb-3">
+			<Toggle bind:toggled={sortToggled} name="signal-enum-values-sort">
+				<SortIcon />
+			</Toggle>
+		</div>
 
 		{#if sortToggled}
 			<SortableList
@@ -49,14 +51,20 @@
 				instanceId={entityId + 'signal-enum-values'}
 				reorder={reorderItems}
 			>
-				{#snippet itemBody({ value })}
-					<div class="p-3">{value.name}</div>
+				{#snippet itemBody({ item: { value } })}
+					<div class="p-3 grid grid-cols-8 gap-5 items-center">
+						<div class="justify-self-center"><span class="text-h3">{value.index}</span></div>
+
+						<div class="col-span-7 text-h4">
+							{value.name}
+						</div>
+					</div>
 				{/snippet}
 			</SortableList>
 		{:else}
 			<div class="grid grid-cols-8 gap-2">
 				{#each signalEnum.values as sigEnumValue}
-					<SignalEnumVal
+					<SignalEnumValuesValue
 						{entityId}
 						value={sigEnumValue}
 						invalidNames={getValueInvalidNames(signalEnum.values, sigEnumValue.entityId)}
