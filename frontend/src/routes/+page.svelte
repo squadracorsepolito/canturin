@@ -40,8 +40,8 @@
 
 <Divider></Divider>
 
-<SortableList {items} reorder={reorderItems}>
+<SortableList {items} instanceId="items" reorder={reorderItems}>
 	{#snippet itemBody({ label })}
-		<div class="border p-3">{label}</div>
+		<div class="p-3">{label}</div>
 	{/snippet}
 </SortableList>

@@ -6,15 +6,17 @@
 	import { onMount } from 'svelte';
 	import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 	import { getReorderDestinationIndex } from '@atlaskit/pragmatic-drag-and-drop-hitbox/util/get-reorder-destination-index';
+	import { flip } from 'svelte/animate';
+	import { isItem } from './types';
 
 	type Props = {
 		items: T[];
-		direction?: 'vertical' | 'horizontal';
+		instanceId: string;
 		reorder: (from: number, to: number) => void;
 		itemBody: Snippet<[T]>;
 	};
 
-	let { items, direction = 'vertical', reorder, itemBody }: Props = $props();
+	let { items, instanceId, reorder, itemBody }: Props = $props();
 
 	let selectedItem = $state({
 		id: '',
@@ -25,11 +27,13 @@
 
 	onMount(() => {
 		return monitorForElements({
-			canMonitor(args) {
-				return args.source.data.instanceId === 'instance';
+			canMonitor({ source }) {
+				return isItem(source.data) && source.data.instanceId === instanceId;
 			},
 			onDrop({ source, location }) {
 				if (location.current.dropTargets.length === 0) return;
+
+				if (!isItem(source.data)) return;
 
 				const itemId = source.data.id;
 				// const listId = location.initial.dropTargets[1].data.listId;
@@ -50,9 +54,12 @@
 				// if (location.current.dropTargets.length === 1) {
 				// Destructure and extract the destination card and column data from the drop targets
 				const [destItemRecord] = location.current.dropTargets;
+				if (!isItem(destItemRecord.data)) return;
+
+				const destItemId = destItemRecord.data.id;
 
 				// Find the index of the target card within the destination column's cards
-				const indexOfTarget = items.findIndex((item) => item.id === destItemRecord.data.id);
+				const indexOfTarget = items.findIndex((item) => item.id === destItemId);
 
 				// Determine the closest edge of the target card: top or bottom
 				const closestEdgeOfTarget = extractClosestEdge(destItemRecord.data);
@@ -77,6 +84,7 @@
 	const listAction: Action<HTMLUListElement> = (el) => {
 		function handleKeydown(e: KeyboardEvent) {
 			if (e.key === 'Escape') {
+				e.preventDefault();
 				selectedItem = { id: '', index: -1 };
 
 				mode = 'drag';
@@ -100,6 +108,8 @@
 			}
 
 			if (e.key === ' ') {
+				e.preventDefault();
+
 				const targetId = items[selectedItem.index].id;
 				if (selectedItem.id === targetId) {
 					selectedItem.id = '';
@@ -110,10 +120,9 @@
 				return;
 			}
 
-			if (
-				(direction === 'vertical' && e.key === 'ArrowUp') ||
-				(direction === 'horizontal' && e.key === 'ArrowLeft')
-			) {
+			if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+				e.preventDefault();
+
 				if (selectedItem.id) {
 					reorder(selectedItem.index, selectedItem.index - 1);
 				}
@@ -125,10 +134,9 @@
 				return;
 			}
 
-			if (
-				(direction === 'vertical' && e.key === 'ArrowDown') ||
-				(direction === 'horizontal' && e.key === 'ArrowRight')
-			) {
+			if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+				e.preventDefault();
+
 				if (selectedItem.id) {
 					reorder(selectedItem.index, selectedItem.index + 1);
 				}
@@ -161,16 +169,19 @@
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <ul use:listAction tabindex="0" class="sortable-list">
 	{#each items as item, idx (item.id)}
-		<SortableItem
-			id={item.id}
-			highlightState={selectedItem.index === idx
-				? selectedItem.id === item.id
-					? 'selected'
-					: 'highlighted'
-				: 'none'}
-		>
-			{@render itemBody(item)}
-		</SortableItem>
+		<li animate:flip={{ duration: 150 }}>
+			<SortableItem
+				id={item.id}
+				{instanceId}
+				highlightState={selectedItem.index === idx
+					? selectedItem.id === item.id
+						? 'moving'
+						: 'selecting'
+					: 'none'}
+			>
+				{@render itemBody(item)}
+			</SortableItem>
+		</li>
 	{/each}
 </ul>
 

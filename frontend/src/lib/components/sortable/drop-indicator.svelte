@@ -21,11 +21,11 @@
 		}
 
 		&[data-edge='top'] {
-			@apply top-[-0.125rem];
+			@apply top-[-0.25rem];
 		}
 
 		&[data-edge='bottom'] {
-			@apply bottom-[-0.125rem];
+			@apply bottom-[-0.25rem];
 		}
 	}
 </style>

@@ -12,15 +12,17 @@
 	import type { Edge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/dist/types/types';
 	import DropIndicator from './drop-indicator.svelte';
 	import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
-	import { DragHandleIcon } from '../icon';
+	import { DragHandleIcon, SortIcon } from '../icon';
+	import { getItem, isItem } from './types';
 
 	type Props = {
+		instanceId: string;
 		id: string;
-		highlightState: 'none' | 'highlighted' | 'selected';
+		highlightState: 'none' | 'selecting' | 'moving';
 		children: Snippet;
 	};
 
-	let { id, highlightState, children }: Props = $props();
+	let { instanceId, id, highlightState, children }: Props = $props();
 
 	let closestEdge = $state<Edge | null>(null);
 	let isDragging = $state(false);
@@ -33,11 +35,7 @@
 				element: el,
 				dragHandle: dragHandle,
 				getInitialData() {
-					return {
-						instanceId: 'instance',
-						type: 'item',
-						id: id
-					};
+					return getItem({ instanceId, id });
 				},
 				onDragStart() {
 					isDragging = true;
@@ -46,7 +44,8 @@
 					isDragging = false;
 
 					el.animate([{ backgroundColor: '#37cdbe' }, {}], {
-						duration: 500,
+						duration: 600,
+						delay: 150,
 						easing: 'cubic-bezier(0.25, 0.1, 0.25, 1.0)',
 						iterations: 1
 					});
@@ -55,29 +54,23 @@
 			dropTargetForElements({
 				element: el,
 				canDrop({ source }) {
-					return source.data.instanceId === 'instance';
+					return isItem(source.data) && source.data.instanceId === instanceId;
 				},
-				getData(args) {
-					return attachClosestEdge(
-						{
-							type: 'item',
-							id: id
-						},
-						{
-							element: args.element,
-							input: args.input,
-							allowedEdges: ['top', 'bottom']
-						}
-					);
+				getData({ element, input }) {
+					return attachClosestEdge(getItem({ instanceId, id }), {
+						element: element,
+						input: input,
+						allowedEdges: ['top', 'bottom']
+					});
 				},
-				onDragEnter(args) {
-					if (args.source.data.id !== id) {
-						closestEdge = extractClosestEdge(args.self.data);
+				onDragEnter({ source, self }) {
+					if (isItem(source.data) && source.data.id !== id) {
+						closestEdge = extractClosestEdge(self.data);
 					}
 				},
-				onDrag(args) {
-					if (args.source.data.id !== id) {
-						closestEdge = extractClosestEdge(args.self.data);
+				onDrag({ source, self }) {
+					if (isItem(source.data) && source.data.id !== id) {
+						closestEdge = extractClosestEdge(self.data);
 					}
 				},
 				onDragLeave() {
@@ -97,15 +90,19 @@
 	};
 </script>
 
-<li
+<div
 	use:itemAction
-	class="relative {isDragging && 'opacity-25'} {highlightState === 'highlighted'
-		? 'bg-base-200'
-		: highlightState === 'selected' && 'bg-accent text-accent-content'} "
+	data-part="root"
+	data-highlight-state={highlightState}
+	data-dragging={isDragging ? 'true' : undefined}
 >
 	<div class="flex items-center gap-3 px-3">
-		<div bind:this={dragHandle}>
-			<DragHandleIcon />
+		<div bind:this={dragHandle} data-part="handle">
+			{#if highlightState === 'moving'}
+				<SortIcon height={20} width={20} />
+			{:else}
+				<DragHandleIcon height={20} width={20} />
+			{/if}
 		</div>
 
 		<div class="flex-1">
@@ -116,4 +113,30 @@
 	{#if closestEdge}
 		<DropIndicator edge={closestEdge} />
 	{/if}
-</li>
+</div>
+
+<style lang="postcss">
+	[data-part='root'] {
+		@apply relative rounded-btn border-2 transition-colors;
+
+		&[data-dragging] {
+			@apply opacity-20;
+		}
+
+		&[data-highlight-state='none'] {
+			@apply border-transparent;
+		}
+
+		&[data-highlight-state='selecting'] {
+			@apply border-secondary focus-ring-secondary text-secondary bg-secondary-ghost;
+		}
+
+		&[data-highlight-state='moving'] {
+			@apply border-primary focus-ring-primary text-primary bg-primary-ghost;
+		}
+	}
+
+	[data-part='handle'] {
+		@apply p-1 rounded-btn cursor-grab;
+	}
+</style>

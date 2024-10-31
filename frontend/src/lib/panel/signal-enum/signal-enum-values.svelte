@@ -37,7 +37,7 @@
 
 {#snippet section(signalEnum: SignalEnum)}
 	{#if signalEnum.values && signalEnum.values.length > 0}
-		<Toggle bind:toggled={sortToggled} name="sort">
+		<Toggle bind:toggled={sortToggled} name="signal-enum-values-sort">
 			<SortIcon />
 		</Toggle>
 
@@ -46,6 +46,7 @@
 				items={signalEnum.values.map((val) => {
 					return { id: val.entityId, value: val };
 				})}
+				instanceId={entityId + 'signal-enum-values'}
 				reorder={reorderItems}
 			>
 				{#snippet itemBody({ value })}
