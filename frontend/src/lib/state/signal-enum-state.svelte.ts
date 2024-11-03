@@ -18,8 +18,17 @@ export async function loadSignalEnum(entityId: string) {
 }
 
 class SignalEnumState extends EntityState<SignalEnum> {
+	indexes = $state<number[]>([]);
+
 	constructor(signalEnum: SignalEnum) {
 		super(signalEnum);
+
+		this.getIndexes(signalEnum);
+	}
+	private getIndexes(sigEnum: SignalEnum) {
+		if (!sigEnum.values) return;
+
+		this.indexes = sigEnum.values.map((val) => val.index);
 	}
 
 	async getInvalidNames() {
@@ -40,12 +49,26 @@ class SignalEnumState extends EntityState<SignalEnum> {
 		this.update(SignalEnumService.UpdateDesc(this.entity.entityId, desc));
 	}
 
+	reorderValue(valueEntID: string, from: number, to: number) {
+		this.update(SignalEnumService.SortValue(this.entity.entityId, valueEntID, from, to));
+	}
+
 	updateValueName(valueEntID: string, name: string) {
 		this.update(SignalEnumService.UpdateValueName(this.entity.entityId, valueEntID, name));
 	}
 
 	updateValueIndex(valueEntID: string, index: number) {
-		this.update(SignalEnumService.UpdateValueIndex(this.entity.entityId, valueEntID, index));
+		const f = async () => {
+			const sigEnum = await SignalEnumService.UpdateValueIndex(
+				this.entity.entityId,
+				valueEntID,
+				index
+			);
+			this.getIndexes(sigEnum);
+			return sigEnum;
+		};
+
+		this.update(f());
 	}
 
 	updateValueDesc(valueEntID: string, desc: string) {

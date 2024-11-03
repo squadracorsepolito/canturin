@@ -29,6 +29,11 @@ export function GetNames(): Promise<string[] | null> & { cancel(): void } {
     return $resultPromise;
 }
 
+export function SortValue(enumEntID: string, valueEntID: string, $from: number, to: number): Promise<$models.SignalEnum> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3421633485, enumEntID, valueEntID, $from, to) as any;
+    return $resultPromise;
+}
+
 export function UpdateDesc(entityID: string, desc: string): Promise<$models.SignalEnum> & { cancel(): void } {
     let $resultPromise = $Call.ByID(3205892276, entityID, desc) as any;
     return $resultPromise;

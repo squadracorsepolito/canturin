@@ -18,6 +18,7 @@
 	import layout from '$lib/state/layout-state.svelte';
 	import sidebarState from '$lib/state/sidebar-state.svelte';
 	import history from '$lib/state/history-state.svelte';
+	import { PaneGroup, Pane, PaneResizer } from 'paneforge';
 
 	let { children } = $props();
 
@@ -137,8 +138,8 @@
 	$inspect(history.history);
 </script>
 
-<div class="flex h-full w-full">
-	<div class="h-full min-w-60 bg-base-200 flex flex-col">
+<PaneGroup direction="horizontal" class="h-full w-full">
+	<Pane defaultSize={15} class="h-full bg-base-200 flex flex-col">
 		<div class="h-12 block bg-base-300 sticky top-0"></div>
 
 		<div class="flex-1 overflow-y-auto overflow-x-hidden">
@@ -146,9 +147,11 @@
 				<Tree rootNode={getNetTree(sidebarState.tree)} />
 			{/if}
 		</div>
-	</div>
+	</Pane>
 
-	<div class="flex-1 flex flex-col">
+	<PaneResizer class="h-full w-1 bg-base-200 data-[active=pointer]:bg-accent"></PaneResizer>
+
+	<Pane class="flex-1 flex flex-col">
 		<div class="h-12 bg-base-200 sticky top-0 block">
 			<div class="flex items-center h-full px-5 gap-2">
 				<IconButton onclick={handleUndo} disabled={!history.canUndo}>
@@ -162,5 +165,5 @@
 		</div>
 
 		{@render children()}
-	</div>
-</div>
+	</Pane>
+</PaneGroup>

@@ -26,7 +26,7 @@
 		}
 	]);
 
-	function reorderItems(startIndex: number, finishIndex: number) {
+	function reorderItems(_id: string, startIndex: number, finishIndex: number) {
 		console.log({ startIndex, finishIndex });
 
 		const updatedItems = reorder({
@@ -41,7 +41,7 @@
 <Divider></Divider>
 
 <SortableList {items} instanceId="items" reorder={reorderItems}>
-	{#snippet itemBody({ label })}
+	{#snippet itemBody({ item: { label } })}
 		<div class="p-3">{label}</div>
 	{/snippet}
 </SortableList>

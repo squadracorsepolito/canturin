@@ -20,7 +20,7 @@
 		<span>
 			<Icon height="16" width="16" />
 		</span>
-		<span class="text-xs">{name}</span>
+		<span class="text-xs truncate">{name}</span>
 	</div>
 {/snippet}
 

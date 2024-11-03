@@ -12,7 +12,7 @@
 	type Props = {
 		items: T[];
 		instanceId: string;
-		reorder: (from: number, to: number) => void;
+		reorder: (id: string, from: number, to: number) => void;
 		itemBody: Snippet<[{ item: T; highlightState: HighlightState }]>;
 	};
 
@@ -73,7 +73,7 @@
 				});
 
 				// Perform the card reordering within the same column
-				reorder(itemIdx, destinationIndex);
+				reorder(itemId, itemIdx, destinationIndex);
 
 				return;
 				// }
@@ -123,8 +123,12 @@
 			if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
 				e.preventDefault();
 
+				if (selectedItem.index <= 0) {
+					return;
+				}
+
 				if (selectedItem.id) {
-					reorder(selectedItem.index, selectedItem.index - 1);
+					reorder(selectedItem.id, selectedItem.index, selectedItem.index - 1);
 				}
 
 				if (selectedItem.index > 0) {
@@ -137,8 +141,12 @@
 			if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
 				e.preventDefault();
 
+				if (selectedItem.index >= items.length - 1) {
+					return;
+				}
+
 				if (selectedItem.id) {
-					reorder(selectedItem.index, selectedItem.index + 1);
+					reorder(selectedItem.id, selectedItem.index, selectedItem.index + 1);
 				}
 
 				if (selectedItem.index < items.length - 1) {

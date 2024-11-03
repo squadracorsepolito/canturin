@@ -2,6 +2,7 @@
 	import type { SignalEnumValue } from '$lib/api/canturin';
 	import { TextareaEditable, TextEditable } from '$lib/components/editable';
 	import NumberEditable from '$lib/components/editable/number-editable.svelte';
+	import { AltArrowIcon, CloseIcon } from '$lib/components/icon';
 	import { getSignalEnumState } from '$lib/state/signal-enum-state.svelte';
 	import { z } from 'zod';
 
@@ -57,10 +58,12 @@
 	function handleDesc(desc: string) {
 		ses.updateValueDesc(value.entityId, desc);
 	}
+
+	let expanded = $state(false);
 </script>
 
-<div class="py-3 col-span-8 grid grid-cols-subgrid">
-	<div class="self-center">
+<div class="border-t-2 border-base-content/10 py-5 col-span-8 grid grid-cols-subgrid items-center">
+	<div>
 		<NumberEditable
 			validator={validateIndex}
 			initialValue={value.index}
@@ -69,7 +72,7 @@
 		/>
 	</div>
 
-	<div class="col-span-3 self-center">
+	<div class="col-span-3">
 		<TextEditable
 			validator={validateName}
 			name="signal-enum-value-name"
@@ -79,13 +82,41 @@
 		/>
 	</div>
 
-	<div class="col-span-4">
-		<TextareaEditable
-			initialValue={value.desc}
-			name="signal-enum-value-desc"
-			onsubmit={handleDesc}
-			triggerLabel="Set Description"
-			rows={1}
-		/>
-	</div>
+	{#if !expanded}
+		<button
+			onclick={() => (expanded = true)}
+			class="col-span-4 p-3 flex items-center justify-between gap-2 hover:bg-base-content/10 h-full transition-colors rounded-btn"
+		>
+			<div class="text-dimmed truncate">
+				{#if value.desc}
+					{value.desc}
+				{:else}
+					Click Here To Add Description
+				{/if}
+			</div>
+
+			<div>
+				<AltArrowIcon />
+			</div>
+		</button>
+	{:else}
+		<div class="col-start-8 flex justify-end">
+			<button
+				onclick={() => (expanded = false)}
+				class="hover:bg-base-content/10 h-full transition-colors rounded-btn p-3"
+			>
+				<CloseIcon />
+			</button>
+		</div>
+
+		<div class="col-start-2 col-span-7 pt-3">
+			<TextareaEditable
+				initialValue={value.desc}
+				name="signal-enum-value-desc"
+				onsubmit={handleDesc}
+				triggerLabel="Add Description"
+				rows={3}
+			/>
+		</div>
+	{/if}
 </div>

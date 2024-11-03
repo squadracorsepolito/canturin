@@ -152,7 +152,7 @@ func (s *SignalEnumService) SortValue(enumEntID, valueEntID string, from, to int
 		for i := from - 1; i >= to; i-- {
 			tmpVal := restValues[i]
 			tmpValIdx := tmpVal.Index()
-			if err := tmpVal.UpdateIndex(lastValIdx - 1); err != nil {
+			if err := tmpVal.UpdateIndex(lastValIdx); err != nil {
 				return SignalEnum{}, err
 			}
 			lastValIdx = tmpValIdx
@@ -162,7 +162,7 @@ func (s *SignalEnumService) SortValue(enumEntID, valueEntID string, from, to int
 		for i := from; i < to; i++ {
 			tmpVal := restValues[i]
 			tmpValIdx := tmpVal.Index()
-			if err := tmpVal.UpdateIndex(lastValIdx + 1); err != nil {
+			if err := tmpVal.UpdateIndex(lastValIdx); err != nil {
 				return SignalEnum{}, err
 			}
 			lastValIdx = tmpValIdx

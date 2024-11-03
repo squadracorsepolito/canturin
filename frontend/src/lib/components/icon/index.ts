@@ -16,3 +16,5 @@ export { default as SortIcon } from './sort-icon.svelte';
 export { default as UndoIcon } from './undo-icon.svelte';
 export { default as RedoIcon } from './redo-icon.svelte';
 export { default as DragHandleIcon } from './drag-handle-icon.svelte';
+export { default as CloseIcon } from './close-icon.svelte';
+export { default as DeleteIcon } from './delete-icon.svelte';

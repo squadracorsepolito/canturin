@@ -60,7 +60,7 @@
 		@apply border-base-300 rounded-btn transition-colors;
 
 		textarea {
-			@apply w-full resize-none outline-none;
+			@apply w-full resize-none outline-none bg-base-100;
 		}
 
 		&:not([data-placeholder-shown]) {
