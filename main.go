@@ -21,11 +21,15 @@ var app *application.App
 
 var proxy *appProxy
 
-// main function serves as the application's entry point. It initializes the application, creates a window,
-// and starts a goroutine that emits a time-based event every second. It subsequently runs the application and
-// logs any error that might occur.
+// main function serves as the application's entry point.
+// Main initializes the application, creates a window,
+// and starts a goroutine that emits a time-based event every second.
+// It subsequently runs the application and logs any error that might occur.
 func main() {
 	proxy = newAppProxy()
+
+	// Path to the file used for loading network data.
+	infilepath := "./testdata/SC24.binpb"
 
 	// Initialize the services
 	sidebarSrv := newSidebarService()
@@ -56,6 +60,7 @@ func main() {
 			application.NewService(signalEnumService),
 		},
 
+		// Key bindings for undo/redo actions, triggering functions on specific key combinations.
 		KeyBindings: map[string]func(window *application.WebviewWindow){
 			"ctrl+z": func(w *application.WebviewWindow) {
 				historySrv.Undo()
@@ -67,10 +72,12 @@ func main() {
 			},
 		},
 
+		// Configure the asset handler to serve embedded frontend files.
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
 		},
 
+		// macOS-specific options: close the app when the last window is closed.
 		Mac: application.MacOptions{
 			ApplicationShouldTerminateAfterLastWindowClosed: true,
 		},
@@ -84,6 +91,8 @@ func main() {
 	menu.AddRole(application.EditMenu)
 	menu.AddRole(application.HelpMenu)
 
+	// Create "File" submenu with an "Open File" option.
+	// When clicked, it opens a file dialog for the user to select a file.
 	openMenu := menu.AddSubmenu("File")
 	openMenu.Add("Open File").OnClick(func(ctx *application.Context) {
 		result, _ := application.OpenFileDialog().
@@ -126,8 +135,9 @@ func main() {
 	// 	}
 	// }()
 
+	// Emit an application event to load network data when the application starts.
 	app.OnApplicationEvent(events.Common.ApplicationStarted, func(_ *application.ApplicationEvent) {
-		loadNetwork("./testdata/SC24.binpb")
+		loadNetwork(infilepath)
 	})
 
 	// Run the application. This blocks until the application has been exited.
