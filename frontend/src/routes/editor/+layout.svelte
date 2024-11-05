@@ -149,7 +149,9 @@
 		</div>
 	</Pane>
 
-	<PaneResizer class="h-full w-1 bg-base-200 data-[active=pointer]:bg-accent"></PaneResizer>
+	<PaneResizer
+		class="h-full w-1 bg-base-200 data-[active=pointer]:bg-accent hover:bg-accent transition-colors delay-75"
+	></PaneResizer>
 
 	<Pane class="flex-1 flex flex-col">
 		<div class="h-12 bg-base-200 sticky top-0 block">

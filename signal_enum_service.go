@@ -127,7 +127,7 @@ func (s *SignalEnumService) UpdateDesc(entityID string, desc string) (SignalEnum
 	return s.converterFn(sigEnum), nil
 }
 
-func (s *SignalEnumService) SortValue(enumEntID, valueEntID string, from, to int) (SignalEnum, error) {
+func (s *SignalEnumService) ReorderValue(enumEntID, valueEntID string, from, to int) (SignalEnum, error) {
 	if from == to {
 		return s.converterFn(nil), nil
 	}
@@ -175,6 +175,40 @@ func (s *SignalEnumService) SortValue(enumEntID, valueEntID string, from, to int
 
 	if err := sigEnum.AddValue(targetEnumVal); err != nil {
 		return SignalEnum{}, err
+	}
+
+	return s.converterFn(sigEnum), nil
+}
+
+func (s *SignalEnumService) RemoveValues(enumEntID string, valueEntIDs ...string) (SignalEnum, error) {
+	if len(valueEntIDs) == 0 {
+		return s.converterFn(nil), nil
+	}
+
+	sigEnum, err := s.getEntity(enumEntID)
+	if err != nil {
+		return SignalEnum{}, err
+	}
+
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	targetIDs := make(map[string]struct{})
+	for _, valueEntID := range valueEntIDs {
+		targetIDs[valueEntID] = struct{}{}
+	}
+
+	for _, tmpValue := range sigEnum.Values() {
+		tmpEntId := tmpValue.EntityID()
+
+		_, ok := targetIDs[tmpEntId.String()]
+		if !ok {
+			continue
+		}
+
+		if err := sigEnum.RemoveValue(tmpValue.EntityID()); err != nil {
+			return SignalEnum{}, err
+		}
 	}
 
 	return s.converterFn(sigEnum), nil

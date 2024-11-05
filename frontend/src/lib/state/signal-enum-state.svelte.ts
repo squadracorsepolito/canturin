@@ -50,7 +50,15 @@ class SignalEnumState extends EntityState<SignalEnum> {
 	}
 
 	reorderValue(valueEntID: string, from: number, to: number) {
-		this.update(SignalEnumService.SortValue(this.entity.entityId, valueEntID, from, to));
+		this.update(SignalEnumService.ReorderValue(this.entity.entityId, valueEntID, from, to));
+	}
+
+	deleteValue(valueEntID: string) {
+		this.update(SignalEnumService.RemoveValues(this.entity.entityId, valueEntID));
+	}
+
+	deleteValues(valueEntIds: string[]) {
+		this.update(SignalEnumService.RemoveValues(this.entity.entityId, ...valueEntIds));
 	}
 
 	updateValueName(valueEntID: string, name: string) {

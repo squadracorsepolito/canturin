@@ -8,9 +8,9 @@
 	import SignalEnumValuesValue from './signal-enum-values-value.svelte';
 	import { SortableList } from '$lib/components/sortable';
 	import { reorder } from '@atlaskit/pragmatic-drag-and-drop/reorder';
-	import Table from '$lib/components/table/table.svelte';
 	import Readonly from '$lib/components/readonly/readonly.svelte';
-	import { untrack } from 'svelte';
+	import Tablev2 from '$lib/components/table/tablev2.svelte';
+	import { IconButton } from '$lib/components/button';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -40,6 +40,14 @@
 	}
 
 	let deleteToggled = $state(false);
+
+	function handleBulkDelete(values: SignalEnumValue[]) {
+		ses.deleteValues(values.map((val) => val.entityId));
+	}
+
+	function handleDelete(value: SignalEnumValue) {
+		ses.deleteValue(value.entityId);
+	}
 </script>
 
 {#snippet actions()}
@@ -56,6 +64,37 @@
 
 {#snippet section(signalEnum: SignalEnum)}
 	{#if signalEnum.values && signalEnum.values.length > 0}
+		<Tablev2 items={signalEnum.values}>
+			{#snippet bulkActions({ selectedCount, selectedItems })}
+				<div class="flex justify-end">
+					<IconButton
+						onclick={() => handleBulkDelete(selectedItems)}
+						label={`Delete Values ${selectedCount > 0 ? ` (${selectedCount})` : ''}`}
+						disabled={selectedCount === 0}
+						color="error"
+					>
+						<DeleteIcon />
+					</IconButton>
+				</div>
+			{/snippet}
+
+			{#snippet header()}
+				<th>Name</th>
+				<th>Index</th>
+			{/snippet}
+
+			{#snippet row({ name, index, desc })}
+				<td>{name}</td>
+				<td>{index}</td>
+			{/snippet}
+
+			{#snippet rowActions(value)}
+				<IconButton onclick={() => handleDelete(value)} color="error">
+					<DeleteIcon />
+				</IconButton>
+			{/snippet}
+		</Tablev2>
+
 		{@render actions()}
 
 		<div class="grid grid-cols-8 gap-x-3">

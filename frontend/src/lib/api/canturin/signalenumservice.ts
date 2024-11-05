@@ -29,8 +29,13 @@ export function GetNames(): Promise<string[] | null> & { cancel(): void } {
     return $resultPromise;
 }
 
-export function SortValue(enumEntID: string, valueEntID: string, $from: number, to: number): Promise<$models.SignalEnum> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(3421633485, enumEntID, valueEntID, $from, to) as any;
+export function RemoveValues(enumEntID: string, ...valueEntIDs: string[]): Promise<$models.SignalEnum> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3900736342, enumEntID, valueEntIDs) as any;
+    return $resultPromise;
+}
+
+export function ReorderValue(enumEntID: string, valueEntID: string, $from: number, to: number): Promise<$models.SignalEnum> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1373905824, enumEntID, valueEntID, $from, to) as any;
     return $resultPromise;
 }
 

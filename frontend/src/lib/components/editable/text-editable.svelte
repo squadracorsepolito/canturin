@@ -17,7 +17,7 @@
 
 	let errors = $state<string[]>();
 
-	const [snpshot, send] = useMachine(
+	const [snapshot, send] = useMachine(
 		editable.machine({
 			id: uniqueId(),
 			value: initialValue,
@@ -41,7 +41,7 @@
 		})
 	);
 
-	const api = $derived(editable.connect(snpshot, send, normalizeProps));
+	const api = $derived(editable.connect(snapshot, send, normalizeProps));
 
 	$effect(() => {
 		untrack(() => api.setValue)(initialValue);
