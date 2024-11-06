@@ -130,14 +130,18 @@ func (s *SignalTypeService) UpdateName(entityID string, name string) (SignalType
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
+	// verify that the new name is not equal to the old one
 	oldName := sigType.Name()
 	if name == oldName {
 		return s.converterFn(sigType), nil
 	}
 
 	sigType.SetName(name)
+
+	// push the new name in the sidebar
 	proxy.pushSidebarUpdate(sigType.EntityID(), name)
 
+	// add to the history
 	proxy.pushHistoryOperation(
 		operationDomainSignalType,
 		func() (any, error) {

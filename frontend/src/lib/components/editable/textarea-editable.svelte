@@ -4,6 +4,7 @@
 	import { useMachine, normalizeProps } from '@zag-js/svelte';
 	import { AddIcon } from '../icon';
 	import { untrack } from 'svelte';
+	import { IconButton } from '../button';
 
 	type Props = {
 		initialValue: string;

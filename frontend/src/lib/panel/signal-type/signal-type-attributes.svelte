@@ -9,6 +9,7 @@
 	import { z } from 'zod';
 	import type { PanelSectionProps } from '../types';
 	import { text } from './signal-type-text';
+	import { Switch } from '$lib/components/switch';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -101,7 +102,7 @@
 		</Attribute>
 
 		<Attribute {...text.signed}>
-			<ToggleReadonly checked={signalType.signed} />
+			<Switch checked={signalType.signed} readOnly />
 		</Attribute>
 	</div>
 

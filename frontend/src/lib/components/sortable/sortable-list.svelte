@@ -193,7 +193,7 @@
 		@apply flex flex-col rounded-box;
 
 		&:focus {
-			@apply outline-none focus-ring-primary;
+			@apply outline-none;
 		}
 	}
 </style>

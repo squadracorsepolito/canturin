@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { HTMLButtonAttributes } from 'svelte/elements';
 
 	type Props = {
 		onclick: () => void;
@@ -7,7 +8,7 @@
 		label?: string;
 		disabled?: boolean;
 		children: Snippet;
-	};
+	} & HTMLButtonAttributes;
 
 	let { onclick, color, label, disabled, children }: Props = $props();
 </script>
@@ -22,10 +23,10 @@
 
 <style lang="postcss">
 	.icon-button {
-		@apply btn btn-sm btn-ghost;
+		@apply btn btn-sm btn-ghost border-2 py-1 h-auto;
 
 		&:disabled {
-			@apply opacity-75;
+			@apply opacity-75 cursor-not-allowed;
 		}
 
 		&[data-color='primary'] {

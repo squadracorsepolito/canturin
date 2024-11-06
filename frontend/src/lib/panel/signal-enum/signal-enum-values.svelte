@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { SignalEnum, SignalEnumValue } from '$lib/api/canturin';
-	import { DeleteIcon, SortIcon } from '$lib/components/icon';
+	import { AddIcon, DeleteIcon, SortIcon } from '$lib/components/icon';
 	import { Toggle } from '$lib/components/toggle';
 	import { getSignalEnumState } from '$lib/state/signal-enum-state.svelte';
 	import type { PanelSectionProps } from '../types';
@@ -52,10 +52,6 @@
 
 {#snippet actions()}
 	<div class="pb-3 flex items-center gap-2">
-		<Toggle bind:toggled={reorderToggled} name="signal-enum-values-reorder">
-			<SortIcon />
-		</Toggle>
-
 		<Toggle bind:toggled={deleteToggled} color="error" name="signal-enum-values-delete">
 			<DeleteIcon />
 		</Toggle>
@@ -66,7 +62,15 @@
 	{#if signalEnum.values && signalEnum.values.length > 0}
 		<Tablev2 items={signalEnum.values}>
 			{#snippet bulkActions({ selectedCount, selectedItems })}
-				<div class="flex justify-end">
+				<div class="flex justify-end gap-3">
+					<Toggle bind:toggled={reorderToggled} name="signal-enum-values-reorder">
+						<SortIcon />
+					</Toggle>
+
+					<IconButton onclick={() => console.log('add')} label="Add Value" color="primary">
+						<AddIcon />
+					</IconButton>
+
 					<IconButton
 						onclick={() => handleBulkDelete(selectedItems)}
 						label={`Delete Values ${selectedCount > 0 ? ` (${selectedCount})` : ''}`}

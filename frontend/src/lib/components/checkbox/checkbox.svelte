@@ -53,6 +53,10 @@
 </label>
 
 <style lang="postcss">
+	[data-part='root'] {
+		@apply inline-block;
+	}
+
 	[data-part='control'] {
 		@apply checkbox h-5 w-5;
 	}
