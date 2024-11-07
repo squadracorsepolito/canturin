@@ -134,8 +134,6 @@
 	function handleRedo() {
 		history.redo();
 	}
-
-	$inspect(history.history);
 </script>
 
 <PaneGroup direction="horizontal" class="h-full w-full">

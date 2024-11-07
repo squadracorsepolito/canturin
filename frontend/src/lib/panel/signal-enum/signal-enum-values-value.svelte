@@ -2,6 +2,7 @@
 	import type { SignalEnumValue } from '$lib/api/canturin';
 	import { TextareaEditable, TextEditable } from '$lib/components/editable';
 	import NumberEditable from '$lib/components/editable/number-editable.svelte';
+	import TextEditablev2 from '$lib/components/editable/text-editablev2.svelte';
 	import { AltArrowIcon, CloseIcon } from '$lib/components/icon';
 	import { getSignalEnumState } from '$lib/state/signal-enum-state.svelte';
 	import { z } from 'zod';
@@ -23,6 +24,8 @@
 			.min(1)
 			.refine((n) => !invalidNames.includes(n), { message: 'Duplicated' })
 	});
+
+	let nameErrors = $derived.by(() => validateName(value.name));
 
 	function validateName(name: string) {
 		const res = nameSchema.safeParse({ name });
@@ -60,6 +63,8 @@
 	}
 
 	let expanded = $state(false);
+
+	$inspect(nameErrors);
 </script>
 
 <div class="border-t-2 border-base-content/10 py-5 col-span-8 grid grid-cols-subgrid items-center">
@@ -80,6 +85,8 @@
 			onsubmit={handleName}
 			size="md"
 		/>
+
+		<TextEditablev2 bind:value={value.name} errors={nameErrors} oncommit={handleName} />
 	</div>
 
 	{#if !expanded}

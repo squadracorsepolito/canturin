@@ -2,25 +2,30 @@
 	import { uniqueId } from '$lib/utils';
 	import * as editable from '@zag-js/editable';
 	import { useMachine, normalizeProps } from '@zag-js/svelte';
-	import { untrack } from 'svelte';
 
 	type Props = {
-		initialValue: string;
-		name: string;
+		value: string;
+		name?: string;
 		placeholder?: string;
-		size?: 'lg' | 'md';
-		validator: (value: string) => string[] | undefined;
-		onsubmit: (value: string) => void;
+		errors?: string[];
+		fontSize?: 'lg' | 'md';
+		oncommit?: (value: string) => void;
 	};
 
-	let { initialValue, name, placeholder, size = 'lg', validator, onsubmit }: Props = $props();
+	let {
+		value = $bindable(),
+		name,
+		placeholder,
+		errors,
+		fontSize = 'md',
+		oncommit
+	}: Props = $props();
 
-	let errors = $state<string[]>();
+	let fallbackValue = $state(value);
 
 	const [snapshot, send] = useMachine(
 		editable.machine({
 			id: uniqueId(),
-			value: initialValue,
 			name: name,
 			activationMode: 'dblclick',
 			placeholder: placeholder,
@@ -28,39 +33,32 @@
 			submitMode: 'both',
 			onValueCommit: (details) => {
 				if (errors) {
-					api.setValue(initialValue);
-					errors = undefined;
+					api.setValue(fallbackValue);
 					return;
 				}
 
-				onsubmit(details.value);
+				fallbackValue = details.value;
+				oncommit?.(details.value);
 			},
 			onValueChange: (details) => {
-				errors = validator(details.value);
+				value = details.value;
 			}
-		})
+		}),
+		{
+			context: {
+				get value() {
+					return value;
+				}
+			}
+		}
 	);
 
 	const api = $derived(editable.connect(snapshot, send, normalizeProps));
-
-	$effect(() => {
-		untrack(() => api.setValue)(initialValue);
-	});
-
-	function getFontSize() {
-		switch (size) {
-			case 'lg':
-				return 'text-h2';
-			case 'md':
-			default:
-				return 'text-h4';
-		}
-	}
 </script>
 
-<div>
+<div class="relative">
 	<div {...api.getRootProps()}>
-		<div {...api.getAreaProps()} data-error={errors ? true : undefined} class={getFontSize()}>
+		<div {...api.getAreaProps()} data-error={errors ? true : undefined} data-font-size={fontSize}>
 			<input {...api.getInputProps()} />
 
 			<span {...api.getPreviewProps()}>
@@ -100,6 +98,14 @@
 
 		input {
 			@apply outline-none;
+		}
+
+		&[data-font-size='md'] {
+			@apply text-h4;
+		}
+
+		&[data-font-size='lg'] {
+			@apply text-h2;
 		}
 	}
 </style>

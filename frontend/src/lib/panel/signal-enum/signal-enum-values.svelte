@@ -11,6 +11,7 @@
 	import Readonly from '$lib/components/readonly/readonly.svelte';
 	import Tablev2 from '$lib/components/table/tablev2.svelte';
 	import { IconButton } from '$lib/components/button';
+	import ValueRow from './value-row.svelte';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -24,7 +25,7 @@
 		return values.filter((val) => val.entityId !== entId).map((val) => val.index);
 	}
 
-	let reorderToggled = $state(true);
+	let reorderToggled = $state(false);
 
 	function handleReorderValue(valueEntId: string, from: number, to: number) {
 		if (!ses.entity.values) return;
@@ -39,8 +40,6 @@
 		ses.reorderValue(valueEntId, from, to);
 	}
 
-	let deleteToggled = $state(false);
-
 	function handleBulkDelete(values: SignalEnumValue[]) {
 		ses.deleteValues(values.map((val) => val.entityId));
 	}
@@ -49,14 +48,6 @@
 		ses.deleteValue(value.entityId);
 	}
 </script>
-
-{#snippet actions()}
-	<div class="pb-3 flex items-center gap-2">
-		<Toggle bind:toggled={deleteToggled} color="error" name="signal-enum-values-delete">
-			<DeleteIcon />
-		</Toggle>
-	</div>
-{/snippet}
 
 {#snippet section(signalEnum: SignalEnum)}
 	{#if signalEnum.values && signalEnum.values.length > 0}
@@ -85,11 +76,15 @@
 			{#snippet header()}
 				<th>Name</th>
 				<th>Index</th>
+				<th>Description</th>
 			{/snippet}
 
-			{#snippet row({ name, index, desc })}
-				<td>{name}</td>
-				<td>{index}</td>
+			{#snippet row(value)}
+				<ValueRow
+					enumEntityId={entityId}
+					{value}
+					invalidNames={getValueInvalidNames(signalEnum.values ?? [], value.entityId)}
+				/>
 			{/snippet}
 
 			{#snippet rowActions(value)}
@@ -98,8 +93,6 @@
 				</IconButton>
 			{/snippet}
 		</Tablev2>
-
-		{@render actions()}
 
 		<div class="grid grid-cols-8 gap-x-3">
 			<div class="col-span-8 grid grid-cols-subgrid font-bold text-sm text-dimmed py-5">
