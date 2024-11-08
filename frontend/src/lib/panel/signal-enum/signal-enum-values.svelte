@@ -80,11 +80,7 @@
 			{/snippet}
 
 			{#snippet row(value)}
-				<ValueRow
-					enumEntityId={entityId}
-					{value}
-					invalidNames={getValueInvalidNames(signalEnum.values ?? [], value.entityId)}
-				/>
+				<ValueRow enumEntityId={entityId} {value} />
 			{/snippet}
 
 			{#snippet rowActions(value)}
