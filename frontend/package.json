@@ -24,7 +24,7 @@
 		"@types/eslint": "^9.6.1",
 		"@types/randomcolor": "^0.5.9",
 		"@types/sortablejs": "^1.15.8",
-		"@wailsio/runtime": "^3.0.0-alpha.27",
+		"@wailsio/runtime": "^3.0.0-alpha.29",
 		"@zag-js/checkbox": "^0.77.0",
 		"@zag-js/editable": "^0.77.0",
 		"@zag-js/number-input": "^0.77.0",

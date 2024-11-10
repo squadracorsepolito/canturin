@@ -63,8 +63,6 @@
 	}
 
 	let expanded = $state(false);
-
-	$inspect(nameErrors);
 </script>
 
 <div class="border-t-2 border-base-content/10 py-5 col-span-8 grid grid-cols-subgrid items-center">

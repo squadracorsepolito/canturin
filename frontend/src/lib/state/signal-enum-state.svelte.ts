@@ -53,6 +53,10 @@ class SignalEnumState extends EntityState<SignalEnum> {
 		this.update(SignalEnumService.ReorderValue(this.entity.entityId, valueEntID, from, to));
 	}
 
+	addValue() {
+		this.update(SignalEnumService.AddValue(this.entity.entityId));
+	}
+
 	deleteValue(valueEntID: string) {
 		this.update(SignalEnumService.RemoveValues(this.entity.entityId, valueEntID));
 	}

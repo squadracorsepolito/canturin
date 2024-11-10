@@ -23,7 +23,12 @@
 			id: uniqueId(),
 			name: name,
 			activationMode: 'dblclick',
-			placeholder: placeholder,
+			placeholder: placeholder
+				? {
+						edit: '',
+						preview: placeholder
+					}
+				: undefined,
 			submitMode: 'both',
 			autoResize: true,
 			onValueCommit: (details) => {
@@ -96,7 +101,7 @@
 		</div>
 	</div>
 
-	{#if errors}
+	{#if errors && api.editing}
 		<div class="absolute pt-1 text-error text-xs truncate">
 			{#each errors as err}
 				<span>{err}</span>
@@ -110,10 +115,12 @@
 		@apply rounded-btn px-2 py-1 border-2 border-transparent transition-colors;
 
 		input {
-			@apply outline-none;
+			@apply outline-none bg-base-100;
 		}
 
 		&[data-error] {
+			@apply focus-ring-warning border-warning;
+
 			&[data-focus] {
 				@apply focus-ring-error border-error;
 			}

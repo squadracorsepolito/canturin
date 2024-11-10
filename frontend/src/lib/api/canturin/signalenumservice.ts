@@ -9,6 +9,11 @@ import {Call as $Call} from "@wailsio/runtime";
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+export function AddValue(enumEntID: string): Promise<$models.SignalEnum> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1459823736, enumEntID) as any;
+    return $resultPromise;
+}
+
 export function Create(name: string, desc: string, minSize: number): Promise<$models.SignalEnum> & { cancel(): void } {
     let $resultPromise = $Call.ByID(4055206348, name, desc, minSize) as any;
     return $resultPromise;

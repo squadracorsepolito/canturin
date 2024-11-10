@@ -8,6 +8,8 @@
 	let { children }: Props = $props();
 </script>
 
-<td class="max-w-96 py-5">
-	{@render children?.()}
-</td>
+<th class="max-w-96">
+	<div class="px-2">
+		{@render children?.()}
+	</div>
+</th>

@@ -14,6 +14,7 @@
 	import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 	import { DragHandleIcon, SortIcon } from '../icon';
 	import { getItem, isItem, type HighlightState } from './types';
+	import { sortableItem } from '$lib/actions/sortable-item.svelte';
 
 	type Props = {
 		instanceId: string;
@@ -29,69 +30,78 @@
 
 	let dragHandle: HTMLElement;
 
-	const itemAction: Action<HTMLElement> = (el) => {
-		const cleanup = combine(
-			draggable({
-				element: el,
-				dragHandle: dragHandle,
-				getInitialData() {
-					return getItem({ instanceId, id });
-				},
-				onDragStart() {
-					isDragging = true;
-				},
-				onDrop() {
-					isDragging = false;
+	// const itemAction: Action<HTMLElement> = (el) => {
+	// 	const cleanup = combine(
+	// 		draggable({
+	// 			element: el,
+	// 			dragHandle: dragHandle,
+	// 			getInitialData() {
+	// 				return getItem({ instanceId, id });
+	// 			},
+	// 			onDragStart() {
+	// 				isDragging = true;
+	// 			},
+	// 			onDrop() {
+	// 				isDragging = false;
 
-					el.animate([{ backgroundColor: '#37cdbe' }, {}], {
-						duration: 600,
-						delay: 150,
-						easing: 'cubic-bezier(0.25, 0.1, 0.25, 1.0)',
-						iterations: 1
-					});
-				}
-			}),
-			dropTargetForElements({
-				element: el,
-				canDrop({ source }) {
-					return isItem(source.data) && source.data.instanceId === instanceId;
-				},
-				getData({ element, input }) {
-					return attachClosestEdge(getItem({ instanceId, id }), {
-						element: element,
-						input: input,
-						allowedEdges: ['top', 'bottom']
-					});
-				},
-				onDragEnter({ source, self }) {
-					if (isItem(source.data) && source.data.id !== id) {
-						closestEdge = extractClosestEdge(self.data);
-					}
-				},
-				onDrag({ source, self }) {
-					if (isItem(source.data) && source.data.id !== id) {
-						closestEdge = extractClosestEdge(self.data);
-					}
-				},
-				onDragLeave() {
-					closestEdge = null;
-				},
-				onDrop() {
-					closestEdge = null;
-				}
-			})
-		);
+	// 				el.animate([{ backgroundColor: '#37cdbe' }, {}], {
+	// 					duration: 600,
+	// 					delay: 150,
+	// 					easing: 'cubic-bezier(0.25, 0.1, 0.25, 1.0)',
+	// 					iterations: 1
+	// 				});
+	// 			}
+	// 		}),
+	// 		dropTargetForElements({
+	// 			element: el,
+	// 			canDrop({ source }) {
+	// 				return isItem(source.data) && source.data.instanceId === instanceId;
+	// 			},
+	// 			getData({ element, input }) {
+	// 				return attachClosestEdge(getItem({ instanceId, id }), {
+	// 					element: element,
+	// 					input: input,
+	// 					allowedEdges: ['top', 'bottom']
+	// 				});
+	// 			},
+	// 			onDragEnter({ source, self }) {
+	// 				if (isItem(source.data) && source.data.id !== id) {
+	// 					closestEdge = extractClosestEdge(self.data);
+	// 				}
+	// 			},
+	// 			onDrag({ source, self }) {
+	// 				if (isItem(source.data) && source.data.id !== id) {
+	// 					closestEdge = extractClosestEdge(self.data);
+	// 				}
+	// 			},
+	// 			onDragLeave() {
+	// 				closestEdge = null;
+	// 			},
+	// 			onDrop() {
+	// 				closestEdge = null;
+	// 			}
+	// 		})
+	// 	);
 
-		return {
-			destroy() {
-				cleanup();
-			}
-		};
-	};
+	// 	return {
+	// 		destroy() {
+	// 			cleanup();
+	// 		}
+	// 	};
+	// };
 </script>
 
 <div
-	use:itemAction
+	use:sortableItem={{
+		id,
+		instanceId,
+		setClosestEdge(edge) {
+			closestEdge = edge;
+		},
+		setIsDragging(isDragging) {
+			isDragging = isDragging;
+		}
+	}}
 	data-part="root"
 	data-highlight-state={highlightState}
 	data-dragging={isDragging ? 'true' : undefined}

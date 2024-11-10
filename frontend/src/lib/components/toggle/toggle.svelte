@@ -30,7 +30,7 @@
 		@apply border-2 rounded-btn transition-colors p-1 shadow-none outline-none;
 
 		&[data-state='off'] {
-			@apply border-base-300;
+			@apply border-transparent;
 		}
 
 		&[data-color='primary'] {
@@ -40,7 +40,7 @@
 
 			&[data-state='off'] {
 				&:hover {
-					@apply border-primary bg-primary-ghost text-primary;
+					@apply bg-primary-ghost text-primary;
 				}
 			}
 

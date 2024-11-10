@@ -1,6 +1,5 @@
-import type { WailsEvent } from '@wailsio/runtime/types/events';
 import type { Entity, EntityState } from './entity-state.svelte';
-import * as wails from '@wailsio/runtime';
+import { Events as wails } from '@wailsio/runtime';
 
 export class StateProvider<E extends Entity, S extends EntityState<E>> {
 	states = $state(new Map<string, S>());
@@ -9,7 +8,7 @@ export class StateProvider<E extends Entity, S extends EntityState<E>> {
 	constructor(stateFactory: (entity: E) => S, historyEventName: string) {
 		this.genFn = stateFactory;
 
-		wails.Events.On(historyEventName, (e: WailsEvent) => {
+		wails.On(historyEventName, (e: wails.WailsEvent) => {
 			this.modify(e.data[0] as E);
 		});
 	}

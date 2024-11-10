@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/squadracorsepolito/acmelib"
 )
 
@@ -180,6 +182,72 @@ func (s *SignalEnumService) ReorderValue(enumEntID, valueEntID string, from, to 
 	return s.converterFn(sigEnum), nil
 }
 
+func (s *SignalEnumService) AddValue(enumEntID string) (SignalEnum, error) {
+	sigEnum, err := s.getEntity(enumEntID)
+	if err != nil {
+		return SignalEnum{}, err
+	}
+
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	valNames := make(map[string]struct{})
+	valIndexes := make(map[int]struct{})
+	for _, tmpVal := range sigEnum.Values() {
+		valNames[tmpVal.Name()] = struct{}{}
+		valIndexes[tmpVal.Index()] = struct{}{}
+	}
+
+	valNameIdx := len(valNames) + 1
+	newValName := ""
+	for {
+		newValName = fmt.Sprintf("NEW_VALUE_%d", valNameIdx)
+		if _, ok := valNames[newValName]; !ok {
+			break
+		}
+		valNameIdx++
+	}
+
+	newValIndex := 0
+	for {
+		if _, ok := valIndexes[newValIndex]; !ok {
+			break
+		}
+		newValIndex++
+	}
+
+	newSigEnumVal := acmelib.NewSignalEnumValue(newValName, newValIndex)
+	if err := sigEnum.AddValue(newSigEnumVal); err != nil {
+		return SignalEnum{}, err
+	}
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalEnum,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			if err := sigEnum.RemoveValue(newSigEnumVal.EntityID()); err != nil {
+				return SignalEnum{}, err
+			}
+
+			return s.converterFn(sigEnum), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			if err := sigEnum.AddValue(newSigEnumVal); err != nil {
+				return SignalEnum{}, err
+			}
+
+			return s.converterFn(sigEnum), nil
+		},
+	)
+
+	return s.converterFn(sigEnum), nil
+}
+
 func (s *SignalEnumService) RemoveValues(enumEntID string, valueEntIDs ...string) (SignalEnum, error) {
 	if len(valueEntIDs) == 0 {
 		return s.converterFn(nil), nil
@@ -198,18 +266,52 @@ func (s *SignalEnumService) RemoveValues(enumEntID string, valueEntIDs ...string
 		targetIDs[valueEntID] = struct{}{}
 	}
 
-	for _, tmpValue := range sigEnum.Values() {
-		tmpEntId := tmpValue.EntityID()
+	sigEnumValues := []*acmelib.SignalEnumValue{}
 
-		_, ok := targetIDs[tmpEntId.String()]
+	for _, tmpValue := range sigEnum.Values() {
+		tmpEntID := tmpValue.EntityID()
+
+		_, ok := targetIDs[tmpEntID.String()]
 		if !ok {
 			continue
 		}
 
+		sigEnumValues = append(sigEnumValues, tmpValue)
+	}
+
+	for _, tmpValue := range sigEnumValues {
 		if err := sigEnum.RemoveValue(tmpValue.EntityID()); err != nil {
 			return SignalEnum{}, err
 		}
 	}
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalEnum,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			for _, tmpValue := range sigEnumValues {
+				if err := sigEnum.AddValue(tmpValue); err != nil {
+					return SignalEnum{}, err
+				}
+			}
+
+			return s.converterFn(sigEnum), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			for _, tmpValue := range sigEnumValues {
+				if err := sigEnum.RemoveValue(tmpValue.EntityID()); err != nil {
+					return SignalEnum{}, err
+				}
+			}
+
+			return s.converterFn(sigEnum), nil
+		},
+	)
 
 	return s.converterFn(sigEnum), nil
 }
@@ -220,14 +322,46 @@ func (s *SignalEnumService) UpdateValueName(enumEntID, valueEntID, name string) 
 		return SignalEnum{}, err
 	}
 
-	for _, tmpValue := range sigEnum.Values() {
-		if tmpValue.EntityID().String() == valueEntID {
-			if err := tmpValue.UpdateName(name); err != nil {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	sigEnumVal, err := sigEnum.GetValue(acmelib.EntityID(valueEntID))
+	if err != nil {
+		return SignalEnum{}, err
+	}
+
+	oldName := sigEnumVal.Name()
+	if name == oldName {
+		return s.converterFn(sigEnum), nil
+	}
+
+	if err := sigEnumVal.UpdateName(name); err != nil {
+		return SignalEnum{}, err
+	}
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalEnum,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			if err := sigEnumVal.UpdateName(oldName); err != nil {
 				return SignalEnum{}, err
 			}
-			break
-		}
-	}
+
+			return s.converterFn(sigEnum), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			if err := sigEnumVal.UpdateName(name); err != nil {
+				return SignalEnum{}, err
+			}
+
+			return s.converterFn(sigEnum), nil
+		},
+	)
 
 	return s.converterFn(sigEnum), nil
 }
@@ -238,14 +372,46 @@ func (s *SignalEnumService) UpdateValueIndex(enumEntID, valueEntID string, index
 		return SignalEnum{}, err
 	}
 
-	for _, tmpValue := range sigEnum.Values() {
-		if tmpValue.EntityID().String() == valueEntID {
-			if err := tmpValue.UpdateIndex(index); err != nil {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	sigEnumValue, err := sigEnum.GetValue(acmelib.EntityID(valueEntID))
+	if err != nil {
+		return SignalEnum{}, err
+	}
+
+	oldIndex := sigEnumValue.Index()
+	if index == oldIndex {
+		return s.converterFn(sigEnum), nil
+	}
+
+	if err := sigEnumValue.UpdateIndex(index); err != nil {
+		return SignalEnum{}, err
+	}
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalEnum,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			if err := sigEnumValue.UpdateIndex(oldIndex); err != nil {
 				return SignalEnum{}, err
 			}
-			break
-		}
-	}
+
+			return s.converterFn(sigEnum), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			if err := sigEnumValue.UpdateIndex(index); err != nil {
+				return SignalEnum{}, err
+			}
+
+			return s.converterFn(sigEnum), nil
+		},
+	)
 
 	return s.converterFn(sigEnum), nil
 }
@@ -256,12 +422,40 @@ func (s *SignalEnumService) UpdateValueDesc(enumEntID, valueEntID, desc string) 
 		return SignalEnum{}, err
 	}
 
-	for _, tmpValue := range sigEnum.Values() {
-		if tmpValue.EntityID().String() == valueEntID {
-			tmpValue.SetDesc(desc)
-			break
-		}
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	sigEnumValue, err := sigEnum.GetValue(acmelib.EntityID(valueEntID))
+	if err != nil {
+		return SignalEnum{}, err
 	}
+
+	oldDesc := sigEnumValue.Desc()
+	if desc == oldDesc {
+		return s.converterFn(sigEnum), nil
+	}
+
+	sigEnumValue.SetDesc(desc)
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalEnum,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigEnumValue.SetDesc(oldDesc)
+
+			return s.converterFn(sigEnum), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigEnumValue.SetDesc(desc)
+
+			return s.converterFn(sigEnum), nil
+		},
+	)
 
 	return s.converterFn(sigEnum), nil
 }

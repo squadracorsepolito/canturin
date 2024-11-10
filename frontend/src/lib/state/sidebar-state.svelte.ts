@@ -1,28 +1,27 @@
 import { SidebarService } from '$lib/api/canturin';
 import { SidebarAdd, SidebarLoad, SidebarRemove, SidebarUpdate } from '$lib/api/events';
-import * as wails from '@wailsio/runtime';
+import { Events as wails } from '@wailsio/runtime';
 import { SidebarNodeKind, type SidebarNode } from '$lib/api/canturin/models';
-import type { WailsEvent } from '@wailsio/runtime/types/events';
 
 class SidebarState {
 	tree = $state<SidebarNode>();
 
 	constructor() {
-		wails.Events.On(SidebarLoad, () => {
+		wails.On(SidebarLoad, () => {
 			this.load();
 		});
 
-		wails.Events.On(SidebarUpdate, (e: WailsEvent) => {
+		wails.On(SidebarUpdate, (e: wails.WailsEvent) => {
 			this.update(e.data[0] as SidebarNode);
 		});
 
-		wails.Events.On(SidebarAdd, (e: WailsEvent) => {
+		wails.On(SidebarAdd, (e: wails.WailsEvent) => {
 			console.log(e);
 
 			this.update(e.data[0] as SidebarNode);
 		});
 
-		wails.Events.On(SidebarRemove, (e: WailsEvent) => {
+		wails.On(SidebarRemove, (e: wails.WailsEvent) => {
 			this.update(e.data[0] as SidebarNode);
 		});
 

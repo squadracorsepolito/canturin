@@ -2,7 +2,7 @@
 	import type { SignalEnumValue } from '$lib/api/canturin';
 	import NumberEditablev2 from '$lib/components/editable/number-editablev2.svelte';
 	import TextEditablev2 from '$lib/components/editable/text-editablev2.svelte';
-	import { ExpandableTableField, TableField } from '$lib/components/table';
+	import { TableField } from '$lib/components/table';
 	import { getSignalEnumState } from '$lib/state/signal-enum-state.svelte';
 	import { z } from 'zod';
 
@@ -14,8 +14,6 @@
 	let { enumEntityId, value }: Props = $props();
 
 	const ses = getSignalEnumState(enumEntityId);
-
-	let tmpName = $state(value.name);
 
 	let invalidNames = $derived.by(() => {
 		if (!ses.entity.values) return [];
@@ -33,7 +31,7 @@
 	});
 
 	let nameErrors = $derived.by(() => {
-		const res = nameSchema.safeParse({ name: tmpName });
+		const res = nameSchema.safeParse({ name: value.name });
 		if (res.success) {
 			return undefined;
 		}
@@ -43,8 +41,6 @@
 	function handleName(name: string) {
 		ses.updateValueName(value.entityId, name);
 	}
-
-	let tmpIndex = $state(value.index);
 
 	let invalidIndexes = $derived.by(() => {
 		if (!ses.entity.values) return [];
@@ -62,7 +58,7 @@
 	});
 
 	let indexErrors = $derived.by(() => {
-		const res = indexSchema.safeParse({ index: tmpIndex });
+		const res = indexSchema.safeParse({ index: value.index });
 		if (res.success) {
 			return undefined;
 		}
@@ -72,32 +68,36 @@
 	function handleIndex(index: number) {
 		ses.updateValueIndex(value.entityId, index);
 	}
+
+	function handleDesc(desc: string) {
+		ses.updateValueDesc(value.entityId, desc);
+	}
 </script>
 
 <TableField>
 	<TextEditablev2
-		bind:value={tmpName}
+		bind:value={value.name}
 		oncommit={handleName}
 		name="signal-enum-value-name"
+		fontWeight="medium"
 		errors={nameErrors}
 	/>
 </TableField>
 
 <TableField>
 	<NumberEditablev2
-		bind:value={tmpIndex}
+		bind:value={value.index}
 		oncommit={handleIndex}
 		name="signal-enum-value-index"
 		errors={indexErrors}
 	/>
 </TableField>
 
-{#if value.desc}
-	<ExpandableTableField>
-		{value.desc}
-	</ExpandableTableField>
-{:else}
-	<TableField>
-		<i class="text-dimmed">No Description</i>
-	</TableField>
-{/if}
+<TableField>
+	<TextEditablev2
+		bind:value={value.desc}
+		oncommit={handleDesc}
+		name="signal-enum-value-desc"
+		placeholder="Add Description"
+	/>
+</TableField>

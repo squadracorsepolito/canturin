@@ -8,6 +8,7 @@
 	import { getReorderDestinationIndex } from '@atlaskit/pragmatic-drag-and-drop-hitbox/util/get-reorder-destination-index';
 	import { flip } from 'svelte/animate';
 	import { isItem, type HighlightState } from './types';
+	import { initSortableWrapper } from '$lib/actions/sortable-item.svelte';
 
 	type Props = {
 		items: T[];
@@ -26,59 +27,61 @@
 	let mode = $state<'drag' | 'keyboard'>('drag');
 
 	onMount(() => {
-		return monitorForElements({
-			canMonitor({ source }) {
-				return isItem(source.data) && source.data.instanceId === instanceId;
-			},
-			onDrop({ source, location }) {
-				if (location.current.dropTargets.length === 0) return;
+		// return monitorForElements({
+		// 	canMonitor({ source }) {
+		// 		return isItem(source.data) && source.data.instanceId === instanceId;
+		// 	},
+		// 	onDrop({ source, location }) {
+		// 		if (location.current.dropTargets.length === 0) return;
 
-				if (!isItem(source.data)) return;
+		// 		if (!isItem(source.data)) return;
 
-				const itemId = source.data.id;
-				// const listId = location.initial.dropTargets[1].data.listId;
+		// 		const itemId = source.data.id;
+		// 		// const listId = location.initial.dropTargets[1].data.listId;
 
-				const itemIdx = items.findIndex((item) => item.id === itemId);
-				if (itemIdx === -1) return;
+		// 		const itemIdx = items.findIndex((item) => item.id === itemId);
+		// 		if (itemIdx === -1) return;
 
-				// console.log('onDrop', itemId, itemIdx);
+		// 		// console.log('onDrop', itemId, itemIdx);
 
-				// if (location.current.dropTargets.length === 1) {
-				// 	console.log(
-				// 		'dropTargets1',
-				// 		location.current.dropTargets,
-				// 		location.current.dropTargets.length
-				// 	);
-				// }
+		// 		// if (location.current.dropTargets.length === 1) {
+		// 		// 	console.log(
+		// 		// 		'dropTargets1',
+		// 		// 		location.current.dropTargets,
+		// 		// 		location.current.dropTargets.length
+		// 		// 	);
+		// 		// }
 
-				// if (location.current.dropTargets.length === 1) {
-				// Destructure and extract the destination card and column data from the drop targets
-				const [destItemRecord] = location.current.dropTargets;
-				if (!isItem(destItemRecord.data)) return;
+		// 		// if (location.current.dropTargets.length === 1) {
+		// 		// Destructure and extract the destination card and column data from the drop targets
+		// 		const [destItemRecord] = location.current.dropTargets;
+		// 		if (!isItem(destItemRecord.data)) return;
 
-				const destItemId = destItemRecord.data.id;
+		// 		const destItemId = destItemRecord.data.id;
 
-				// Find the index of the target card within the destination column's cards
-				const indexOfTarget = items.findIndex((item) => item.id === destItemId);
+		// 		// Find the index of the target card within the destination column's cards
+		// 		const indexOfTarget = items.findIndex((item) => item.id === destItemId);
 
-				// Determine the closest edge of the target card: top or bottom
-				const closestEdgeOfTarget = extractClosestEdge(destItemRecord.data);
+		// 		// Determine the closest edge of the target card: top or bottom
+		// 		const closestEdgeOfTarget = extractClosestEdge(destItemRecord.data);
 
-				// Calculate the destination index for the card to be reordered within the same column
-				const destinationIndex = getReorderDestinationIndex({
-					startIndex: itemIdx,
-					indexOfTarget,
-					closestEdgeOfTarget,
-					axis: 'vertical'
-				});
+		// 		// Calculate the destination index for the card to be reordered within the same column
+		// 		const destinationIndex = getReorderDestinationIndex({
+		// 			startIndex: itemIdx,
+		// 			indexOfTarget,
+		// 			closestEdgeOfTarget,
+		// 			axis: 'vertical'
+		// 		});
 
-				// Perform the card reordering within the same column
-				reorder(itemId, itemIdx, destinationIndex);
+		// 		// Perform the card reordering within the same column
+		// 		reorder(itemId, itemIdx, destinationIndex);
 
-				return;
-				// }
-			}
-		});
+		// 		return;
+		// 		// }
+		// 	}
+		// });
+
+		return initSortableWrapper(instanceId, items, reorder);
 	});
 
 	const listAction: Action<HTMLUListElement> = (el) => {

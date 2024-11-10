@@ -1,7 +1,6 @@
 import { HistoryService, type History } from '$lib/api/canturin';
 import { HistoryChange } from '$lib/api/events';
-import * as wails from '@wailsio/runtime';
-import type { WailsEvent } from '@wailsio/runtime/types/events';
+import { Events as wails } from '@wailsio/runtime';
 
 class HistoryState {
 	history = $state({
@@ -13,7 +12,7 @@ class HistoryState {
 	canRedo = $derived(this.history.currentIndex < this.history.operationCount - 1);
 
 	constructor() {
-		wails.Events.On(HistoryChange, (event: WailsEvent) => {
+		wails.On(HistoryChange, (event: wails.WailsEvent) => {
 			const history = event.data[0] as History;
 			this.history = history;
 		});

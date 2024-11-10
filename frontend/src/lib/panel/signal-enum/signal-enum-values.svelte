@@ -12,6 +12,7 @@
 	import Tablev2 from '$lib/components/table/tablev2.svelte';
 	import { IconButton } from '$lib/components/button';
 	import ValueRow from './value-row.svelte';
+	import { TableTitle } from '$lib/components/table';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -40,6 +41,10 @@
 		ses.reorderValue(valueEntId, from, to);
 	}
 
+	function handleAdd() {
+		ses.addValue();
+	}
+
 	function handleBulkDelete(values: SignalEnumValue[]) {
 		ses.deleteValues(values.map((val) => val.entityId));
 	}
@@ -51,14 +56,14 @@
 
 {#snippet section(signalEnum: SignalEnum)}
 	{#if signalEnum.values && signalEnum.values.length > 0}
-		<Tablev2 items={signalEnum.values}>
+		<Tablev2 items={signalEnum.values} idKey="entityId">
 			{#snippet bulkActions({ selectedCount, selectedItems })}
 				<div class="flex justify-end gap-3">
 					<Toggle bind:toggled={reorderToggled} name="signal-enum-values-reorder">
 						<SortIcon />
 					</Toggle>
 
-					<IconButton onclick={() => console.log('add')} label="Add Value" color="primary">
+					<IconButton onclick={() => handleAdd()} label="Add Value" color="primary">
 						<AddIcon />
 					</IconButton>
 
@@ -74,9 +79,11 @@
 			{/snippet}
 
 			{#snippet header()}
-				<th>Name</th>
-				<th>Index</th>
-				<th>Description</th>
+				<TableTitle>Name</TableTitle>
+
+				<TableTitle>Index</TableTitle>
+
+				<TableTitle>Description</TableTitle>
 			{/snippet}
 
 			{#snippet row(value)}
@@ -90,7 +97,7 @@
 			{/snippet}
 		</Tablev2>
 
-		<div class="grid grid-cols-8 gap-x-3">
+		<!-- <div class="grid grid-cols-8 gap-x-3">
 			<div class="col-span-8 grid grid-cols-subgrid font-bold text-sm text-dimmed py-5">
 				<div class="pl-2">INDEX</div>
 
@@ -141,7 +148,7 @@
 					/>
 				{/each}
 			{/if}
-		</div>
+		</div> -->
 	{/if}
 {/snippet}
 

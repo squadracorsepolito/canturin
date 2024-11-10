@@ -86,7 +86,7 @@ func (s *HistoryService) addOperation(op *operation) {
 	if s.currOpIdx == -1 {
 		s.operations = []*operation{}
 	} else if s.currOpIdx < len(s.operations)-1 {
-		s.operations = s.operations[:s.currOpIdx]
+		s.operations = s.operations[:s.currOpIdx+1]
 	}
 
 	s.operations = append(s.operations, op)
@@ -101,6 +101,10 @@ func (s *HistoryService) Undo() (History, error) {
 
 	if s.currOpIdx == -1 {
 		return s.getState(), nil
+	}
+
+	if s.currOpIdx > len(s.operations)-1 {
+		s.currOpIdx = len(s.operations) - 1
 	}
 
 	op := s.operations[s.currOpIdx]

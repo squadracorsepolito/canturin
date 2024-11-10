@@ -1,27 +1,34 @@
-<script lang="ts" generics="T">
+<script lang="ts" generics="T extends { [K in keyof T]: any }">
 	import type { Snippet } from 'svelte';
 	import { Checkbox } from '../checkbox';
-
-	type RowItem = {
-		selected: boolean;
-	} & T;
+	import { flip } from 'svelte/animate';
+	import TableField from './table-field.svelte';
+	import TableTitle from './table-title.svelte';
 
 	type Props = {
 		items: T[];
-		bulkActions?: Snippet<[{ selectedCount: number; selectedItems: RowItem[] }]>;
+		idKey: {
+			[K in keyof T]: T[K] extends string ? K : never;
+		}[keyof T];
+		bulkActions?: Snippet<[{ selectedCount: number; selectedItems: T[] }]>;
 		header: Snippet;
 		row: Snippet<[T]>;
-		rowActions?: Snippet<[RowItem]>;
+		rowActions?: Snippet<[T]>;
 	};
 
-	let { items, bulkActions, header, row, rowActions }: Props = $props();
+	let { items, idKey, bulkActions, header, row, rowActions }: Props = $props();
 
-	class RowItems {
-		#items = $state<RowItem[]>([]);
+	class Selector {
+		#items = $state<
+			{
+				id: string;
+				selected: boolean;
+			}[]
+		>([]);
 
 		constructor(getter: () => T[]) {
 			$effect(() => {
-				this.#items = getter().map((item) => ({ selected: false, ...item }));
+				this.#items = getter().map((item) => ({ selected: false, id: item[idKey] }));
 			});
 		}
 
@@ -30,19 +37,19 @@
 		}
 	}
 
-	let rowItems = new RowItems(() => items);
+	let itemSelector = new Selector(() => items);
 
 	let allItemsSelected = $state(false);
 	let selectedCount = $state(0);
 
 	function handleSelectAll(checked: boolean) {
 		if (checked) {
-			selectedCount = rowItems.items.length;
+			selectedCount = itemSelector.items.length;
 		} else {
 			selectedCount = 0;
 		}
 
-		for (const item of rowItems.items) {
+		for (const item of itemSelector.items) {
 			item.selected = checked;
 		}
 	}
@@ -55,18 +62,20 @@
 			selectedCount -= 1;
 		}
 
-		if (selectedCount === rowItems.items.length) {
+		if (selectedCount === itemSelector.items.length) {
 			allItemsSelected = true;
 		}
 	}
+
+	let selectedItems = $derived.by(() => {
+		const selectedIds = itemSelector.items.filter((item) => item.selected).map((item) => item.id);
+		return items.filter((item) => selectedIds.includes(item[idKey]));
+	});
 </script>
 
 {#if bulkActions}
 	<div class="pb-3">
-		{@render bulkActions({
-			selectedCount,
-			selectedItems: rowItems.items.filter((i) => i.selected)
-		})}
+		{@render bulkActions({ selectedCount, selectedItems })}
 	</div>
 {/if}
 
@@ -80,26 +89,35 @@
 			{@render header()}
 
 			{#if rowActions}
-				<th>Actions</th>
+				<TableTitle>Actions</TableTitle>
 			{/if}
 		</tr>
 	</thead>
 
 	<tbody>
-		{#each rowItems.items as item}
-			<tr>
-				<td>
-					<Checkbox bind:checked={item.selected} oncheckchange={handleRowSelect} />
-				</td>
-
-				{@render row(item)}
-
-				{#if rowActions}
+		{#if items.length === itemSelector.items.length}
+			{#each items as item, idx (item[idKey])}
+				<tr
+					animate:flip={{
+						duration: 150
+					}}
+				>
 					<td>
-						{@render rowActions(item)}
+						<Checkbox
+							bind:checked={itemSelector.items[idx].selected}
+							oncheckchange={handleRowSelect}
+						/>
 					</td>
-				{/if}
-			</tr>
-		{/each}
+
+					{@render row(item)}
+
+					{#if rowActions}
+						<TableField>
+							{@render rowActions(item)}
+						</TableField>
+					{/if}
+				</tr>
+			{/each}
+		{/if}
 	</tbody>
 </table>
