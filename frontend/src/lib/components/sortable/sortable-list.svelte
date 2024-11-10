@@ -2,13 +2,9 @@
 	import type { Snippet } from 'svelte';
 	import type { Action } from 'svelte/action';
 	import SortableItem from './sortable-item.svelte';
-	import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
-	import { onMount } from 'svelte';
-	import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
-	import { getReorderDestinationIndex } from '@atlaskit/pragmatic-drag-and-drop-hitbox/util/get-reorder-destination-index';
 	import { flip } from 'svelte/animate';
-	import { isItem, type HighlightState } from './types';
-	import { initSortableWrapper } from '$lib/actions/sortable-item.svelte';
+	import { type HighlightState } from './types';
+	import { mountSortableWrapper } from '$lib/actions/sortable.svelte';
 
 	type Props = {
 		items: T[];
@@ -26,63 +22,7 @@
 
 	let mode = $state<'drag' | 'keyboard'>('drag');
 
-	onMount(() => {
-		// return monitorForElements({
-		// 	canMonitor({ source }) {
-		// 		return isItem(source.data) && source.data.instanceId === instanceId;
-		// 	},
-		// 	onDrop({ source, location }) {
-		// 		if (location.current.dropTargets.length === 0) return;
-
-		// 		if (!isItem(source.data)) return;
-
-		// 		const itemId = source.data.id;
-		// 		// const listId = location.initial.dropTargets[1].data.listId;
-
-		// 		const itemIdx = items.findIndex((item) => item.id === itemId);
-		// 		if (itemIdx === -1) return;
-
-		// 		// console.log('onDrop', itemId, itemIdx);
-
-		// 		// if (location.current.dropTargets.length === 1) {
-		// 		// 	console.log(
-		// 		// 		'dropTargets1',
-		// 		// 		location.current.dropTargets,
-		// 		// 		location.current.dropTargets.length
-		// 		// 	);
-		// 		// }
-
-		// 		// if (location.current.dropTargets.length === 1) {
-		// 		// Destructure and extract the destination card and column data from the drop targets
-		// 		const [destItemRecord] = location.current.dropTargets;
-		// 		if (!isItem(destItemRecord.data)) return;
-
-		// 		const destItemId = destItemRecord.data.id;
-
-		// 		// Find the index of the target card within the destination column's cards
-		// 		const indexOfTarget = items.findIndex((item) => item.id === destItemId);
-
-		// 		// Determine the closest edge of the target card: top or bottom
-		// 		const closestEdgeOfTarget = extractClosestEdge(destItemRecord.data);
-
-		// 		// Calculate the destination index for the card to be reordered within the same column
-		// 		const destinationIndex = getReorderDestinationIndex({
-		// 			startIndex: itemIdx,
-		// 			indexOfTarget,
-		// 			closestEdgeOfTarget,
-		// 			axis: 'vertical'
-		// 		});
-
-		// 		// Perform the card reordering within the same column
-		// 		reorder(itemId, itemIdx, destinationIndex);
-
-		// 		return;
-		// 		// }
-		// 	}
-		// });
-
-		return initSortableWrapper(instanceId, items, reorder);
-	});
+	mountSortableWrapper(instanceId, () => items, reorder);
 
 	const listAction: Action<HTMLUListElement> = (el) => {
 		function handleKeydown(e: KeyboardEvent) {

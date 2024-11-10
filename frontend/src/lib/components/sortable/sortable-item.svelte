@@ -1,20 +1,10 @@
 <script lang="ts">
-	import type { Action } from 'svelte/action';
-	import {
-		draggable,
-		dropTargetForElements
-	} from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
-	import {
-		attachClosestEdge,
-		extractClosestEdge
-	} from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
 	import type { Snippet } from 'svelte';
 	import type { Edge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/dist/types/types';
 	import DropIndicator from './drop-indicator.svelte';
-	import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 	import { DragHandleIcon, SortIcon } from '../icon';
-	import { getItem, isItem, type HighlightState } from './types';
-	import { sortableItem } from '$lib/actions/sortable-item.svelte';
+	import { type HighlightState } from './types';
+	import { sortableItem } from '$lib/actions/sortable.svelte';
 
 	type Props = {
 		instanceId: string;
@@ -28,73 +18,14 @@
 	let closestEdge = $state<Edge | null>(null);
 	let isDragging = $state(false);
 
-	let dragHandle: HTMLElement;
-
-	// const itemAction: Action<HTMLElement> = (el) => {
-	// 	const cleanup = combine(
-	// 		draggable({
-	// 			element: el,
-	// 			dragHandle: dragHandle,
-	// 			getInitialData() {
-	// 				return getItem({ instanceId, id });
-	// 			},
-	// 			onDragStart() {
-	// 				isDragging = true;
-	// 			},
-	// 			onDrop() {
-	// 				isDragging = false;
-
-	// 				el.animate([{ backgroundColor: '#37cdbe' }, {}], {
-	// 					duration: 600,
-	// 					delay: 150,
-	// 					easing: 'cubic-bezier(0.25, 0.1, 0.25, 1.0)',
-	// 					iterations: 1
-	// 				});
-	// 			}
-	// 		}),
-	// 		dropTargetForElements({
-	// 			element: el,
-	// 			canDrop({ source }) {
-	// 				return isItem(source.data) && source.data.instanceId === instanceId;
-	// 			},
-	// 			getData({ element, input }) {
-	// 				return attachClosestEdge(getItem({ instanceId, id }), {
-	// 					element: element,
-	// 					input: input,
-	// 					allowedEdges: ['top', 'bottom']
-	// 				});
-	// 			},
-	// 			onDragEnter({ source, self }) {
-	// 				if (isItem(source.data) && source.data.id !== id) {
-	// 					closestEdge = extractClosestEdge(self.data);
-	// 				}
-	// 			},
-	// 			onDrag({ source, self }) {
-	// 				if (isItem(source.data) && source.data.id !== id) {
-	// 					closestEdge = extractClosestEdge(self.data);
-	// 				}
-	// 			},
-	// 			onDragLeave() {
-	// 				closestEdge = null;
-	// 			},
-	// 			onDrop() {
-	// 				closestEdge = null;
-	// 			}
-	// 		})
-	// 	);
-
-	// 	return {
-	// 		destroy() {
-	// 			cleanup();
-	// 		}
-	// 	};
-	// };
+	let dragHandle = $state() as HTMLElement;
 </script>
 
 <div
 	use:sortableItem={{
 		id,
 		instanceId,
+		dragHandle,
 		setClosestEdge(edge) {
 			closestEdge = edge;
 		},
