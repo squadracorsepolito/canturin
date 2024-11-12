@@ -29,15 +29,6 @@
 	let reorderToggled = $state(false);
 
 	function handleReorderValue(valueEntId: string, from: number, to: number) {
-		if (!ses.entity.values) return;
-
-		const updatedItems = reorder({
-			list: ses.entity.values,
-			startIndex: from,
-			finishIndex: to
-		});
-		ses.entity.values = updatedItems;
-
 		ses.reorderValue(valueEntId, from, to);
 	}
 
@@ -56,7 +47,7 @@
 
 {#snippet section(signalEnum: SignalEnum)}
 	{#if signalEnum.values && signalEnum.values.length > 0}
-		<Tablev2 items={signalEnum.values} idKey="entityId">
+		<Tablev2 items={signalEnum.values} idKey="entityId" reorder={handleReorderValue}>
 			{#snippet bulkActions({ selectedCount, selectedItems })}
 				<div class="flex justify-end gap-3">
 					<Toggle bind:toggled={reorderToggled} name="signal-enum-values-reorder">

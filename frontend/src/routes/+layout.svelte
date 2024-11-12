@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { EditorIcon, SettingIcon } from '$lib/components/icon';
 
-	import '../app.pcss';
+	import '../app.css';
 
 	let { children } = $props();
 </script>

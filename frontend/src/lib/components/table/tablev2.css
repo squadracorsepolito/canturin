@@ -1,0 +1,47 @@
+.sortable2 {
+	&:focus {
+		@apply outline-none;
+	}
+
+	[data-part='item'] {
+		&[data-dragging='true'] {
+			@apply opacity-20;
+		}
+
+		&[data-highlight-state='none'] {
+			@apply border-transparent;
+		}
+
+		&[data-highlight-state='selecting'] {
+			@apply border-secondary focus-ring-secondary text-secondary bg-secondary-ghost;
+		}
+
+		&[data-highlight-state='moving'] {
+			@apply border-primary focus-ring-primary text-primary bg-primary-ghost;
+		}
+
+		&[data-closest-edge='top'] {
+			background-image: linear-gradient(
+				var(--fallback-a, oklch(var(--a) / var(--tw-border-opacity))),
+				var(--fallback-a, oklch(var(--a) / var(--tw-border-opacity)))
+			);
+			background-size: 100% 5%;
+			background-repeat: no-repeat;
+		}
+
+		&[data-closest-edge='bottom'] {
+			@apply bg-accent;
+
+			background-image: linear-gradient(
+				var(--fallback-b1, oklch(var(--b1) / var(--tw-bg-opacity))),
+				var(--fallback-b1, oklch(var(--b1) / var(--tw-bg-opacity)))
+			);
+			background-size: 100% 95%;
+			background-repeat: no-repeat;
+		}
+	}
+
+	[data-part='drag-handle'] {
+		@apply cursor-grab inline-block;
+	}
+}

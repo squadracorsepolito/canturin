@@ -50,6 +50,8 @@ class SignalEnumState extends EntityState<SignalEnum> {
 	}
 
 	reorderValue(valueEntID: string, from: number, to: number) {
+		if (from === to) return;
+
 		this.update(SignalEnumService.ReorderValue(this.entity.entityId, valueEntID, from, to));
 	}
 

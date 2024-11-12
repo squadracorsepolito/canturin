@@ -4,19 +4,24 @@
 	import { flip } from 'svelte/animate';
 	import TableField from './table-field.svelte';
 	import TableTitle from './table-title.svelte';
+	import { Sortable } from '$lib/actions/sortable.svelte';
+	import { DragHandleIcon, SortIcon } from '../icon';
+	import Toggle from '../toggle/toggle.svelte';
+	import './tablev2.css';
 
 	type Props = {
 		items: T[];
 		idKey: {
 			[K in keyof T]: T[K] extends string ? K : never;
 		}[keyof T];
+		reorder: (id: string, from: number, to: number) => void;
 		bulkActions?: Snippet<[{ selectedCount: number; selectedItems: T[] }]>;
 		header: Snippet;
 		row: Snippet<[T]>;
 		rowActions?: Snippet<[T]>;
 	};
 
-	let { items, idKey, bulkActions, header, row, rowActions }: Props = $props();
+	let { items, idKey, reorder, bulkActions, header, row, rowActions }: Props = $props();
 
 	class Selector {
 		#items = $state<
@@ -71,6 +76,13 @@
 		const selectedIds = itemSelector.items.filter((item) => item.selected).map((item) => item.id);
 		return items.filter((item) => selectedIds.includes(item[idKey]));
 	});
+
+	const sortable = new Sortable({
+		instanceId: 'table',
+		enabled: false,
+		itemsGetter: () => items.map((item) => ({ id: item[idKey] })),
+		reorder
+	});
 </script>
 
 {#if bulkActions}
@@ -78,6 +90,10 @@
 		{@render bulkActions({ selectedCount, selectedItems })}
 	</div>
 {/if}
+
+<Toggle bind:toggled={sortable.enabled} name="sortable-list-enable">
+	<SortIcon />
+</Toggle>
 
 <table class="table">
 	<thead>
@@ -94,19 +110,23 @@
 		</tr>
 	</thead>
 
-	<tbody>
+	<tbody use:sortable.root class="sortable2">
 		{#if items.length === itemSelector.items.length}
 			{#each items as item, idx (item[idKey])}
-				<tr
-					animate:flip={{
-						duration: 150
-					}}
-				>
+				<tr animate:flip={{ duration: 150 }} use:sortable.item={{ id: item[idKey] }}>
 					<td>
-						<Checkbox
-							bind:checked={itemSelector.items[idx].selected}
-							oncheckchange={handleRowSelect}
-						/>
+						<div class="flex">
+							{#if sortable.enabled}
+								<div use:sortable.dragHandle={{ id: item[idKey] }}>
+									<DragHandleIcon height="20" width="20" />
+								</div>
+							{:else}
+								<Checkbox
+									bind:checked={itemSelector.items[idx].selected}
+									oncheckchange={handleRowSelect}
+								/>
+							{/if}
+						</div>
 					</td>
 
 					{@render row(item)}

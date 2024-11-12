@@ -1,0 +1,51 @@
+.sortable {
+	&:focus {
+		@apply outline-none;
+	}
+
+	[data-part='item'] {
+		@apply relative transition-colors flex items-center border-2;
+
+		&[data-dragging='true'] {
+			@apply opacity-20;
+		}
+
+		&[data-highlight-state='none'] {
+			@apply border-transparent;
+		}
+
+		&[data-highlight-state='selecting'] {
+			@apply border-secondary focus-ring-secondary text-secondary bg-secondary-ghost;
+		}
+
+		&[data-highlight-state='moving'] {
+			@apply border-primary focus-ring-primary text-primary bg-primary-ghost;
+		}
+	}
+
+	[data-part='drop-indicator'] {
+		@apply absolute h-1 w-full bg-accent z-10 rounded-r-badge invisible;
+
+		&[data-visible] {
+			@apply visible;
+		}
+
+		&::before {
+			content: '';
+
+			@apply absolute w-1 h-4 bg-accent rounded-badge -left-1 top-[-0.375rem];
+		}
+
+		&[data-closest-edge='top'] {
+			@apply top-[-0.25rem];
+		}
+
+		&[data-closest-edge='bottom'] {
+			@apply bottom-[-0.25rem];
+		}
+	}
+
+	[data-part='drag-handle'] {
+		@apply cursor-grab inline-block;
+	}
+}
