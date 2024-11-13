@@ -47,8 +47,7 @@ export class Sortable<T extends { id: string }> {
 	#itemsGetter: () => T[];
 	#reorder: (id: string, from: number, to: number) => void;
 
-	#dropIndicators = new Map<string, { el: HTMLElement; edge: Edge | null }>();
-
+	#dropIndicator: HTMLElement | undefined = undefined;
 	#dragHandles = new Map<string, HTMLElement>();
 
 	selectedItem = $state({
@@ -195,29 +194,55 @@ export class Sortable<T extends { id: string }> {
 		this.mode = 'drag';
 	}
 
-	private setClosestEdge(id: string, edge: Edge | null) {
-		const dropIndicator = this.#dropIndicators.get(id);
-		if (!dropIndicator) {
-			return;
-		}
-
-		if (dropIndicator.edge === edge) {
-			return;
-		}
-
-		dropIndicator.edge = edge;
+	private handleClosestEdge(itemEl: HTMLElement, edge: Edge | null) {
 		if (edge === null) {
-			dropIndicator.el.removeAttribute('data-visible');
-			dropIndicator.el.removeAttribute('data-closest-edge');
+			itemEl.removeAttribute('data-closest-edge');
 		} else {
-			dropIndicator.el.setAttribute('data-visible', 'true');
-			dropIndicator.el.setAttribute('data-closest-edge', edge);
+			itemEl.setAttribute('data-closest-edge', edge);
+		}
+
+		if (!this.#dropIndicator) {
+			return;
+		}
+
+		if (edge === null) {
+			this.#dropIndicator.hidden = true;
+			this.#dropIndicator.removeAttribute('data-visible');
+			return;
+		}
+
+		this.#dropIndicator.hidden = false;
+		this.#dropIndicator.setAttribute('data-visible', 'true');
+
+		const itemRect = itemEl.getBoundingClientRect();
+		const indicatorRect = this.#dropIndicator.getBoundingClientRect();
+
+		this.#dropIndicator.style.left = `${itemRect.left}px`;
+
+		if (edge === 'top') {
+			this.#dropIndicator.style.top = `${itemRect.top - indicatorRect.height / 2}px`;
+		} else {
+			this.#dropIndicator.style.top = `${itemRect.top + itemRect.height - indicatorRect.height / 2}px`;
 		}
 	}
 
+	private handleEnabled(el: HTMLElement, enabled: boolean) {
+		if (enabled) {
+			el.setAttribute('data-enabled', 'true');
+		} else {
+			el.removeAttribute('data-enabled');
+		}
+	}
+
+	private initPart(el: HTMLElement, partName: string) {
+		el.setAttribute('data-scope', 'sortable');
+		el.setAttribute('data-part', partName);
+	}
+
 	root(el: HTMLElement) {
+		this.initPart(el, 'root');
+
 		el.tabIndex = 0;
-		el.setAttribute('data-part', 'root');
 
 		const handleKeydown = (e: KeyboardEvent) => this.handleKeydown(el, e);
 
@@ -241,7 +266,9 @@ export class Sortable<T extends { id: string }> {
 	}
 
 	item(el: HTMLElement, { id }: PartOptions) {
-		el.setAttribute('data-part', 'item');
+		this.initPart(el, 'item');
+
+		let prevEdge: Edge | null = null;
 
 		$effect(() => {
 			if (this.enabled) {
@@ -291,34 +318,32 @@ export class Sortable<T extends { id: string }> {
 					onDragEnter: ({ source, self }) => {
 						if (isItem(source.data) && source.data.id !== id) {
 							const edge = extractClosestEdge(self.data);
-							this.setClosestEdge(id, edge);
-
-							if (edge) {
-								el.setAttribute('data-closest-edge', edge);
-							} else {
-								el.removeAttribute('data-closest-edge');
+							if (edge === prevEdge) {
+								return;
 							}
+
+							prevEdge = edge;
+							this.handleClosestEdge(el, edge);
 						}
 					},
 					onDrag: ({ source, self }) => {
 						if (isItem(source.data) && source.data.id !== id) {
 							const edge = extractClosestEdge(self.data);
-							this.setClosestEdge(id, edge);
-
-							if (edge) {
-								el.setAttribute('data-closest-edge', edge);
-							} else {
-								el.removeAttribute('data-closest-edge');
+							if (edge === prevEdge) {
+								return;
 							}
+
+							prevEdge = edge;
+							this.handleClosestEdge(el, edge);
 						}
 					},
 					onDragLeave: () => {
-						this.setClosestEdge(id, null);
-						el.removeAttribute('data-closest-edge');
+						prevEdge = null;
+						this.handleClosestEdge(el, null);
 					},
 					onDrop: () => {
-						this.setClosestEdge(id, null);
-						el.removeAttribute('data-closest-edge');
+						prevEdge = null;
+						this.handleClosestEdge(el, null);
 					}
 				})
 			);
@@ -330,28 +355,25 @@ export class Sortable<T extends { id: string }> {
 	}
 
 	dragHandle(el: HTMLElement, { id }: PartOptions) {
-		el.setAttribute('data-part', 'drag-handle');
+		this.initPart(el, 'drag-handle');
+
 		this.#dragHandles.set(id, el);
 
 		$effect(() => {
-			if (this.enabled) {
-				el.setAttribute('data-enabled', 'true');
-			} else {
-				el.removeAttribute('data-enabled');
-			}
+			this.handleEnabled(el, this.enabled);
 		});
 	}
 
-	dropIndicator(el: HTMLElement, { id }: PartOptions) {
-		el.setAttribute('data-part', 'drop-indicator');
-		this.#dropIndicators.set(id, { el, edge: null });
+	dropIndicator(el: HTMLElement) {
+		this.initPart(el, 'drop-indicator');
+
+		el.style.position = 'absolute';
+		el.hidden = true;
+
+		this.#dropIndicator = el;
 
 		$effect(() => {
-			if (this.enabled) {
-				el.setAttribute('data-enabled', 'true');
-			} else {
-				el.removeAttribute('data-enabled');
-			}
+			this.handleEnabled(el, this.enabled);
 		});
 	}
 }

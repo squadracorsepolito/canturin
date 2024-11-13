@@ -147,6 +147,7 @@
 </Toggle>
 
 <div use:sortable.root class="sortable">
+	<div use:sortable.dropIndicator></div>
 	{#each items as item (item.id)}
 		<div
 			animate:flip={{ duration: 150 }}
@@ -157,8 +158,6 @@
 			<span use:sortable.dragHandle={{ id: item.id }}><DragHandleIcon /></span>
 
 			{@render itemBody({ item, highlightState: 'none' })}
-
-			<div use:sortable.dropIndicator={{ id: item.id }}></div>
 		</div>
 	{/each}
 </div>

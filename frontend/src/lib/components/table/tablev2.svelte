@@ -113,8 +113,14 @@
 	<tbody use:sortable.root class="sortable2">
 		{#if items.length === itemSelector.items.length}
 			{#each items as item, idx (item[idKey])}
-				<tr animate:flip={{ duration: 150 }} use:sortable.item={{ id: item[idKey] }}>
+				<tr
+					animate:flip={{ duration: 150 }}
+					use:sortable.item={{ id: item[idKey] }}
+					class="relative"
+				>
 					<td>
+						<!-- <div class="h-10 w-full block bg-red-500 top-0 left-[-20px]"></div> -->
+
 						<div class="flex">
 							{#if sortable.enabled}
 								<div use:sortable.dragHandle={{ id: item[idKey] }}>
