@@ -14,6 +14,28 @@ import { onMount } from 'svelte';
 
 const privateItemKey = Symbol('Item');
 
+enum Keys {
+	enter = 'Enter',
+	escape = 'Escape',
+	space = ' ',
+	arrowLeft = 'ArrowLeft',
+	arrowRight = 'ArrowRight',
+	arrowUp = 'ArrowUp',
+	arrowDown = 'ArrowDown'
+}
+
+enum ItemStates {
+	idle = 'idle',
+	dragging = 'dragging',
+	selecting = 'selecting',
+	moving = 'moving'
+}
+
+enum Mode {
+	drag = 'drag',
+	keyboard = 'keyboard'
+}
+
 type Item = {
 	[privateItemKey]: true;
 	instanceId: string;
@@ -47,15 +69,9 @@ export class Sortable<T extends { id: string }> {
 	#itemsGetter: () => T[];
 	#reorder: (id: string, from: number, to: number) => void;
 
-	#dropIndicator: HTMLElement | undefined = undefined;
+	#items = new Map<string, HTMLElement>();
 	#dragHandles = new Map<string, HTMLElement>();
-
-	selectedItem = $state({
-		id: '',
-		index: -1
-	});
-
-	mode = $state<'drag' | 'keyboard'>('drag');
+	#dropIndicator: HTMLElement | undefined = undefined;
 
 	enabled = $state(false);
 
@@ -114,84 +130,155 @@ export class Sortable<T extends { id: string }> {
 		});
 	}
 
-	private handleKeydown(el: HTMLElement, e: KeyboardEvent) {
-		if (e.key === 'Escape') {
-			e.preventDefault();
-			this.selectedItem = { id: '', index: -1 };
+	private handleMode(el: HTMLElement, mode: Mode) {
+		this.#mode = mode;
+		el.setAttribute('data-mode', mode);
+	}
 
-			this.mode = 'drag';
-			el.blur();
-			return;
-		}
+	private handleItemState(el: HTMLElement, state: ItemStates) {
+		el.setAttribute('data-state', state);
+	}
 
-		if (this.mode === 'drag') {
-			if (e.key === 'Enter') {
-				this.mode = 'keyboard';
-				this.selectedItem.index = 0;
-			}
-			return;
-		}
+	private resetItemStates() {
+		this.#selectedItemIdx = -1;
 
-		if (e.key === 'Enter') {
-			this.selectedItem = { id: '', index: -1 };
-			this.mode = 'drag';
-
-			return;
-		}
-
-		if (e.key === ' ') {
-			e.preventDefault();
-
-			const targetId = this.#itemsGetter()[this.selectedItem.index].id;
-			if (this.selectedItem.id === targetId) {
-				this.selectedItem.id = '';
-			} else {
-				this.selectedItem.id = targetId;
-			}
-
-			return;
-		}
-
-		if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-			e.preventDefault();
-
-			if (this.selectedItem.index <= 0) {
-				return;
-			}
-
-			if (this.selectedItem.id) {
-				this.#reorder(this.selectedItem.id, this.selectedItem.index, this.selectedItem.index - 1);
-			}
-
-			if (this.selectedItem.index > 0) {
-				this.selectedItem.index--;
-			}
-
-			return;
-		}
-
-		if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-			e.preventDefault();
-
-			if (this.selectedItem.index >= this.#itemsGetter().length - 1) {
-				return;
-			}
-
-			if (this.selectedItem.id) {
-				this.#reorder(this.selectedItem.id, this.selectedItem.index, this.selectedItem.index + 1);
-			}
-
-			if (this.selectedItem.index < this.#itemsGetter().length - 1) {
-				this.selectedItem.index++;
-			}
-
-			return;
+		for (const item of this.#items.values()) {
+			this.handleItemState(item, ItemStates.idle);
 		}
 	}
 
-	private handleBlur() {
-		this.selectedItem = { id: '', index: -1 };
-		this.mode = 'drag';
+	#mode: Mode = Mode.drag;
+	#selectedItemIdx = -1;
+	#movingItemId = '';
+
+	private handleKeydown(el: HTMLElement, e: KeyboardEvent) {
+		if (e.key === Keys.escape) {
+			e.preventDefault();
+			this.resetItemStates();
+			this.handleMode(el, Mode.drag);
+
+			this.#movingItemId = '';
+
+			el.blur();
+
+			return;
+		}
+
+		const items = this.#itemsGetter();
+		if (items.length === 0) return;
+
+		if (e.key === Keys.enter) {
+			if (this.#mode === Mode.drag) {
+				const firstItemId = items[0].id;
+				const firstItem = this.#items.get(firstItemId);
+				if (!firstItem) return;
+
+				this.handleMode(el, Mode.keyboard);
+				this.handleItemState(firstItem, ItemStates.selecting);
+				this.#selectedItemIdx = 0;
+			} else {
+				this.resetItemStates();
+				this.handleMode(el, Mode.drag);
+
+				this.#movingItemId = '';
+			}
+
+			return;
+		}
+
+		if (e.key === Keys.space) {
+			e.preventDefault();
+
+			const itemId = items[this.#selectedItemIdx].id;
+			const item = this.#items.get(itemId);
+			if (!item) return;
+
+			if (this.#movingItemId === itemId) {
+				this.handleItemState(item, ItemStates.selecting);
+				this.#movingItemId = '';
+			} else {
+				this.handleItemState(item, ItemStates.moving);
+				this.#movingItemId = itemId;
+			}
+
+			return;
+		}
+
+		if (e.key === Keys.arrowUp || e.key === Keys.arrowLeft) {
+			e.preventDefault();
+
+			// reached the first item
+			if (this.#selectedItemIdx <= 0) {
+				return;
+			}
+
+			// changing the selecting item
+			if (!this.#movingItemId) {
+				const prevItem = this.#items.get(items[this.#selectedItemIdx].id);
+				if (!prevItem) return;
+
+				const nextItem = this.#items.get(items[this.#selectedItemIdx - 1].id);
+				if (!nextItem) return;
+
+				this.handleItemState(prevItem, ItemStates.idle);
+				this.handleItemState(nextItem, ItemStates.selecting);
+
+				this.#selectedItemIdx--;
+
+				return;
+			}
+
+			// swapping the moving item
+			const itemId = items[this.#selectedItemIdx].id;
+			const item = this.#items.get(itemId);
+			if (!item) return;
+
+			const fromIdx = this.#selectedItemIdx;
+			const toIdx = this.#selectedItemIdx - 1;
+			this.#reorder(itemId, fromIdx, toIdx);
+
+			this.#selectedItemIdx--;
+
+			return;
+		}
+
+		if (e.key === Keys.arrowDown || e.key === Keys.arrowRight) {
+			e.preventDefault();
+
+			// reached the last item
+			if (this.#selectedItemIdx >= items.length - 1) {
+				return;
+			}
+
+			// changing the selecting item
+			if (!this.#movingItemId) {
+				const prevItem = this.#items.get(items[this.#selectedItemIdx].id);
+				if (!prevItem) return;
+
+				const nextItem = this.#items.get(items[this.#selectedItemIdx + 1].id);
+				if (!nextItem) return;
+
+				this.handleItemState(prevItem, ItemStates.idle);
+				this.handleItemState(nextItem, ItemStates.selecting);
+
+				this.#selectedItemIdx++;
+
+				return;
+			}
+
+			// swapping the moving item
+			const itemId = items[this.#selectedItemIdx].id;
+			const item = this.#items.get(itemId);
+			if (!item) return;
+
+			const fromIdx = this.#selectedItemIdx;
+			const toIdx = this.#selectedItemIdx + 1;
+			this.#reorder(itemId, fromIdx, toIdx);
+
+			this.#selectedItemIdx++;
+
+			return;
+		}
 	}
 
 	private handleClosestEdge(itemEl: HTMLElement, edge: Edge | null) {
@@ -256,26 +343,23 @@ export class Sortable<T extends { id: string }> {
 
 		$effect(() => {
 			el.addEventListener('keydown', handleKeydown);
-			el.addEventListener('blur', this.handleBlur);
 
 			return () => {
 				el.removeEventListener('keydown', handleKeydown);
-				el.removeEventListener('blur', this.handleBlur);
 			};
 		});
 	}
 
 	item(el: HTMLElement, { id }: PartOptions) {
 		this.initPart(el, 'item');
+		this.handleItemState(el, ItemStates.idle);
+
+		this.#items.set(id, el);
 
 		let prevEdge: Edge | null = null;
 
 		$effect(() => {
-			if (this.enabled) {
-				el.setAttribute('data-enabled', 'true');
-			} else {
-				el.removeAttribute('data-enabled');
-			}
+			this.handleEnabled(el, this.enabled);
 		});
 
 		$effect(() => {
@@ -287,11 +371,11 @@ export class Sortable<T extends { id: string }> {
 					getInitialData: () => {
 						return getItem({ instanceId: this.#instanceId, id });
 					},
-					onDragStart() {
-						el.setAttribute('data-dragging', 'true');
+					onDragStart: () => {
+						this.handleItemState(el, ItemStates.dragging);
 					},
-					onDrop() {
-						el.setAttribute('data-dragging', 'false');
+					onDrop: () => {
+						this.handleItemState(el, ItemStates.idle);
 
 						el.animate([{ backgroundColor: '#37cdbe' }, {}], {
 							duration: 600,
@@ -350,6 +434,7 @@ export class Sortable<T extends { id: string }> {
 
 			return () => {
 				cleanup();
+				this.#items.delete(id);
 			};
 		});
 	}
