@@ -1,6 +1,6 @@
 .sortable2 {
 	&:focus {
-		@apply outline-none;
+		@apply outline-2 outline-red-500;
 	}
 
 	[data-part='item'] {
@@ -8,16 +8,16 @@
 			@apply opacity-20;
 		}
 
-		&[data-highlight-state='none'] {
-			@apply border-transparent;
+		&[data-state='dragging'] {
+			@apply opacity-20;
 		}
 
-		&[data-highlight-state='selecting'] {
-			@apply border-secondary focus-ring-secondary text-secondary bg-secondary-ghost;
+		&[data-state='selecting'] {
+			@apply focus-ring-secondary text-secondary bg-secondary-ghost;
 		}
 
-		&[data-highlight-state='moving'] {
-			@apply border-primary focus-ring-primary text-primary bg-primary-ghost;
+		&[data-state='moving'] {
+			@apply focus-ring-primary text-primary bg-primary-ghost;
 		}
 
 		&[data-closest-edge='top'] {

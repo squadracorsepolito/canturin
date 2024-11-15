@@ -149,7 +149,7 @@ export class Sortable<T extends { id: string }> {
 
 	#mode: Mode = Mode.drag;
 	#selectedItemIdx = -1;
-	#movingItemId = '';
+	#movingItemId = $state('');
 
 	private handleKeydown(el: HTMLElement, e: KeyboardEvent) {
 		if (e.key === Keys.escape) {
@@ -158,9 +158,14 @@ export class Sortable<T extends { id: string }> {
 			this.handleMode(el, Mode.drag);
 
 			this.#movingItemId = '';
+			this.enabled = false;
 
 			el.blur();
 
+			return;
+		}
+
+		if (!this.enabled) {
 			return;
 		}
 
@@ -181,6 +186,8 @@ export class Sortable<T extends { id: string }> {
 				this.handleMode(el, Mode.drag);
 
 				this.#movingItemId = '';
+
+				this.enabled = false;
 			}
 
 			return;
@@ -460,5 +467,9 @@ export class Sortable<T extends { id: string }> {
 		$effect(() => {
 			this.handleEnabled(el, this.enabled);
 		});
+	}
+
+	isItemMoving(id: string) {
+		return this.#movingItemId === id;
 	}
 }

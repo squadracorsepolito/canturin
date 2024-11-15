@@ -130,13 +130,13 @@ func (s *SignalEnumService) UpdateDesc(entityID string, desc string) (SignalEnum
 }
 
 func (s *SignalEnumService) ReorderValue(enumEntID, valueEntID string, from, to int) (SignalEnum, error) {
-	if from == to {
-		return s.converterFn(nil), nil
-	}
-
 	sigEnum, err := s.getEntity(enumEntID)
 	if err != nil {
 		return SignalEnum{}, err
+	}
+
+	if from == to {
+		return s.converterFn(sigEnum), nil
 	}
 
 	s.mux.Lock()

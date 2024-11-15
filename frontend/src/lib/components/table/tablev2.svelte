@@ -124,7 +124,11 @@
 						<div class="flex">
 							{#if sortable.enabled}
 								<div use:sortable.dragHandle={{ id: item[idKey] }}>
-									<DragHandleIcon height="20" width="20" />
+									{#if sortable.isItemMoving(item[idKey])}
+										<SortIcon height="20" width="20" />
+									{:else}
+										<DragHandleIcon height="20" width="20" />
+									{/if}
 								</div>
 							{:else}
 								<Checkbox
