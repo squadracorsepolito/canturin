@@ -5,7 +5,7 @@
 	import { type HighlightState } from './types';
 	import { Sortable } from '$lib/actions/sortable.svelte';
 	import DragHandleIcon from '../icon/drag-handle-icon.svelte';
-	import Toggle from '../toggle/toggle.svelte';
+	import { Toggle } from '../toggle';
 	import SortIcon from '../icon/sort-icon.svelte';
 	import './style.css';
 

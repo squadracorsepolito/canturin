@@ -1,6 +1,30 @@
 .sortable2 {
-	&:focus {
-		@apply outline-2 outline-red-500;
+	@apply border-2 border-transparent outline-none rounded-box;
+
+	&[data-enabled='true'] {
+		&:focus {
+			@apply ring-2 ring-primary;
+		}
+	}
+
+	tr:first-child {
+		td:first-child {
+			@apply rounded-tl-box;
+		}
+
+		td:last-child {
+			@apply rounded-tr-box;
+		}
+	}
+
+	tr:last-child {
+		td:first-child {
+			@apply rounded-bl-box;
+		}
+
+		td:last-child {
+			@apply rounded-br-box;
+		}
 	}
 
 	[data-part='item'] {
@@ -13,11 +37,11 @@
 		}
 
 		&[data-state='selecting'] {
-			@apply focus-ring-secondary text-secondary bg-secondary-ghost;
+			@apply text-secondary bg-secondary-ghost;
 		}
 
 		&[data-state='moving'] {
-			@apply focus-ring-primary text-primary bg-primary-ghost;
+			@apply text-primary bg-primary-ghost;
 		}
 
 		&[data-closest-edge='top'] {

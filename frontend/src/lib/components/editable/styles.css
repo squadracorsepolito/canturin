@@ -1,0 +1,47 @@
+.editable {
+	[data-part='area'] {
+		@apply rounded-btn border-2 border-transparent px-2 py-1 transition-colors;
+
+		&[data-error] {
+			@apply focus-ring-warning border-warning bg-warning-ghost text-warning;
+
+			&[data-focus] {
+				@apply focus-ring-error border-error bg-error-ghost text-error;
+			}
+		}
+
+		&:not([data-error]) {
+			&[data-focus] {
+				@apply focus-ring-primary border-primary bg-primary-ghost text-primary;
+			}
+		}
+
+		&[data-placeholder-shown] {
+			@apply text-dimmed italic;
+		}
+
+		input {
+			@apply outline-none bg-transparent;
+		}
+
+		&[data-text-size='lg'] {
+			@apply text-h2;
+		}
+
+		&[data-font-weight='medium'] {
+			@apply font-medium;
+		}
+	}
+
+	[data-part='input'] {
+		@apply outline-none bg-base-100;
+	}
+
+	[data-part='preview']:focus {
+		@apply outline-none;
+	}
+}
+
+[data-part='error'] {
+	@apply absolute pt-1 text-error text-xs truncate cursor-pointer;
+}

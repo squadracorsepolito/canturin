@@ -6,8 +6,10 @@
 	import TableTitle from './table-title.svelte';
 	import { Sortable } from '$lib/actions/sortable.svelte';
 	import { DragHandleIcon, SortIcon } from '../icon';
-	import Toggle from '../toggle/toggle.svelte';
+	import { Toggle } from '../toggle';
 	import './tablev2.css';
+	import { uniqueId } from '$lib/utils';
+	import Divider from '../divider/divider.svelte';
 
 	type Props = {
 		items: T[];
@@ -78,28 +80,34 @@
 	});
 
 	const sortable = new Sortable({
-		instanceId: 'table',
+		instanceId: uniqueId(),
 		enabled: false,
 		itemsGetter: () => items.map((item) => ({ id: item[idKey] })),
 		reorder
 	});
 </script>
 
-{#if bulkActions}
-	<div class="pb-3">
-		{@render bulkActions({ selectedCount, selectedItems })}
-	</div>
-{/if}
+<div class="flex items-center gap-5 justify-end pb-5">
+	<Toggle bind:toggled={sortable.enabled} name="sortable-list-enable">
+		<SortIcon />
+	</Toggle>
 
-<Toggle bind:toggled={sortable.enabled} name="sortable-list-enable">
-	<SortIcon />
-</Toggle>
+	{#if bulkActions}
+		<div>
+			{@render bulkActions({ selectedCount, selectedItems })}
+		</div>
+	{/if}
+</div>
 
 <table class="table">
 	<thead>
 		<tr>
 			<th>
-				<Checkbox bind:checked={allItemsSelected} oncheckchange={handleSelectAll} />
+				<div class="min-h-6">
+					{#if !sortable.enabled}
+						<Checkbox bind:checked={allItemsSelected} oncheckchange={handleSelectAll} />
+					{/if}
+				</div>
 			</th>
 
 			{@render header()}
@@ -113,14 +121,8 @@
 	<tbody use:sortable.root class="sortable2">
 		{#if items.length === itemSelector.items.length}
 			{#each items as item, idx (item[idKey])}
-				<tr
-					animate:flip={{ duration: 150 }}
-					use:sortable.item={{ id: item[idKey] }}
-					class="relative"
-				>
+				<tr animate:flip={{ duration: 150 }} use:sortable.item={{ id: item[idKey] }}>
 					<td>
-						<!-- <div class="h-10 w-full block bg-red-500 top-0 left-[-20px]"></div> -->
-
 						<div class="flex">
 							{#if sortable.enabled}
 								<div use:sortable.dragHandle={{ id: item[idKey] }}>

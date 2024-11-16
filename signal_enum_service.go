@@ -111,9 +111,39 @@ func (s *SignalEnumService) UpdateName(entityID string, name string) (SignalEnum
 		return SignalEnum{}, err
 	}
 
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	oldName := sigEnum.Name()
+	if name == oldName {
+		return s.converterFn(sigEnum), nil
+	}
+
 	sigEnum.UpdateName(name)
 
 	proxy.pushSidebarUpdate(sigEnum.EntityID(), name)
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalEnum,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigEnum.UpdateName(oldName)
+			proxy.pushSidebarUpdate(sigEnum.EntityID(), oldName)
+
+			return s.converterFn(sigEnum), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigEnum.UpdateName(name)
+			proxy.pushSidebarUpdate(sigEnum.EntityID(), name)
+
+			return s.converterFn(sigEnum), nil
+		},
+	)
 
 	return s.converterFn(sigEnum), nil
 }
@@ -124,29 +154,48 @@ func (s *SignalEnumService) UpdateDesc(entityID string, desc string) (SignalEnum
 		return SignalEnum{}, err
 	}
 
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	oldDesc := sigEnum.Desc()
+	if desc == oldDesc {
+		return s.converterFn(sigEnum), nil
+	}
+
 	sigEnum.SetDesc(desc)
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalEnum,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigEnum.SetDesc(oldDesc)
+
+			return s.converterFn(sigEnum), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigEnum.SetDesc(desc)
+
+			return s.converterFn(sigEnum), nil
+		},
+	)
 
 	return s.converterFn(sigEnum), nil
 }
 
-func (s *SignalEnumService) ReorderValue(enumEntID, valueEntID string, from, to int) (SignalEnum, error) {
-	sigEnum, err := s.getEntity(enumEntID)
-	if err != nil {
-		return SignalEnum{}, err
-	}
-
+func (s *SignalEnumService) reorderValue(sigEnum *acmelib.SignalEnum, sigEnumVal *acmelib.SignalEnumValue, from, to int) error {
 	if from == to {
-		return s.converterFn(sigEnum), nil
+		return nil
 	}
 
-	s.mux.Lock()
-	defer s.mux.Unlock()
-
-	targetEnumVal := sigEnum.Values()[from]
-	if err := sigEnum.RemoveValue(targetEnumVal.EntityID()); err != nil {
-		return SignalEnum{}, err
+	if err := sigEnum.RemoveValue(sigEnumVal.EntityID()); err != nil {
+		return err
 	}
-	lastValIdx := targetEnumVal.Index()
+	lastValIdx := sigEnumVal.Index()
 
 	restValues := sigEnum.Values()
 	if to < from {
@@ -155,7 +204,7 @@ func (s *SignalEnumService) ReorderValue(enumEntID, valueEntID string, from, to 
 			tmpVal := restValues[i]
 			tmpValIdx := tmpVal.Index()
 			if err := tmpVal.UpdateIndex(lastValIdx); err != nil {
-				return SignalEnum{}, err
+				return err
 			}
 			lastValIdx = tmpValIdx
 		}
@@ -165,19 +214,67 @@ func (s *SignalEnumService) ReorderValue(enumEntID, valueEntID string, from, to 
 			tmpVal := restValues[i]
 			tmpValIdx := tmpVal.Index()
 			if err := tmpVal.UpdateIndex(lastValIdx); err != nil {
-				return SignalEnum{}, err
+				return err
 			}
 			lastValIdx = tmpValIdx
 		}
 	}
 
-	if err := targetEnumVal.UpdateIndex(lastValIdx); err != nil {
+	if err := sigEnumVal.UpdateIndex(lastValIdx); err != nil {
+		return err
+	}
+
+	if err := sigEnum.AddValue(sigEnumVal); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *SignalEnumService) ReorderValue(enumEntID, valueEntID string, from, to int) (SignalEnum, error) {
+	sigEnum, err := s.getEntity(enumEntID)
+	if err != nil {
 		return SignalEnum{}, err
 	}
 
-	if err := sigEnum.AddValue(targetEnumVal); err != nil {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	if from == to {
+		return s.converterFn(sigEnum), nil
+	}
+
+	sigEnumVal, err := sigEnum.GetValue(acmelib.EntityID(valueEntID))
+	if err != nil {
 		return SignalEnum{}, err
 	}
+
+	if err := s.reorderValue(sigEnum, sigEnumVal, from, to); err != nil {
+		return SignalEnum{}, err
+	}
+
+	proxy.pushHistoryOperation(operationDomainSignalEnum,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			if err := s.reorderValue(sigEnum, sigEnumVal, to, from); err != nil {
+				return SignalEnum{}, err
+			}
+
+			return s.converterFn(sigEnum), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			if err := s.reorderValue(sigEnum, sigEnumVal, from, to); err != nil {
+				return SignalEnum{}, err
+			}
+
+			return s.converterFn(sigEnum), nil
+		},
+	)
 
 	return s.converterFn(sigEnum), nil
 }

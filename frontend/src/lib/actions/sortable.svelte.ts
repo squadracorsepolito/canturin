@@ -141,6 +141,7 @@ export class Sortable<T extends { id: string }> {
 
 	private resetItemStates() {
 		this.#selectedItemIdx = -1;
+		this.#movingItemId = '';
 
 		for (const item of this.#items.values()) {
 			this.handleItemState(item, ItemStates.idle);
@@ -157,7 +158,6 @@ export class Sortable<T extends { id: string }> {
 			this.resetItemStates();
 			this.handleMode(el, Mode.drag);
 
-			this.#movingItemId = '';
 			this.enabled = false;
 
 			el.blur();
@@ -184,10 +184,6 @@ export class Sortable<T extends { id: string }> {
 			} else {
 				this.resetItemStates();
 				this.handleMode(el, Mode.drag);
-
-				this.#movingItemId = '';
-
-				this.enabled = false;
 			}
 
 			return;
@@ -340,9 +336,14 @@ export class Sortable<T extends { id: string }> {
 
 		const handleKeydown = (e: KeyboardEvent) => this.handleKeydown(el, e);
 
+		const handleBlur = () => {
+			this.resetItemStates();
+		};
+
 		$effect(() => {
 			if (this.enabled) {
 				el.setAttribute('data-enabled', 'true');
+				el.focus();
 			} else {
 				el.removeAttribute('data-enabled');
 			}
@@ -350,9 +351,11 @@ export class Sortable<T extends { id: string }> {
 
 		$effect(() => {
 			el.addEventListener('keydown', handleKeydown);
+			el.addEventListener('blur', handleBlur);
 
 			return () => {
 				el.removeEventListener('keydown', handleKeydown);
+				el.removeEventListener('blur', handleBlur);
 			};
 		});
 	}

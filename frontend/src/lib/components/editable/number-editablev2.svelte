@@ -1,4 +1,5 @@
 <script lang="ts">
+	import './styles.css';
 	import { uniqueId } from '$lib/utils';
 	import * as editable from '@zag-js/editable';
 	import * as numberInput from '@zag-js/number-input';
@@ -87,11 +88,20 @@
 	const api = $derived(editable.connect(snpshot, send, normalizeProps));
 	const inputApi = $derived(numberInput.connect(inputSnapshot, inputSend, normalizeProps));
 
+	const rootProps = $derived(
+		mergeProps(api.getRootProps(), {
+			onkeydown: (e: KeyboardEvent) => {
+				if (e.key === 'Escape') {
+					api.cancel();
+				}
+			}
+		})
+	);
 	const inputProps = $derived(mergeProps(inputApi.getInputProps(), api.getInputProps()));
 </script>
 
-<div class="relative">
-	<div {...api.getRootProps()}>
+<div class="relative editable">
+	<div {...rootProps}>
 		<div {...api.getAreaProps()} data-error={errors ? true : undefined}>
 			<input {...inputProps} />
 
@@ -102,38 +112,10 @@
 	</div>
 
 	{#if errors && api.editing}
-		<div class="absolute pt-1 text-error text-xs truncate">
+		<div data-part="error">
 			{#each errors as err}
 				<span>{err}</span>
 			{/each}
 		</div>
 	{/if}
 </div>
-
-<style lang="postcss">
-	[data-part='area'] {
-		@apply rounded-btn px-2 py-1 border-2 border-transparent transition-colors;
-
-		input {
-			@apply outline-none bg-base-100;
-		}
-
-		&[data-error] {
-			@apply focus-ring-warning border-warning;
-
-			&[data-focus] {
-				@apply focus-ring-error border-error;
-			}
-		}
-
-		&:not([data-error]) {
-			&[data-focus] {
-				@apply focus-ring-primary border-primary;
-			}
-		}
-
-		&[data-placeholder-shown] {
-			@apply text-dimmed;
-		}
-	}
-</style>
