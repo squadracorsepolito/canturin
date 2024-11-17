@@ -100,7 +100,7 @@
 	const inputProps = $derived(mergeProps(inputApi.getInputProps(), api.getInputProps()));
 </script>
 
-<div class="relative editable">
+<div class="editable">
 	<div {...rootProps}>
 		<div {...api.getAreaProps()} data-error={errors ? true : undefined}>
 			<input {...inputProps} />

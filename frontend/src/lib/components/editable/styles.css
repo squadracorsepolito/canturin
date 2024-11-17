@@ -1,4 +1,6 @@
 .editable {
+	@apply relative;
+
 	[data-part='area'] {
 		@apply rounded-btn border-2 border-transparent px-2 py-1 transition-colors;
 
@@ -40,8 +42,8 @@
 	[data-part='preview']:focus {
 		@apply outline-none;
 	}
-}
 
-[data-part='error'] {
-	@apply absolute pt-1 text-error text-xs truncate cursor-pointer;
+	[data-part='error'] {
+		@apply absolute pt-1 text-error text-xs truncate cursor-pointer;
+	}
 }

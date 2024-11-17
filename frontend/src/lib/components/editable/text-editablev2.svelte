@@ -74,7 +74,7 @@
 	);
 </script>
 
-<div class="relative editable">
+<div class="editable">
 	<div {...rootProps}>
 		<div
 			{...api.getAreaProps()}
