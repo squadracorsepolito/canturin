@@ -31,3 +31,97 @@ func newSignalUnitService() *SignalUnitService {
 		}),
 	}
 }
+
+func (s *SignalUnitService) UpdateName(entityID string, name string) (SignalUnit, error) {
+    // retrieve the signal unit
+    sigUnit, err := s.getEntity(entityID)
+    if err != nil {
+        return SignalUnit{}, err
+    }
+
+    // Lock to guarantee unique access
+    s.mux.Lock()
+    defer s.mux.Unlock()
+
+    // Actual signal unit name
+    oldName := sigUnit.Name()
+    
+    if name == oldName {
+        return s.converterFn(sigUnit), nil
+    }
+
+    // Update name
+    sigUnit.SetName(name)
+    
+    // Push the new name to the sideBar
+    proxy.pushSidebarUpdate(sigUnit.EntityID(), name)
+
+    // Add history operation
+    proxy.pushHistoryOperation(
+        operationDomainSignalUnit,
+        func() (any, error) {
+            s.mux.Lock()
+            defer s.mux.Unlock()
+
+            // Rollback of the name
+            sigUnit.SetName(oldName)
+            proxy.pushSidebarUpdate(sigUnit.EntityID(), oldName)
+
+            return s.converterFn(sigUnit), nil
+        },
+        func() (any, error) {
+            s.mux.Lock()
+            defer s.mux.Unlock()
+
+            // Final update
+            sigUnit.SetName(name)
+            proxy.pushSidebarUpdate(sigUnit.EntityID(), name)
+
+            return s.converterFn(sigUnit), nil
+        },
+    )
+
+    // return the updated entity
+    return s.converterFn(sigUnit), nil
+}
+
+func (s *SignalUnitService) UpdateDesc(entityID string, desc string) (SignalUnit, error) {
+	sigUnit, err := s.getEntity(entityID)
+	if err != nil {
+		return SignalUnit{}, err
+	}
+
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	oldDesc := sigUnit.Desc()
+	if desc == oldDesc {
+		return s.converterFn(sigUnit), nil
+	}
+
+	sigUnit.SetDesc(desc)
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalUnit,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigUnit.SetDesc(oldDesc)
+
+			return s.converterFn(sigUnit), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			sigUnit.SetDesc(desc)
+
+			return s.converterFn(sigUnit), nil
+		},
+	)
+
+	return s.converterFn(sigUnit), nil
+}
+
+
