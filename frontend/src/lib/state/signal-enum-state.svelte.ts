@@ -63,24 +63,7 @@ class SignalEnumState extends EntityState<SignalEnum> {
 	}
 
 	updateValueIndex(valueEntID: string, index: number) {
-		const f = async () => {
-			try {
-				const sigEnum = await SignalEnumService.UpdateValueIndex(
-					this.entity.entityId,
-					valueEntID,
-					index
-				);
-
-				this.entity = sigEnum;
-			} catch (error) {
-				console.error(error);
-
-				const sigEnum = await SignalEnumService.Get(this.entity.entityId);
-				this.entity = sigEnum;
-			}
-		};
-
-		f();
+		this.update(SignalEnumService.UpdateValueIndex(this.entity.entityId, valueEntID, index));
 	}
 
 	updateValueDesc(valueEntID: string, desc: string) {

@@ -54,6 +54,7 @@
 		index: z
 			.number()
 			.min(0)
+			.max(4_294_967_295)
 			.refine((n) => !invalidIndexes.includes(n), { message: 'Duplicated' })
 	});
 

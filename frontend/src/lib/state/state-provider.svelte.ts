@@ -26,7 +26,7 @@ export class StateProvider<E extends Entity, S extends EntityState<E>> {
 		if (!data) {
 			throw new Error(`No entity with id ${entityId} found`);
 		}
-		return data as S;
+		return data;
 	}
 
 	modify(entity: E) {
