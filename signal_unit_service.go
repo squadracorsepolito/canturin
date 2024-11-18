@@ -17,18 +17,20 @@ type SignalUnitService struct {
 	*service[*acmelib.SignalUnit, SignalUnit]
 }
 
+func signalUnitConverter(sigType *acmelib.SignalUnit) SignalUnit {
+	return SignalUnit{
+		base: getBase(sigType),
+
+		Symbol: sigType.Symbol(),
+
+		ReferenceCount: sigType.ReferenceCount(),
+		References:     getSignalReferences(sigType),
+	}
+}
+
 func newSignalUnitService() *SignalUnitService {
 	return &SignalUnitService{
-		service: newService(proxy.sigUnitCh, func(su *acmelib.SignalUnit) SignalUnit {
-			return SignalUnit{
-				base: getBase(su),
-
-				Symbol: su.Symbol(),
-
-				ReferenceCount: su.ReferenceCount(),
-				References:     getSignalReferences(su),
-			}
-		}),
+		service: newService(proxy.sigUnitCh, signalUnitConverter),
 	}
 }
 
