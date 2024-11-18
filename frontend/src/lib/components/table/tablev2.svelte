@@ -7,9 +7,8 @@
 	import { Sortable } from '$lib/actions/sortable.svelte';
 	import { DragHandleIcon, SortIcon } from '../icon';
 	import { Toggle } from '../toggle';
-	import './tablev2.css';
+	import './styles.css';
 	import { uniqueId } from '$lib/utils';
-	import Divider from '../divider/divider.svelte';
 
 	type Props = {
 		items: T[];
@@ -118,7 +117,7 @@
 		</tr>
 	</thead>
 
-	<tbody use:sortable.root class="sortable2">
+	<tbody use:sortable.root class="table-body">
 		{#if items.length === itemSelector.items.length}
 			{#each items as item, idx (item[idKey])}
 				<tr animate:flip={{ duration: 150 }} use:sortable.item={{ id: item[idKey] }}>

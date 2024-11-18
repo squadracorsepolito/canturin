@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { SignalEnum, SignalEnumValue } from '$lib/api/canturin';
-	import { AddIcon, DeleteIcon, SortIcon } from '$lib/components/icon';
-	import { Toggle } from '$lib/components/toggle';
+	import { AddIcon, DeleteIcon } from '$lib/components/icon';
 	import { getSignalEnumState } from '$lib/state/signal-enum-state.svelte';
 	import type { PanelSectionProps } from '../types';
 	import { text } from './signal-enum-text';
@@ -13,16 +12,6 @@
 	let { entityId }: PanelSectionProps = $props();
 
 	const ses = getSignalEnumState(entityId);
-
-	function getValueInvalidNames(values: SignalEnumValue[], entId: string) {
-		return values.filter((val) => val.entityId !== entId).map((val) => val.name);
-	}
-
-	function getValueInvalidIndexes(values: SignalEnumValue[], entId: string) {
-		return values.filter((val) => val.entityId !== entId).map((val) => val.index);
-	}
-
-	let reorderToggled = $state(false);
 
 	function handleReorderValue(valueEntId: string, from: number, to: number) {
 		ses.reorderValue(valueEntId, from, to);

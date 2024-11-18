@@ -23,10 +23,6 @@
 		loadInvalidNames();
 	});
 
-	function handleName(name: string) {
-		ses.updateName(name);
-	}
-
 	const nameSchema = z.object({
 		name: z
 			.string()
@@ -34,12 +30,16 @@
 			.refine((n) => !invalidNames.includes(n), { message: 'Duplicated' })
 	});
 
-	function validateName(name: string) {
-		const res = nameSchema.safeParse(name);
+	let nameErrors = $derived.by(() => {
+		const res = nameSchema.safeParse({ name: ses.entity.name });
 		if (res.success) {
 			return undefined;
 		}
 		return res.error.flatten().fieldErrors.name;
+	});
+
+	function handleName(name: string) {
+		ses.updateName(name);
 	}
 
 	function handleDesc(desc: string) {
@@ -52,11 +52,12 @@
 		<SignalEnumIcon width="48" height="48" />
 
 		<TextEditable
-			validator={validateName}
+			bind:value={signalEnum.name}
 			name="signal-enum-name"
-			initialValue={signalEnum.name}
-			onsubmit={handleName}
-			placeholder="Name"
+			oncommit={handleName}
+			errors={nameErrors}
+			fontWeight="semibold"
+			textSize="lg"
 		/>
 	</div>
 

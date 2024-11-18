@@ -10,7 +10,7 @@
 		placeholder?: string;
 		errors?: string[];
 		textSize?: 'md' | 'lg';
-		fontWeight?: 'normal' | 'medium';
+		fontWeight?: 'normal' | 'medium' | 'semibold';
 		oncommit?: (value: string) => void;
 	};
 

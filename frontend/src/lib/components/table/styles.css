@@ -1,10 +1,8 @@
-.sortable2 {
+.table-body {
 	@apply border-2 border-transparent outline-none rounded-box;
 
 	&[data-enabled='true'] {
-		&:focus {
-			@apply ring-2 ring-primary;
-		}
+		@apply ring-2 ring-primary;
 	}
 
 	tr:first-child {
@@ -44,7 +42,7 @@
 			@apply text-primary bg-primary-ghost;
 		}
 
-		&[data-closest-edge='top'] {
+		&[data-closest-edge] {
 			background-image: linear-gradient(
 				var(--fallback-a, oklch(var(--a) / var(--tw-border-opacity))),
 				var(--fallback-a, oklch(var(--a) / var(--tw-border-opacity)))
@@ -54,14 +52,7 @@
 		}
 
 		&[data-closest-edge='bottom'] {
-			@apply bg-accent;
-
-			background-image: linear-gradient(
-				var(--fallback-b1, oklch(var(--b1) / var(--tw-bg-opacity))),
-				var(--fallback-b1, oklch(var(--b1) / var(--tw-bg-opacity)))
-			);
-			background-size: 100% 95%;
-			background-repeat: no-repeat;
+			background-position: bottom;
 		}
 	}
 

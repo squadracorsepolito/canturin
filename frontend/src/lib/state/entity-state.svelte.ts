@@ -1,3 +1,5 @@
+import { pushToast } from '$lib/components/toast/toast-provider.svelte';
+
 export type Entity = {
 	entityId: string;
 };
@@ -18,6 +20,7 @@ export class EntityState<E extends Entity> {
 			this.entity = newEntity;
 		} catch (error) {
 			this.entity = this.#fallback;
+			pushToast('error', 'Error', 'Operation failed');
 			console.error(error);
 		}
 	}

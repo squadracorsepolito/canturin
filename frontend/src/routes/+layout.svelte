@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { EditorIcon, SettingIcon } from '$lib/components/icon';
-	import ToastGroup from '$lib/components/toast/toast-group.svelte';
+	import { ToastGroup } from '$lib/components/toast';
 
 	import '../app.css';
 

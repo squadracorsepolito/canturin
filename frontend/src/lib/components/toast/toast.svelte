@@ -12,8 +12,6 @@
 	const [snapshot, send] = useActor(actor);
 
 	const api = $derived(toast.connect(snapshot, send, normalizeProps));
-
-	$inspect(actor.config);
 </script>
 
 <div {...api.getRootProps()}>
@@ -41,7 +39,7 @@
 		opacity: var(--opacity);
 		will-change: translate, opacity, scale;
 
-		@apply min-w-96 p-5 gap-3  rounded-box flex transition-all;
+		@apply min-w-96 p-5 gap-3 rounded-box flex justify-between transition-all;
 
 		&[data-type='error'] {
 			@apply bg-error text-error-content;

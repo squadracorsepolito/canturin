@@ -27,11 +27,15 @@
 		}
 
 		&[data-text-size='lg'] {
-			@apply text-h2;
+			@apply text-2xl;
 		}
 
 		&[data-font-weight='medium'] {
 			@apply font-medium;
+		}
+
+		&[data-font-weight='semibold'] {
+			@apply font-semibold;
 		}
 	}
 

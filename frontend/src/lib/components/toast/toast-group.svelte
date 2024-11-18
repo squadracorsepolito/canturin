@@ -3,6 +3,7 @@
 	import { normalizeProps, useMachine } from '@zag-js/svelte';
 	import * as toast from '@zag-js/toast';
 	import Toast from './toast.svelte';
+	import { createToastProvider, pushToast } from './toast-provider.svelte';
 
 	const [snapshot, send] = useMachine(
 		toast.group.machine({
@@ -15,19 +16,9 @@
 	);
 
 	const api = $derived(toast.group.connect(snapshot, send, normalizeProps));
-</script>
 
-<!-- <button
-	onclick={() =>
-		api.create({
-			type: 'error',
-			title: 'Error',
-			description:
-				'Something went wrong Something went wrong Something went wrong Something went wrong Something went wrong Something went wrong'
-		})}
->
-	add
-</button> -->
+	createToastProvider(() => api);
+</script>
 
 {#each api.getPlacements() as placement}
 	<div {...api.getGroupProps({ placement })}>
