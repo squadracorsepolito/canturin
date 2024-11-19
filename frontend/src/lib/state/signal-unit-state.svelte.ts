@@ -1,60 +1,43 @@
 import { SignalUnitService, type SignalUnit } from '$lib/api/canturin';
-import { AsyncState } from './async-state.svelte';
+import { HistorySignalTypeModify } from '$lib/api/events';
+import { EntityState } from './entity-state.svelte';
+import { StateProvider } from './state-provider.svelte';
 
-async function loadSignalUnit(state: SignalUnitState, entityId: string) {
-	state.isLoading = true;
+const provider = new StateProvider(
+	(signalUnit: SignalUnit) => new SignalUnitState(signalUnit),
+	HistorySignalTypeModify
+);
 
-	try {
-		const sigUnit = await SignalUnitService.Get(entityId);
-		state.signalUnit = sigUnit;
-	} catch (error) {
-		state.signalUnit = undefined;
-		console.error(error);
-	}
-
-	state.isLoading = false;
+export function getSignalUnitState(entityId: string) {
+	return provider.get(entityId);
 }
 
-// posso estendere non asyncstate ma l'altro!!! quindi posso implementarli uguali
-class SignalUnitState extends AsyncState {
-	signalUnit = $state<SignalUnit | undefined>();
-
-	reload(entityId: string) {
-		loadSignalUnit(this, entityId);
-	}
-
-	async updateName(name: string) {
-		// Check if signal unit is defined
-        if (!this.signalUnit) return;
-
-		// Update the name
-        try {
-            const updatedSignalUnit = await SignalUnitService.UpdateName(this.signalUnit.entityId, name);
-            this.signalUnit = updatedSignalUnit;
-        } catch (error) {
-            console.error("Error updating SignalUnit name:", error);
-        }
-    }
-
-	async updateDesc(description: string) {
-		// Check if signal unit is defined
-		if (!this.signalUnit) return;
-	
-		// Update the description
-		try {
-			const updatedSignalUnit = await SignalUnitService.UpdateDesc(this.signalUnit.entityId, description);
-			this.signalUnit = updatedSignalUnit;
-		} catch (error) {
-			console.error("Error updating SignalUnit description:", error);
-		}
-	}
-	
+export async function loadSignalUnit(entityId: string) {
+	const signalUnit = await SignalUnitService.Get(entityId);
+	provider.add(signalUnit);
 }
 
 export function useSignalUnit(entityId: string) {
-	const state = new SignalUnitState();
+	loadSignalUnit(entityId);
+}
 
-	loadSignalUnit(state, entityId);
+class SignalUnitState extends EntityState<SignalUnit> {
+	// signalUnit = $state<SignalUnit | undefined>();
 
-	return state;
+	constructor(signalUnit: SignalUnit) {
+		super(signalUnit);
+	}
+
+	reload(entityId: string) {
+		loadSignalUnit(entityId);
+	}
+
+	updateName(name: string) {
+		this.update(SignalUnitService.UpdateName(this.entity.entityId, name));
+	}
+
+	updateDesc(desc: string) {
+		this.update(SignalUnitService.UpdateDesc(this.entity.entityId, desc));
+	}
+	
 }

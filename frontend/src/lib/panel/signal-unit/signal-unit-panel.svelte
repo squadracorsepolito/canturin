@@ -1,25 +1,19 @@
 <script lang="ts">
 	import { SignalTypeIcon } from '$lib/components/icon';
+	import type { PanelSectionProps } from '../types';
 	import { TextEditable } from '$lib/components/editable';
 	import { type SignalUnit } from '$lib/api/canturin';
-	import Summary from '$lib/components/summary/summary.svelte';
-	import Divider from '$lib/components/divider/divider.svelte';
 	import { ReferenceTree } from '$lib/components/tree';
-	import { useSignalUnit } from '$lib/state/signal-unit-state.svelte';
+	import { getSignalUnitState } from '$lib/state/signal-unit-state.svelte';
 	import { getSignalReferenceTree } from '$lib/utils';
-	import Panel from '../panel.svelte';
 	import TextareaEditable from '$lib/components/editable/textarea-editable.svelte';
 	import { text } from './signal-unit-text';
 	import Attribute from '$lib/components/attribute/attribute.svelte';
 	import Readonly from '$lib/components/readonly/readonly.svelte';
 
-	type Props = {
-		entityId: string;
-	};
+	let { entityId }: PanelSectionProps = $props();
 
-	let { entityId }: Props = $props();
-
-	let state = useSignalUnit(entityId);
+	let state = getSignalUnitState(entityId);
 
 	$effect(() => {
 		state.reload(entityId);
@@ -86,8 +80,6 @@
 	{/if}
 {/snippet}
 
-<Panel>
-	{#if !state.isLoading && state.signalUnit}
-		{@render sigUnitPanel(state.signalUnit)}
-	{/if}
-</Panel>
+<section>
+	{@render sigUnitPanel(state.entity)}
+</section>
