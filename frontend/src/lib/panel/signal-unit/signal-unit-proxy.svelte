@@ -11,7 +11,6 @@
 
 <Panel>
 	{#await promise then}
-		{console.log("started")}
 		<SignalUnitPanel {entityId} />
 	{/await}
 </Panel>

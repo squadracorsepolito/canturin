@@ -126,4 +126,41 @@ func (s *SignalUnitService) UpdateDesc(entityID string, desc string) (SignalUnit
 	return s.converterFn(sigUnit), nil
 }
 
+func (s *SignalUnitService) UpdateSymbol(entityID string, symbol string) (SignalUnit, error) {
+    sigUnit, err := s.getEntity(entityID)
+    if err != nil {
+        return SignalUnit{}, err
+    }
+
+    s.mux.Lock()
+    defer s.mux.Unlock()
+
+    oldSymbol := sigUnit.Symbol()
+    if symbol == oldSymbol {
+        return s.converterFn(sigUnit), nil
+    }
+
+    sigUnit.SetSymbol(symbol)
+
+    proxy.pushHistoryOperation(
+        operationDomainSignalUnit,
+        func() (any, error) {
+            s.mux.Lock()
+            defer s.mux.Unlock()
+
+            sigUnit.SetSymbol(oldSymbol)
+            return s.converterFn(sigUnit), nil
+        },
+        func() (any, error) {
+            s.mux.Lock()
+            defer s.mux.Unlock()
+
+            sigUnit.SetSymbol(symbol)
+            return s.converterFn(sigUnit), nil
+        },
+    )
+
+    return s.converterFn(sigUnit), nil
+}
+
 

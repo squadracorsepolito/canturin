@@ -18,3 +18,18 @@ export function GetNames(): Promise<string[] | null> & { cancel(): void } {
     let $resultPromise = $Call.ByID(2566933599) as any;
     return $resultPromise;
 }
+
+export function UpdateDesc(entityID: string, desc: string): Promise<$models.SignalUnit> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3797493755, entityID, desc) as any;
+    return $resultPromise;
+}
+
+export function UpdateName(entityID: string, name: string): Promise<$models.SignalUnit> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1637602753, entityID, name) as any;
+    return $resultPromise;
+}
+
+export function UpdateSymbol(entityID: string, $symbol: string): Promise<$models.SignalUnit> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(2276999818, entityID, $symbol) as any;
+    return $resultPromise;
+}

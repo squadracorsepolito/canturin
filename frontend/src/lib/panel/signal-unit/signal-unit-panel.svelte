@@ -27,12 +27,17 @@
 		state.updateDesc(desc);
 	}
 
+	function handleSymbol(sym: string) {
+		state.updateSymbol(sym);
+	}
+
 </script>
 
 {#snippet sigUnitPanel(sigUnit: SignalUnit)}
 	<!-- name box -->
 	<div class="flex gap-2 items-center">
 		<SignalTypeIcon width="48" height="48" />
+		
 		<TextEditable
 			validator={() => undefined}
 			name="signal-type-name"
@@ -52,15 +57,18 @@
 		/>
 	</div>
 
-	<div class="grid grid-cols-2 gap-5">
+	<!-- attribute grid -->
+	<div class="grid grid-cols-2 gap-5 pt-8">
 		<Attribute {...text.symbol}>
-			<Readonly>
-				<span class="font-medium">
-					{sigUnit.symbol}
-				</span>
-			</Readonly>
+			<TextEditable
+				validator={() => undefined}
+				name="Symbol"
+				initialValue={sigUnit.symbol}
+				onsubmit={handleSymbol}
+				placeholder={sigUnit.symbol}
+			/>
 		</Attribute>
-
+	
 		<Attribute {...text.refCount}>
 			<Readonly>
 				<span class="font-medium">
@@ -68,15 +76,16 @@
 				</span>
 			</Readonly>
 		</Attribute>
-
 	</div>
 
 	{#if sigUnit.references}
-		<section>
-			<h4>References</h4>
+		<div class="pt-8">
+			<section>
+				<h3 class="pb-5">{text.headings.refs}</h3>
 
-			<ReferenceTree siblingNodes={getSignalReferenceTree(sigUnit.references)} depth={4} />
-		</section>
+				<ReferenceTree siblingNodes={getSignalReferenceTree(sigUnit.references)} depth={4} />
+			</section>
+		</div>
 	{/if}
 {/snippet}
 
