@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Divider from '$lib/components/divider/divider.svelte';
+	import Select from '$lib/components/select/select.svelte';
 	import SortableList from '$lib/components/sortable/sortable-list.svelte';
 	import { reorder } from '@atlaskit/pragmatic-drag-and-drop/reorder';
 
@@ -36,7 +37,23 @@
 		});
 		items = updatedItems;
 	}
+
+	let selectData = $state([
+		{ label: 'Nigeria', value: 'NG' },
+		{ label: 'Japan', value: 'JP' },
+		{ label: 'Korea', value: 'KO' },
+		{ label: 'Kenya', value: 'KE' },
+		{ label: 'United Kingdom', value: 'UK' },
+		{ label: 'Ghana', value: 'GH' },
+		{ label: 'Uganda', value: 'UG' }
+	]);
+
+	let selected = $state('');
+
+	$inspect(selected);
 </script>
+
+<Select items={selectData} bind:selected />
 
 <Divider></Divider>
 

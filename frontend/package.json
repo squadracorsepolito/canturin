@@ -29,6 +29,7 @@
 		"@zag-js/editable": "^0.77.0",
 		"@zag-js/number-input": "^0.77.0",
 		"@zag-js/radio-group": "^0.77.0",
+		"@zag-js/select": "^0.77.1",
 		"@zag-js/svelte": "^0.77.0",
 		"@zag-js/switch": "^0.77.0",
 		"@zag-js/toast": "^0.77.1",
