@@ -12,6 +12,13 @@ export default {
     tailwindContainerQueries,
     tailwindTypography,
     daisyui,
+    function ({ addUtilities }) {
+      addUtilities({
+        '.focus-ring-primary': {
+          '@apply ring ring-primary': {},
+        },
+      }, ['responsive', 'hover']);
+    },
   ],
 }
 

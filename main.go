@@ -3,9 +3,9 @@ package main
 import (
 	"embed"
 	_ "embed"
-	"fmt"
+	// "fmt"
 	"log"
-	"os"
+	// "os"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
@@ -101,7 +101,7 @@ func main() {
 			CanChooseFiles(true).
 			PromptForSingleSelection()
 		if result != "" {
-			processFile(result)
+			loadNetwork(result)
 		} else {
 			application.InfoDialog().SetMessage("No file selected").Show()
 		}
@@ -150,14 +150,14 @@ func main() {
 }
 
 // function to process and read files
-func processFile(filePath string) {
-	// read selected file
-	data, err := os.ReadFile(filePath)
-	if err != nil {
-		fmt.Println("Error reading file:", err)
-		return
-	}
+// func processFile(filePath string) {
+// 	// read selected file
+// 	data, err := os.ReadFile(filePath)
+// 	if err != nil {
+// 		fmt.Println("Error reading file:", err)
+// 		return
+// 	}
 
-	// Show file content on the terminal
-	fmt.Printf("File %s loaded successfully! Content:\n%s\n", filePath, string(data))
-}
+// 	// Show file content on the terminal
+// 	fmt.Printf("File %s loaded successfully! Content:\n%s\n", filePath, string(data))
+// }
