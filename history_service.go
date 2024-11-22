@@ -15,7 +15,8 @@ type History struct {
 type operationDomain int
 
 const (
-	operationDomainSignalType operationDomain = iota
+	operationDomainBus operationDomain = iota
+	operationDomainSignalType
 	operationDomainSignalUnit
 	operationDomainSignalEnum
 )
@@ -143,6 +144,8 @@ func (s *HistoryService) Redo() (History, error) {
 func (s *HistoryService) sendModifyEvent(opDomain operationDomain, res any) {
 	eventName := ""
 	switch opDomain {
+	case operationDomainBus:
+		eventName = HistoryBusModify
 	case operationDomainSignalType:
 		eventName = HistorySignalTypeModify
 	case operationDomainSignalUnit:

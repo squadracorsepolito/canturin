@@ -13,6 +13,14 @@ import * as time$0 from "../time/models.js";
 // @ts-ignore: Unused imports
 import * as $internal from "./internal.js";
 
+export interface Bus {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+    "nodeInterfaces": NodeInterface[] | null;
+}
+
 export interface History {
     "operationCount": number;
     "currentIndex": number;
@@ -38,6 +46,14 @@ export interface Node {
     "desc": string;
     "createTime": time$0.Time;
     "sendedMessages": Message[] | null;
+}
+
+export interface NodeInterface {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+    "number": number;
 }
 
 export interface SidebarNode {

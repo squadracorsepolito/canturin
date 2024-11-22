@@ -28,12 +28,13 @@ func main() {
 	proxy = newAppProxy()
 
 	// Initialize the services
-	sidebarSrv := newSidebarService()
-	historySrv := newHistoryService()
+	sidebarService := newSidebarService()
+	historyService := newHistoryService()
 
-	msgServ := newMessageService()
-	sigTypeServ := newSignalTypeService()
-	sigUnitServ := newSignalUnitService()
+	busService := newBusService()
+	messageService := newMessageService()
+	signalTypeService := newSignalTypeService()
+	signalUnitService := newSignalUnitService()
 	signalEnumService := newSignalEnumService()
 
 	// Create a new Wails application by providing the necesvar (sary options.
@@ -47,23 +48,24 @@ func main() {
 
 		Services: []application.Service{
 
-			application.NewService(sidebarSrv),
-			application.NewService(historySrv),
+			application.NewService(sidebarService),
+			application.NewService(historyService),
 
-			application.NewService(msgServ),
-			application.NewService(sigTypeServ),
-			application.NewService(sigUnitServ),
+			application.NewService(busService),
+			application.NewService(messageService),
+			application.NewService(signalTypeService),
+			application.NewService(signalUnitService),
 			application.NewService(signalEnumService),
 		},
 
 		KeyBindings: map[string]func(window *application.WebviewWindow){
 			"ctrl+z": func(w *application.WebviewWindow) {
-				historySrv.Undo()
-				historySrv.emitHistoryChange()
+				historyService.Undo()
+				historyService.emitHistoryChange()
 			},
 			"ctrl+y": func(w *application.WebviewWindow) {
-				historySrv.Redo()
-				historySrv.emitHistoryChange()
+				historyService.Redo()
+				historyService.emitHistoryChange()
 			},
 		},
 
@@ -92,19 +94,6 @@ func main() {
 		BackgroundColour: application.NewRGB(27, 38, 54),
 		URL:              "/",
 	})
-
-	// // Create a goroutine that emits an event containing the current time every second.
-	// // The frontend can listen to this event and update the UI accordingly.
-	// go func() {
-	// 	for {
-	// 		now := time.Now().Format(time.RFC1123)
-	// 		app.Events.Emit(&application.WailsEvent{
-	// 			Name: "time",
-	// 			Data: now,
-	// 		})
-	// 		time.Sleep(time.Second)
-	// 	}
-	// }()
 
 	app.OnApplicationEvent(events.Common.ApplicationStarted, func(_ *application.ApplicationEvent) {
 		loadNetwork("./testdata/SC24.binpb")

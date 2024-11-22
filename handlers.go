@@ -26,6 +26,7 @@ func loadNetwork(path string) {
 	sigEnums := make(map[acmelib.EntityID]*acmelib.SignalEnum)
 
 	for _, bus := range net.Buses() {
+		proxy.pushBus(bus)
 
 		for _, nodeInt := range bus.NodeInterfaces() {
 

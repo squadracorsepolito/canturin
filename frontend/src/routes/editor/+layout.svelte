@@ -19,6 +19,7 @@
 	import sidebarState from '$lib/state/sidebar-state.svelte';
 	import history from '$lib/state/history-state.svelte';
 	import { PaneGroup, Pane, PaneResizer } from 'paneforge';
+	import TickIcon from '$lib/components/icon/tick-icon.svelte';
 
 	let { children } = $props();
 
@@ -73,6 +74,12 @@
 
 			case SidebarNodeKind.SidebarNodeKindBus:
 				n.icon = BusIcon;
+				n.childNodes.push({
+					name: 'Open Bus',
+					icon: TickIcon,
+					childNodes: [],
+					onclick: () => layout.openPanel('bus', currNode.entityId)
+				});
 				break;
 
 			case SidebarNodeKind.SidebarNodeKindNode:
