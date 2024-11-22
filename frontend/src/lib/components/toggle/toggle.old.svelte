@@ -1,27 +1,32 @@
 <script lang="ts">
+	import { createToggle } from '@melt-ui/svelte';
 	import type { Snippet } from 'svelte';
 
 	type Props = {
 		toggled: boolean;
-		name?: string;
+		name: string;
 		color?: 'primary' | 'error';
 		children: Snippet;
 	};
 
 	let { toggled = $bindable(), name, color = 'primary', children }: Props = $props();
+
+	const {
+		elements: { root }
+	} = createToggle({
+		onPressedChange: ({ next }) => {
+			toggled = next;
+			return next;
+		}
+	});
 </script>
 
-<button
-	onclick={() => (toggled = !toggled)}
-	aria-label={name}
-	data-color={color}
-	data-state={toggled ? 'on' : 'off'}
->
+<button {...$root} use:root aria-label={name} data-color={color}>
 	{@render children()}
 </button>
 
 <style lang="postcss">
-	button {
+	[data-melt-toggle] {
 		@apply border-2 rounded-btn transition-colors p-1 shadow-none outline-none;
 
 		&[data-state='off'] {

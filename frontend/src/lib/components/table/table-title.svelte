@@ -9,7 +9,7 @@
 </script>
 
 <th class="max-w-96">
-	<div class="px-2">
+	<div class="px-2 min-h-6">
 		{@render children?.()}
 	</div>
 </th>

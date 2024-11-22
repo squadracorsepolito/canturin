@@ -1,0 +1,62 @@
+.table-body {
+	@apply border-2 border-transparent outline-none rounded-box;
+
+	&[data-enabled='true'] {
+		@apply ring-2 ring-primary;
+	}
+
+	tr:first-child {
+		td:first-child {
+			@apply rounded-tl-box;
+		}
+
+		td:last-child {
+			@apply rounded-tr-box;
+		}
+	}
+
+	tr:last-child {
+		td:first-child {
+			@apply rounded-bl-box;
+		}
+
+		td:last-child {
+			@apply rounded-br-box;
+		}
+	}
+
+	[data-part='item'] {
+		&[data-dragging='true'] {
+			@apply opacity-20;
+		}
+
+		&[data-state='dragging'] {
+			@apply opacity-20;
+		}
+
+		&[data-state='selecting'] {
+			@apply text-secondary bg-secondary-ghost;
+		}
+
+		&[data-state='moving'] {
+			@apply text-primary bg-primary-ghost;
+		}
+
+		&[data-closest-edge] {
+			background-image: linear-gradient(
+				var(--fallback-a, oklch(var(--a) / var(--tw-border-opacity))),
+				var(--fallback-a, oklch(var(--a) / var(--tw-border-opacity)))
+			);
+			background-size: 100% 5%;
+			background-repeat: no-repeat;
+		}
+
+		&[data-closest-edge='bottom'] {
+			background-position: bottom;
+		}
+	}
+
+	[data-part='drag-handle'] {
+		@apply cursor-grab inline-block;
+	}
+}

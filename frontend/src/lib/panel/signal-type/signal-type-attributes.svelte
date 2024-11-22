@@ -2,8 +2,8 @@
 	import type { SignalType } from '$lib/api/canturin';
 	import { Attribute } from '$lib/components/attribute';
 	import Divider from '$lib/components/divider/divider.svelte';
-	import NumberEditable from '$lib/components/editable/number-editable.svelte';
-	import { Readonly, ToggleReadonly } from '$lib/components/readonly';
+	import { NumberEditable } from '$lib/components/editable';
+	import { Readonly } from '$lib/components/readonly';
 	import SegmentedControl from '$lib/components/segmented-control/segmented-control.svelte';
 	import { getSignalTypeState } from '$lib/state/signal-type-state.svelte';
 	import { z } from 'zod';
@@ -19,13 +19,13 @@
 		min: z.number()
 	});
 
-	function validateMin(min: number) {
-		const res = minSchema.safeParse({ min });
+	let minErrors = $derived.by(() => {
+		const res = minSchema.safeParse({ min: sts.entity.min });
 		if (res.success) {
 			return undefined;
 		}
 		return res.error.flatten().fieldErrors.min;
-	}
+	});
 
 	function handleMin(min: number) {
 		sts.updateMin(min);
@@ -35,13 +35,13 @@
 		max: z.number()
 	});
 
-	function validateMax(max: number) {
-		const res = maxSchema.safeParse({ max });
+	let maxErrors = $derived.by(() => {
+		const res = maxSchema.safeParse({ max: sts.entity.max });
 		if (res.success) {
 			return undefined;
 		}
 		return res.error.flatten().fieldErrors.max;
-	}
+	});
 
 	function handleMax(max: number) {
 		sts.updateMax(max);
@@ -51,13 +51,13 @@
 		scale: z.number()
 	});
 
-	function validateScale(scale: number) {
-		const res = scaleSchema.safeParse({ scale });
+	let scaleErrors = $derived.by(() => {
+		const res = scaleSchema.safeParse({ scale: sts.entity.scale });
 		if (res.success) {
 			return undefined;
 		}
 		return res.error.flatten().fieldErrors.scale;
-	}
+	});
 
 	function handleScale(scale: number) {
 		sts.updateScale(scale);
@@ -67,13 +67,13 @@
 		offset: z.number()
 	});
 
-	function validateOffset(offset: number) {
-		const res = offsetSchema.safeParse({ offset });
+	let offsetErrors = $derived.by(() => {
+		const res = offsetSchema.safeParse({ offset: sts.entity.offset });
 		if (res.success) {
 			return undefined;
 		}
 		return res.error.flatten().fieldErrors.offset;
-	}
+	});
 
 	function handleOffset(offset: number) {
 		sts.updateOffset(offset);
@@ -111,21 +111,19 @@
 	<div class="grid grid-cols-2 gap-5">
 		<Attribute {...text.min}>
 			<NumberEditable
-				validator={validateMin}
-				initialValue={signalType.min}
+				bind:value={signalType.min}
 				name="signal-type-min"
-				onsubmit={handleMin}
-				placeholder={text.min.label}
+				oncommit={handleMin}
+				errors={minErrors}
 			/>
 		</Attribute>
 
 		<Attribute {...text.max}>
 			<NumberEditable
-				validator={validateMax}
-				initialValue={signalType.max}
+				bind:value={signalType.max}
 				name="signal-type-max"
-				onsubmit={handleMax}
-				placeholder={text.max.label}
+				oncommit={handleMax}
+				errors={maxErrors}
 			/>
 		</Attribute>
 	</div>
@@ -135,21 +133,19 @@
 	<div class="grid grid-cols-2 gap-5">
 		<Attribute {...text.scale}>
 			<NumberEditable
-				validator={validateScale}
-				initialValue={signalType.scale}
+				bind:value={signalType.scale}
 				name="signal-type-scale"
-				onsubmit={handleScale}
-				placeholder={text.scale.label}
+				oncommit={handleScale}
+				errors={scaleErrors}
 			/>
 		</Attribute>
 
 		<Attribute {...text.offset}>
 			<NumberEditable
-				validator={validateOffset}
-				initialValue={signalType.offset}
+				bind:value={signalType.offset}
 				name="signal-type-offset"
-				onsubmit={handleOffset}
-				placeholder={text.offset.label}
+				oncommit={handleOffset}
+				errors={offsetErrors}
 			/>
 		</Attribute>
 	</div>

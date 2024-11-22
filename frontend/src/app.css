@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
+@layer base {
 	.text-dimmed {
 		@apply opacity-85;
 	}
@@ -13,6 +13,10 @@
 
 	.bg-secondary-ghost {
 		@apply bg-secondary/5;
+	}
+
+	.bg-warning-ghost {
+		@apply bg-warning/5;
 	}
 
 	.bg-error-ghost {

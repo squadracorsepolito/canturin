@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { EditorIcon, SettingIcon } from '$lib/components/icon';
+	import { ToastGroup } from '$lib/components/toast';
 
-	import '../app.pcss';
+	import '../app.css';
 
 	let { children } = $props();
 </script>
@@ -28,4 +29,6 @@
 	<div class="flex-1">
 		{@render children()}
 	</div>
+
+	<ToastGroup />
 </main>
