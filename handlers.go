@@ -21,6 +21,8 @@ func loadNetwork(path string) {
 	proxy.pushSidebarLoad(net)
 	proxy.network = net
 
+	nodes := make(map[acmelib.EntityID]*acmelib.Node)
+
 	sigTypes := make(map[acmelib.EntityID]*acmelib.SignalType)
 	sigUnits := make(map[acmelib.EntityID]*acmelib.SignalUnit)
 	sigEnums := make(map[acmelib.EntityID]*acmelib.SignalEnum)
@@ -29,8 +31,10 @@ func loadNetwork(path string) {
 		proxy.pushBus(bus)
 
 		for _, nodeInt := range bus.NodeInterfaces() {
+			tmpNode := nodeInt.Node()
+			nodes[tmpNode.EntityID()] = tmpNode
 
-			for _, msg := range nodeInt.Messages() {
+			for _, msg := range nodeInt.SentMessages() {
 				proxy.pushMessage(msg)
 
 				for _, sig := range msg.Signals() {
@@ -56,6 +60,10 @@ func loadNetwork(path string) {
 				}
 			}
 		}
+	}
+
+	for _, node := range nodes {
+		proxy.pushNode(node)
 	}
 
 	for _, sigType := range sigTypes {

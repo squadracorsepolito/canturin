@@ -39,8 +39,6 @@ class SidebarState {
 	}
 
 	update(node: SidebarNode) {
-		// console.log(node);
-
 		let idx: number;
 		switch (node.kind) {
 			case SidebarNodeKind.SidebarNodeKindNetwork:
@@ -59,6 +57,25 @@ class SidebarState {
 				return;
 
 			case SidebarNodeKind.SidebarNodeKindNode:
+				if (!this.tree || !this.tree.children) return;
+
+				for (let busNodeIdx = 0; busNodeIdx < this.tree.children.length; busNodeIdx++) {
+					const tmpNode = this.tree.children[busNodeIdx];
+
+					if (tmpNode.kind !== SidebarNodeKind.SidebarNodeKindBus || !tmpNode.children) {
+						continue;
+					}
+
+					idx = tmpNode.children.findIndex((n) => n.entityId === node.entityId);
+					if (idx === -1) {
+						continue;
+					}
+
+					// @ts-expect-error this.tree.children[busNodeIdx].children is not null because it is checked above
+					this.tree.children[busNodeIdx].children[idx] = node;
+				}
+				return;
+
 			case SidebarNodeKind.SidebarNodeKindMessage:
 		}
 	}

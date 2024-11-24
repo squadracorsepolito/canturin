@@ -84,6 +84,12 @@
 
 			case SidebarNodeKind.SidebarNodeKindNode:
 				n.icon = NodeIcon;
+				n.childNodes.push({
+					name: 'Open Node',
+					icon: TickIcon,
+					childNodes: [],
+					onclick: () => layout.openPanel('node', currNode.entityId)
+				});
 				break;
 
 			case SidebarNodeKind.SidebarNodeKindMessage:

@@ -32,6 +32,7 @@ func main() {
 	historyService := newHistoryService()
 
 	busService := newBusService()
+	nodeService := newNodeService()
 	messageService := newMessageService()
 	signalTypeService := newSignalTypeService()
 	signalUnitService := newSignalUnitService()
@@ -52,6 +53,7 @@ func main() {
 			application.NewService(historyService),
 
 			application.NewService(busService),
+			application.NewService(nodeService),
 			application.NewService(messageService),
 			application.NewService(signalTypeService),
 			application.NewService(signalUnitService),

@@ -1,4 +1,11 @@
-type PanelType = 'none' | 'bus' | 'message' | 'signal_type' | 'signal_unit' | 'signal_enum';
+type PanelType =
+	| 'none'
+	| 'bus'
+	| 'node'
+	| 'message'
+	| 'signal_type'
+	| 'signal_unit'
+	| 'signal_enum';
 
 class LayoutState {
 	openPanelType: PanelType = $state('none');

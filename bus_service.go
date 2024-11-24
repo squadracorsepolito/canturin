@@ -2,31 +2,17 @@ package main
 
 import "github.com/squadracorsepolito/acmelib"
 
-type NodeInterface struct {
-	base
-
-	Number int `json:"number"`
-}
-
-func newNodeInterface(nodeInt *acmelib.NodeInterface) NodeInterface {
-	return NodeInterface{
-		base: getBase(nodeInt.Node()),
-
-		Number: nodeInt.Number(),
-	}
-}
-
 type Bus struct {
 	base
 
 	NodeInterfaces []NodeInterface `json:"nodeInterfaces"`
 }
 
-func newBus(bus *acmelib.Bus) Bus {
+func getBus(bus *acmelib.Bus) Bus {
 	nodeInts := []NodeInterface{}
 
 	for _, nodeInt := range bus.NodeInterfaces() {
-		nodeInts = append(nodeInts, newNodeInterface(nodeInt))
+		nodeInts = append(nodeInts, getNodeInterface(nodeInt))
 	}
 
 	return Bus{
@@ -42,7 +28,7 @@ type BusService struct {
 
 func newBusService() *BusService {
 	return &BusService{
-		service: newService(proxy.busCh, newBus),
+		service: newService(proxy.busCh, getBus),
 	}
 }
 

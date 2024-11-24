@@ -19,7 +19,7 @@ func convertMessage(m *acmelib.Message) Message {
 		SizeByte: m.SizeByte(),
 		Signals:  []Signal{},
 
-		Receivers: []Node{},
+		Receivers: []Node0{},
 	}
 
 	for _, sig := range m.Signals() {

@@ -59,7 +59,7 @@ type sidebarNode struct {
 	children []*sidebarNode
 }
 
-func (sn *sidebarNode) Convert(parentsIDs ...string) SidebarNode {
+func (sn *sidebarNode) convert(parentsIDs ...string) SidebarNode {
 	res := SidebarNode{
 		Kind:            sn.kind,
 		Name:            sn.name,
@@ -70,7 +70,7 @@ func (sn *sidebarNode) Convert(parentsIDs ...string) SidebarNode {
 	parentsIDs = append(parentsIDs, sn.entityID.String())
 	slices.SortFunc(sn.children, func(a, b *sidebarNode) int { return strings.Compare(a.name, b.name) })
 	for _, child := range sn.children {
-		res.Children = append(res.Children, child.Convert(parentsIDs...))
+		res.Children = append(res.Children, child.convert(parentsIDs...))
 	}
 
 	return res
@@ -159,7 +159,7 @@ func (s *SidebarService) load(req *sidebarLoadReq) {
 				parent:   busNode,
 			}
 
-			for _, msg := range nodeInt.Messages() {
+			for _, msg := range nodeInt.SentMessages() {
 				msgNode := &sidebarNode{
 					kind:     SidebarNodeKindMessage,
 					name:     msg.Name(),
@@ -255,7 +255,7 @@ func (s *SidebarService) update(req *sidebarUpdateReq) {
 
 	node.name = req.name
 
-	app.EmitEvent(SidebarUpdate, node.Convert())
+	app.EmitEvent(SidebarUpdate, node.convert())
 }
 
 func (s *SidebarService) add(req *sidebarAddReq) {
@@ -281,7 +281,7 @@ func (s *SidebarService) add(req *sidebarAddReq) {
 		parent:   parent,
 	}
 
-	app.EmitEvent(SidebarAdd, parent.Convert())
+	app.EmitEvent(SidebarAdd, parent.convert())
 }
 
 func (s *SidebarService) remove(req *sidebarRemoveReq) {
@@ -300,12 +300,12 @@ func (s *SidebarService) remove(req *sidebarRemoveReq) {
 
 	delete(s.nodes, req.entityID)
 
-	app.EmitEvent(SidebarRemove, parent.Convert())
+	app.EmitEvent(SidebarRemove, parent.convert())
 }
 
 func (s *SidebarService) GetTree() SidebarNode {
 	s.mux.RLock()
 	defer s.mux.RUnlock()
 
-	return s.root.Convert()
+	return s.root.convert()
 }

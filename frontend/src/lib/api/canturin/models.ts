@@ -37,10 +37,19 @@ export interface Message {
     "sizeByte": number;
     "byteOrder": acmelib$0.MessageByteOrder;
     "signals": Signal[] | null;
-    "receivers": Node[] | null;
+    "receivers": Node0[] | null;
 }
 
 export interface Node {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+    "id": number;
+    "interfaces": NodeInterface[] | null;
+}
+
+export interface Node0 {
     "entityId": string;
     "name": string;
     "desc": string;
@@ -54,6 +63,23 @@ export interface NodeInterface {
     "desc": string;
     "createTime": time$0.Time;
     "number": number;
+    "bus": NodeInterfaceBus;
+    "sentMessages": NodeMessage[] | null;
+    "receivedMessages": NodeMessage[] | null;
+}
+
+export interface NodeInterfaceBus {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+}
+
+export interface NodeMessage {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
 }
 
 export interface SidebarNode {

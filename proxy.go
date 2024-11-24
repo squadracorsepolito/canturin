@@ -14,8 +14,8 @@ type appProxy struct {
 
 	historyOperationCh chan *operation
 
-	busCh chan *acmelib.Bus
-
+	busCh     chan *acmelib.Bus
+	nodeCh    chan *acmelib.Node
 	messageCh chan *acmelib.Message
 
 	sigTypeCh    chan *acmelib.SignalType
@@ -32,8 +32,8 @@ func newAppProxy() *appProxy {
 
 		historyOperationCh: make(chan *operation),
 
-		busCh: make(chan *acmelib.Bus),
-
+		busCh:     make(chan *acmelib.Bus),
+		nodeCh:    make(chan *acmelib.Node),
 		messageCh: make(chan *acmelib.Message),
 
 		sigTypeCh:    make(chan *acmelib.SignalType),
@@ -80,6 +80,10 @@ func (p *appProxy) pushHistoryOperation(domain operationDomain, undo, redo opera
 
 func (p *appProxy) pushBus(bus *acmelib.Bus) {
 	p.busCh <- bus
+}
+
+func (p *appProxy) pushNode(node *acmelib.Node) {
+	p.nodeCh <- node
 }
 
 func (p *appProxy) pushMessage(msg *acmelib.Message) {
