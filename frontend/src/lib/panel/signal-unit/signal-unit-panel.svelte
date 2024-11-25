@@ -15,10 +15,6 @@
 
 	let state = getSignalUnitState(entityId);
 
-	$effect(() => {
-		state.reload(entityId);
-	});
-
 	function handleName(name: string) {
 		state.updateName(name);
 	}
@@ -44,7 +40,7 @@
 			initialValue={sigUnit.name}
 			onsubmit={handleName}
 			placeholder="Name"
-		/>
+		/>csrd
 	</div>
 
 	<!-- description box -->
