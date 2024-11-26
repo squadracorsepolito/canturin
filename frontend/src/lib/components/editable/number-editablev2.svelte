@@ -4,18 +4,20 @@
 	import * as editable from '@zag-js/editable';
 	import * as numberInput from '@zag-js/number-input';
 	import { useMachine, normalizeProps, mergeProps } from '@zag-js/svelte';
-
-	type Props = {
-		value: number;
-		name?: string;
-		placeholder?: string;
-		errors?: string[];
-		oncommit?: (value: number) => void;
-	};
+	import type { EditableProps } from './types';
 
 	const inputId = uniqueId() + ':input';
 
-	let { value = $bindable(), name, placeholder, errors, oncommit }: Props = $props();
+	let {
+		value = $bindable(),
+		name,
+		placeholder,
+		errors,
+		textSize = 'md',
+		fontWeight = 'normal',
+		border = 'transparent',
+		oncommit
+	}: EditableProps<number> = $props();
 
 	let fallbackValue = $state(value);
 
@@ -102,7 +104,13 @@
 
 <div class="editable">
 	<div {...rootProps}>
-		<div {...api.getAreaProps()} data-error={errors ? true : undefined}>
+		<div
+			{...api.getAreaProps()}
+			data-error={errors ? true : undefined}
+			data-text-size={textSize}
+			data-font-weight={fontWeight}
+			data-border={border}
+		>
 			<input {...inputProps} />
 
 			<span {...api.getPreviewProps()}>

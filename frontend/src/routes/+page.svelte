@@ -48,12 +48,12 @@
 		{ label: 'Uganda', value: 'UG' }
 	]);
 
-	let selected = $state('');
+	let selected = $state(selectData[0]);
 
 	$inspect(selected);
 </script>
 
-<Select items={selectData} bind:selected />
+<Select items={selectData} bind:selected labelKey="label" valueKey="value" />
 
 <Divider></Divider>
 

@@ -10,10 +10,16 @@
 		children: Snippet;
 	} & HTMLButtonAttributes;
 
-	let { onclick, color, label, disabled, children }: Props = $props();
+	let { onclick, color, label, disabled, children, ...rest }: Props = $props();
 </script>
 
-<button {onclick} class="icon-button {!label && 'btn-square'}" {disabled} data-color={color}>
+<button
+	{onclick}
+	{...rest}
+	class="icon-button {!label && 'btn-square'}"
+	{disabled}
+	data-color={color}
+>
 	{@render children()}
 
 	{#if label}

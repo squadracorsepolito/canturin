@@ -9,8 +9,18 @@ import {Call as $Call} from "@wailsio/runtime";
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+export function AttachBus(entityID: string, interfaceNumber: number, busEntityID: string): Promise<$models.Node> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(2185278590, entityID, interfaceNumber, busEntityID) as any;
+    return $resultPromise;
+}
+
 export function Get(entityID: string): Promise<$models.Node> & { cancel(): void } {
     let $resultPromise = $Call.ByID(963582531, entityID) as any;
+    return $resultPromise;
+}
+
+export function GetInvalidIDs(entityID: string): Promise<number[] | null> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3779751492, entityID) as any;
     return $resultPromise;
 }
 

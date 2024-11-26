@@ -3,16 +3,7 @@
 	import { uniqueId } from '$lib/utils';
 	import * as editable from '@zag-js/editable';
 	import { useMachine, normalizeProps, mergeProps } from '@zag-js/svelte';
-
-	type Props = {
-		value: string;
-		name?: string;
-		placeholder?: string;
-		errors?: string[];
-		textSize?: 'md' | 'lg';
-		fontWeight?: 'normal' | 'medium' | 'semibold';
-		oncommit?: (value: string) => void;
-	};
+	import type { EditableProps } from './types';
 
 	let {
 		value = $bindable(),
@@ -21,8 +12,9 @@
 		errors,
 		textSize = 'md',
 		fontWeight = 'normal',
+		border = 'transparent',
 		oncommit
-	}: Props = $props();
+	}: EditableProps<string> = $props();
 
 	let fallbackValue = $state(value);
 
@@ -81,6 +73,7 @@
 			data-error={errors ? true : undefined}
 			data-text-size={textSize}
 			data-font-weight={fontWeight}
+			data-border={border}
 		>
 			<input {...api.getInputProps()} />
 

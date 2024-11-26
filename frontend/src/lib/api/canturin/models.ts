@@ -21,6 +21,13 @@ export interface Bus {
     "nodeInterfaces": NodeInterface[] | null;
 }
 
+export interface BusBase {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+}
+
 export interface History {
     "operationCount": number;
     "currentIndex": number;
@@ -58,21 +65,10 @@ export interface Node0 {
 }
 
 export interface NodeInterface {
-    "entityId": string;
-    "name": string;
-    "desc": string;
-    "createTime": time$0.Time;
     "number": number;
-    "bus": NodeInterfaceBus;
+    "attachedBus": BusBase;
     "sentMessages": NodeMessage[] | null;
     "receivedMessages": NodeMessage[] | null;
-}
-
-export interface NodeInterfaceBus {
-    "entityId": string;
-    "name": string;
-    "desc": string;
-    "createTime": time$0.Time;
 }
 
 export interface NodeMessage {

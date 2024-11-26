@@ -3,8 +3,7 @@
 	import { Attribute } from '$lib/components/attribute';
 	import Divider from '$lib/components/divider/divider.svelte';
 	import Readonly from '$lib/components/readonly/readonly.svelte';
-	import { getSignalEnumState } from '$lib/state/signal-enum-state.svelte';
-	import { text } from '../signal-enum/signal-enum-text';
+	import { getSignalEnumState } from '$lib/panel/signal-enum/state.svelte';
 	import type { PanelSectionProps } from '../types';
 
 	let { entityId }: PanelSectionProps = $props();
@@ -13,7 +12,7 @@
 </script>
 
 {#snippet section(signalEnum: SignalEnum)}
-	<Attribute {...text.size}>
+	<Attribute label="Size" desc="The current size of the enum in bits">
 		<Readonly>
 			<span class="font-medium">{signalEnum.size}</span>
 		</Readonly>
@@ -21,7 +20,10 @@
 
 	<Divider />
 
-	<Attribute {...text.minSize}>
+	<Attribute
+		label="Minimum Size"
+		desc="The minimum size of the enum in bits. It is useful when a signal should be of a fixed size"
+	>
 		<Readonly>
 			<span class="font-medium">{signalEnum.minSize}</span>
 		</Readonly>
@@ -29,7 +31,7 @@
 
 	<Divider />
 
-	<Attribute {...text.maxIndex}>
+	<Attribute label="Maximum Index" desc="The maximum index of the values">
 		<Readonly>
 			<span class="font-medium">{signalEnum.maxIndex}</span>
 		</Readonly>
@@ -37,7 +39,7 @@
 {/snippet}
 
 <secion>
-	<h3 class="pb-5">{text.headings.attributes}</h3>
+	<h3 class="pb-5">Attributes</h3>
 
 	{@render section(ses.entity)}
 </secion>

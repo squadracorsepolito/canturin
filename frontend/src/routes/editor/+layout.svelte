@@ -24,6 +24,14 @@
 	let { children } = $props();
 
 	function getNetTree(currNode: SidebarNode) {
+		const indexes = {
+			// bus: 0,
+			// node: 1,
+			signalType: 0,
+			signalUnit: 1,
+			signalEnum: 2
+		};
+
 		const n: TreeNode = {
 			name: currNode.name,
 			icon: NetworkIcon,
@@ -32,6 +40,73 @@
 
 		switch (currNode.kind) {
 			case SidebarNodeKind.SidebarNodeKindNetwork:
+				// n.childNodes[indexes.bus] = {
+				// 	name: 'Buses',
+				// 	icon: BusIcon,
+				// 	childNodes: [
+				// 		{
+				// 			name: 'Add Bus',
+				// 			icon: AddIcon,
+				// 			childNodes: [],
+				// 			onclick: () => layout.openPanel('bus', 'draft')
+				// 		}
+				// 	]
+				// };
+
+				// n.childNodes[indexes.node] = {
+				// 	name: 'Nodes',
+				// 	icon: NodeIcon,
+				// 	childNodes: [
+				// 		{
+				// 			name: 'Add Node',
+				// 			icon: AddIcon,
+				// 			childNodes: [],
+				// 			onclick: () => layout.openPanel('node', 'draft')
+				// 		}
+				// 	]
+				// };
+
+				// n.childNodes[indexes.signalType] = {
+				// 	name: 'Signal Types',
+				// 	icon: SignalTypeIcon,
+				// 	childNodes: [
+				// 		{
+				// 			name: 'Add Signal Type',
+				// 			icon: AddIcon,
+				// 			childNodes: [],
+				// 			onclick: () => layout.openPanel('signal_type', 'draft')
+				// 		}
+				// 	]
+				// };
+
+				// n.childNodes[indexes.signalUnit] = {
+				// 	name: 'Signal Units',
+				// 	icon: SignalUnitIcon,
+				// 	childNodes: [
+				// 		{
+				// 			name: 'Add Signal Unit',
+				// 			icon: AddIcon,
+				// 			childNodes: [],
+				// 			onclick: () => layout.openPanel('signal_unit', 'draft')
+				// 		}
+				// 	]
+				// };
+
+				// n.childNodes[indexes.signalEnum] = {
+				// 	name: 'Signal Enums',
+				// 	icon: SignalEnumIcon,
+				// 	childNodes: [
+				// 		{
+				// 			name: 'Add Signal Enum',
+				// 			icon: AddIcon,
+				// 			childNodes: [],
+				// 			onclick: () => layout.openPanel('signal_enum', 'draft')
+				// 		}
+				// 	]
+				// };
+
+				// break;
+
 				n.childNodes.push(
 					{
 						name: 'Signal Types',
@@ -118,16 +193,24 @@
 				const childNode = getNetTree(child);
 
 				switch (child.kind) {
+					// case SidebarNodeKind.SidebarNodeKindBus:
+					// 	n.childNodes[indexes.bus].childNodes.push(childNode);
+					// 	break;
+
+					// case SidebarNodeKind.SidebarNodeKindNode:
+					// 	n.childNodes[indexes.node].childNodes.push(childNode);
+					// 	break;
+
 					case SidebarNodeKind.SidebarNodeKindSignalType:
-						n.childNodes[0].childNodes.push(childNode);
+						n.childNodes[indexes.signalType].childNodes.push(childNode);
 						break;
 
 					case SidebarNodeKind.SidebarNodeKindSignalUnit:
-						n.childNodes[1].childNodes.push(childNode);
+						n.childNodes[indexes.signalUnit].childNodes.push(childNode);
 						break;
 
 					case SidebarNodeKind.SidebarNodeKindSignalEnum:
-						n.childNodes[2].childNodes.push(childNode);
+						n.childNodes[indexes.signalEnum].childNodes.push(childNode);
 						break;
 
 					default:
@@ -147,6 +230,8 @@
 	function handleRedo() {
 		history.redo();
 	}
+
+	$inspect(sidebarState.tree);
 </script>
 
 <PaneGroup direction="horizontal" class="h-full w-full">

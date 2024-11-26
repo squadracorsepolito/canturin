@@ -1,29 +1,37 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { IconButton } from '../button';
 	import { AltArrowIcon, CloseIcon } from '../icon';
 
 	type Props = {
-		children: Snippet;
+		initialCollapsed?: boolean;
+		trigger: Snippet;
+		content: Snippet;
 	};
 
-	let { children }: Props = $props();
+	let { initialCollapsed, trigger, content }: Props = $props();
 
-	let collapsed = $state(false);
+	let collapsed = $state(initialCollapsed ?? false);
+
+	function toggle() {
+		collapsed = !collapsed;
+	}
 </script>
 
-<div class="flex gap-2">
-	<div class:line-clamp-2={collapsed}>
-		{@render children()}
-	</div>
+<button
+	onclick={toggle}
+	class="w-full flex justify-between rounded-btn items-center gap-2 p-3 hover:bg-base-content/20 transition-colors"
+>
+	{@render trigger()}
 
-	<div>
-		<IconButton onclick={() => (collapsed = !collapsed)}>
-			{#if collapsed}
-				<AltArrowIcon height="20" width="20" />
-			{:else}
-				<CloseIcon height="20" width="20" />
-			{/if}
-		</IconButton>
+	{#if collapsed}
+		<AltArrowIcon />
+	{:else}
+		<CloseIcon />
+	{/if}
+</button>
+
+{#if !collapsed}
+	<div class="pt-5">
+		{@render content()}
 	</div>
-</div>
+{/if}

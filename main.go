@@ -21,22 +21,26 @@ var app *application.App
 
 var proxy *appProxy
 
+var manager *serviceManager
+
 // main function serves as the application's entry point. It initializes the application, creates a window,
 // and starts a goroutine that emits a time-based event every second. It subsequently runs the application and
 // logs any error that might occur.
 func main() {
 	proxy = newAppProxy()
 
-	// Initialize the services
-	sidebarService := newSidebarService()
-	historyService := newHistoryService()
+	manager = newServiceManager()
 
-	busService := newBusService()
-	nodeService := newNodeService()
-	messageService := newMessageService()
-	signalTypeService := newSignalTypeService()
-	signalUnitService := newSignalUnitService()
-	signalEnumService := newSignalEnumService()
+	// Initialize the services
+	// sidebarService := newSidebarService()
+	// historyService := newHistoryService()
+
+	// busService := newBusService()
+	// nodeService := newNodeService()
+	// messageService := newMessageService()
+	// signalTypeService := newSignalTypeService()
+	// signalUnitService := newSignalUnitService()
+	// signalEnumService := newSignalEnumService()
 
 	// Create a new Wails application by providing the necesvar (sary options.
 	// Variables 'Name' and 'Description' are for application metadata.
@@ -47,27 +51,33 @@ func main() {
 		Name:        "canturin",
 		Description: "",
 
-		Services: []application.Service{
+		Services: manager.getServices(),
 
-			application.NewService(sidebarService),
-			application.NewService(historyService),
+		// Services: []application.Service{
 
-			application.NewService(busService),
-			application.NewService(nodeService),
-			application.NewService(messageService),
-			application.NewService(signalTypeService),
-			application.NewService(signalUnitService),
-			application.NewService(signalEnumService),
-		},
+		// 	application.NewService(sidebarService),
+		// 	application.NewService(historyService),
+
+		// 	application.NewService(busService),
+		// 	application.NewService(nodeService),
+		// 	application.NewService(messageService),
+		// 	application.NewService(signalTypeService),
+		// 	application.NewService(signalUnitService),
+		// 	application.NewService(signalEnumService),
+		// },
 
 		KeyBindings: map[string]func(window *application.WebviewWindow){
 			"ctrl+z": func(w *application.WebviewWindow) {
-				historyService.Undo()
-				historyService.emitHistoryChange()
+				// historyService.Undo()
+				// historyService.emitHistoryChange()
+				manager.historyService.Undo()
+				manager.historyService.emitHistoryChange()
 			},
 			"ctrl+y": func(w *application.WebviewWindow) {
-				historyService.Redo()
-				historyService.emitHistoryChange()
+				// historyService.Redo()
+				// historyService.emitHistoryChange()
+				manager.historyService.Redo()
+				manager.historyService.emitHistoryChange()
 			},
 		},
 

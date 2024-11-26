@@ -8,14 +8,12 @@
 	import { DragHandleIcon, SortIcon } from '../icon';
 	import { Toggle } from '../toggle';
 	import './styles.css';
-	import { uniqueId } from '$lib/utils';
+	import { uniqueId, type KeyOfString } from '$lib/utils';
 
 	type Props = {
 		items: T[];
-		idKey: {
-			[K in keyof T]: T[K] extends string ? K : never;
-		}[keyof T];
-		reorder: (id: string, from: number, to: number) => void;
+		idKey: KeyOfString<T>;
+		reorder?: (id: string, from: number, to: number) => void;
 		bulkActions?: Snippet<[{ selectedCount: number; selectedItems: T[] }]>;
 		header: Snippet;
 		row: Snippet<[T]>;
@@ -82,14 +80,18 @@
 		instanceId: uniqueId(),
 		enabled: false,
 		itemsGetter: () => items.map((item) => ({ id: item[idKey] })),
-		reorder
+		reorder: (id, from, to) => {
+			reorder?.(id, from, to);
+		}
 	});
 </script>
 
 <div class="flex items-center gap-5 justify-end pb-5">
-	<Toggle bind:toggled={sortable.enabled} name="sortable-list-enable">
-		<SortIcon />
-	</Toggle>
+	{#if reorder}
+		<Toggle bind:toggled={sortable.enabled} name="sortable-list-enable">
+			<SortIcon />
+		</Toggle>
+	{/if}
 
 	{#if bulkActions}
 		<div>

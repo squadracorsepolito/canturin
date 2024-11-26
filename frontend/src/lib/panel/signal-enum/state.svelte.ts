@@ -1,7 +1,7 @@
 import { SignalEnumService, type SignalEnum } from '$lib/api/canturin';
 import { HistorySignalEnumModify } from '$lib/api/events';
-import { EntityState } from './entity-state.svelte';
-import { StateProvider } from './state-provider.svelte';
+import { EntityState } from '../../state/entity-state.svelte';
+import { StateProvider } from '../../state/state-provider.svelte';
 
 const provider = new StateProvider(
 	(signalEnum: SignalEnum) => new SignalEnumState(signalEnum),

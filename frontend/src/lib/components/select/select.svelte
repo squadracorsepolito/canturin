@@ -1,36 +1,56 @@
-<script lang="ts" generics="T extends {label: string; value: string}">
-	import { uniqueId } from '$lib/utils';
+<script lang="ts" generics="T extends { [K in keyof T]: any }">
+	import { uniqueId, type KeyOfString } from '$lib/utils';
 	import * as select from '@zag-js/select';
 	import { normalizeProps, portal, useMachine } from '@zag-js/svelte';
 	import { AltArrowIcon, CheckIcon } from '../icon';
 
 	type Props = {
 		items: T[];
-		selected: string;
-		disable?: (item: T) => boolean;
+		selected: T;
+		valueKey: KeyOfString<T>;
+		labelKey: KeyOfString<T>;
+		label?: string;
+		onselect?: (item: T) => void;
+		filter?: (item: T) => boolean;
 	};
 
-	let { items, selected = $bindable(), disable }: Props = $props();
+	let {
+		items,
+		selected = $bindable(),
+		valueKey,
+		labelKey,
+		label,
+		onselect,
+		filter
+	}: Props = $props();
 
 	const collection = select.collection({
 		items,
-		isItemDisabled: disable,
-		itemToString: (item) => item.label,
-		itemToValue: (item) => item.value
+		isItemDisabled: filter,
+		itemToString: (item) => item[labelKey],
+		itemToValue: (item) => item[valueKey]
 	});
 
 	const [snapshot, send] = useMachine(
 		select.machine({
 			id: uniqueId(),
 			collection,
-			onValueChange: ({ value }) => {
-				if (value.length === 0) {
+			onValueChange: (details) => {
+				if (details.items.length === 0) {
 					return;
 				}
 
-				selected = value[0];
+				selected = details.items[0] as T;
+				onselect?.(details.items[0] as T);
 			}
-		})
+		}),
+		{
+			context: {
+				get value() {
+					return [selected[valueKey]];
+				}
+			}
+		}
 	);
 
 	const api = $derived(select.connect(snapshot, send, normalizeProps));
@@ -38,8 +58,10 @@
 
 <div {...api.getRootProps()}>
 	<div {...api.getControlProps()}>
-		<!-- svelte-ignore a11y_label_has_associated_control -->
-		<label {...api.getLabelProps()}>Label</label>
+		{#if label}
+			<!-- svelte-ignore a11y_label_has_associated_control -->
+			<label {...api.getLabelProps()}>{label}</label>
+		{/if}
 
 		<button {...api.getTriggerProps()}>
 			<span>
@@ -54,9 +76,9 @@
 
 	<div use:portal {...api.getPositionerProps()}>
 		<ul {...api.getContentProps()}>
-			{#each items as item (item.value)}
+			{#each items as item (item[valueKey])}
 				<li {...api.getItemProps({ item })}>
-					<span {...api.getItemTextProps({ item })}>{item.label}</span>
+					<span {...api.getItemTextProps({ item })}>{item[labelKey]}</span>
 
 					<span {...api.getItemIndicatorProps({ item })}>
 						<CheckIcon height={18} width={18} />

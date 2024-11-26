@@ -1,6 +1,8 @@
 package main
 
-import "github.com/squadracorsepolito/acmelib"
+import (
+	"github.com/squadracorsepolito/acmelib"
+)
 
 type NodeMessage struct {
 	base
@@ -12,27 +14,11 @@ func getNodeMessage(msg *acmelib.Message) NodeMessage {
 	}
 }
 
-type NodeInterfaceBus struct {
-	base
-}
-
-func getNodeInterfaceBus(bus *acmelib.Bus) NodeInterfaceBus {
-	if bus == nil {
-		return NodeInterfaceBus{}
-	}
-
-	return NodeInterfaceBus{
-		base: getBase(bus),
-	}
-}
-
 type NodeInterface struct {
-	base
-
-	Number           int              `json:"number"`
-	Bus              NodeInterfaceBus `json:"bus"`
-	SentMessages     []NodeMessage    `json:"sentMessages"`
-	ReceivedMessages []NodeMessage    `json:"receivedMessages"`
+	Number           int           `json:"number"`
+	AttachedBus      BusBase       `json:"attachedBus"`
+	SentMessages     []NodeMessage `json:"sentMessages"`
+	ReceivedMessages []NodeMessage `json:"receivedMessages"`
 }
 
 func getNodeInterface(nodeInt *acmelib.NodeInterface) NodeInterface {
@@ -47,9 +33,7 @@ func getNodeInterface(nodeInt *acmelib.NodeInterface) NodeInterface {
 	}
 
 	return NodeInterface{
-		base: getBase(nodeInt.Node()),
-
-		Bus:              getNodeInterfaceBus(nodeInt.ParentBus()),
+		AttachedBus:      getBusBase(nodeInt.ParentBus()),
 		Number:           nodeInt.Number(),
 		SentMessages:     sentMessages,
 		ReceivedMessages: receivedMessages,
@@ -78,7 +62,7 @@ func getNode(node *acmelib.Node) Node {
 		base: getBase(node),
 
 		ID:         uint(node.ID()),
-		Interfaces: make([]NodeInterface, len(node.Interfaces())),
+		Interfaces: interfaces,
 	}
 }
 
@@ -100,6 +84,20 @@ func (s *NodeService) GetInvalidNames(entityID string) []string {
 	}
 
 	return names
+}
+
+func (s *NodeService) GetInvalidIDs(entityID string) []uint {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	ids := []uint{}
+	for _, tmpNode := range s.pool {
+		if tmpNode.EntityID() != acmelib.EntityID(entityID) {
+			ids = append(ids, uint(tmpNode.ID()))
+		}
+	}
+
+	return ids
 }
 
 func (s *NodeService) UpdateName(entityID, name string) (Node, error) {
@@ -229,6 +227,67 @@ func (s *NodeService) UpdateID(entityID string, id uint) (Node, error) {
 			defer s.mux.Unlock()
 
 			if err := node.UpdateID(nodeID); err != nil {
+				return Node{}, err
+			}
+
+			return s.converterFn(node), nil
+		},
+	)
+
+	return s.converterFn(node), nil
+}
+
+func (s *NodeService) AttachBus(entityID string, interfaceNumber int, busEntityID string) (Node, error) {
+	node, err := s.getEntity(entityID)
+	if err != nil {
+		return Node{}, err
+	}
+
+	nodeInt, err := node.GetInterface(interfaceNumber)
+	if err != nil {
+		return Node{}, err
+	}
+
+	bus, err := manager.busService.getEntity(busEntityID)
+	if err != nil {
+		return Node{}, err
+	}
+
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	oldBus := nodeInt.ParentBus()
+	if oldBus.EntityID() == bus.EntityID() {
+		return s.converterFn(node), nil
+	}
+
+	if err := bus.AddNodeInterface(nodeInt); err != nil {
+		return Node{}, err
+	}
+
+	proxy.pushHistoryOperation(
+		operationDomainNode,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			if err := bus.RemoveNodeInterface(nodeInt.Node().EntityID()); err != nil {
+				return Node{}, err
+			}
+
+			if oldBus != nil {
+				if err := oldBus.AddNodeInterface(nodeInt); err != nil {
+					return Node{}, err
+				}
+			}
+
+			return s.converterFn(node), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			if err := bus.AddNodeInterface(nodeInt); err != nil {
 				return Node{}, err
 			}
 

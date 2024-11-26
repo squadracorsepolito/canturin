@@ -6,7 +6,6 @@
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';
 	import { z } from 'zod';
-	import { text } from './signal-enum-text';
 	import FormField from '$lib/components/form-field/form-field.svelte';
 	import { NumberInput, TextInput } from '$lib/components/input';
 	import { Textarea } from '$lib/components/textarea';
@@ -51,26 +50,26 @@
 	<div class="flex gap-3 items-center pb-8">
 		<SignalEnumIcon height="48" width="48" />
 
-		<h2>{text.headings.draft}</h2>
+		<h2>Create new Signal Enum</h2>
 	</div>
 
-	<FormField {...text.name} cols={4}>
+	<FormField label="Name" cols={4}>
 		<TextInput name="signal-enum-name" bind:value={$form.name} errors={$errors.name} />
 	</FormField>
 
 	<div class="py-5">
-		<FormField {...text.desc} cols={4}>
+		<FormField label="Description (optional)" cols={4}>
 			<Textarea name="signal-enum-desc" bind:value={$form.desc} />
 		</FormField>
 	</div>
 
 	<Divider />
 
-	<FormField {...text.minSize}>
+	<FormField label="Size">
 		<NumberInput name="signal-enum-min-size" bind:value={$form.minSize} errors={$errors.minSize} />
 	</FormField>
 
 	<div class="flex justify-end pt-5">
-		<SubmitButton label={text.buttons.draft.submit} />
+		<SubmitButton label="Create Signal Enum" />
 	</div>
 </form>

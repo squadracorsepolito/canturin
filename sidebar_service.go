@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"slices"
 	"strings"
 	"sync"
@@ -104,7 +103,6 @@ func (s *SidebarService) run() {
 			s.update(req)
 
 		case req := <-proxy.sidebarAddCh:
-			log.Print(req)
 			s.add(req)
 
 		case req := <-proxy.sidebarRemoveCh:

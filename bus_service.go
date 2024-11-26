@@ -2,6 +2,20 @@ package main
 
 import "github.com/squadracorsepolito/acmelib"
 
+type BusBase struct {
+	base
+}
+
+func getBusBase(bus *acmelib.Bus) BusBase {
+	if bus == nil {
+		return BusBase{}
+	}
+
+	return BusBase{
+		base: getBase(bus),
+	}
+}
+
 type Bus struct {
 	base
 
@@ -44,6 +58,18 @@ func (s *BusService) GetInvalidNames(entityID string) []string {
 	}
 
 	return names
+}
+
+func (s *BusService) ListBase() []BusBase {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	briefs := []BusBase{}
+	for _, bus := range s.pool {
+		briefs = append(briefs, getBusBase(bus))
+	}
+
+	return briefs
 }
 
 func (s *BusService) UpdateName(entityID string, name string) (Bus, error) {

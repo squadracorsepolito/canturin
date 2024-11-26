@@ -1,10 +1,9 @@
 <script lang="ts">
 	import type { SignalEnum, SignalEnumValue } from '$lib/api/canturin';
 	import { AddIcon, DeleteIcon } from '$lib/components/icon';
-	import { getSignalEnumState } from '$lib/state/signal-enum-state.svelte';
+	import { getSignalEnumState } from '$lib/panel/signal-enum/state.svelte';
 	import type { PanelSectionProps } from '../types';
-	import { text } from './signal-enum-text';
-	import Tablev2 from '$lib/components/table/tablev2.svelte';
+	import { Table } from '$lib/components/table';
 	import { IconButton } from '$lib/components/button';
 	import ValueRow from './value-row.svelte';
 	import { TableTitle } from '$lib/components/table';
@@ -32,7 +31,7 @@
 
 {#snippet section(signalEnum: SignalEnum)}
 	{#if signalEnum.values && signalEnum.values.length > 0}
-		<Tablev2 items={signalEnum.values} idKey="entityId" reorder={handleReorderValue}>
+		<Table items={signalEnum.values} idKey="entityId" reorder={handleReorderValue}>
 			{#snippet bulkActions({ selectedCount, selectedItems })}
 				<div class="flex justify-end gap-5">
 					<IconButton onclick={() => handleAdd()} label="Add Value" color="primary">
@@ -67,12 +66,12 @@
 					<DeleteIcon />
 				</IconButton>
 			{/snippet}
-		</Tablev2>
+		</Table>
 	{/if}
 {/snippet}
 
 <section>
-	<h3 class="pb-5">{text.headings.values}</h3>
+	<h3 class="pb-5">Values</h3>
 
 	{@render section(ses.entity)}
 </section>

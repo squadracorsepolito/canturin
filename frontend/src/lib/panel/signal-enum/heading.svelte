@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { getSignalEnumState } from '$lib/state/signal-enum-state.svelte';
+	import { getSignalEnumState } from '$lib/panel/signal-enum/state.svelte';
 	import { z } from 'zod';
 	import type { PanelSectionProps } from '../types';
 	import { type SignalEnum } from '$lib/api/canturin';
 	import { SignalEnumIcon } from '$lib/components/icon';
 	import { TextEditable } from '$lib/components/editable';
 	import { TextareaEditable } from '$lib/components/editable';
-	import { text } from '../signal-type/signal-type-text';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -65,7 +64,7 @@
 		<TextareaEditable
 			initialValue={signalEnum.desc}
 			name="signal-enum-desc"
-			triggerLabel={text.buttons.heading.descTriggerLabel}
+			triggerLabel="Add Description"
 			onsubmit={handleDesc}
 		/>
 	</div>

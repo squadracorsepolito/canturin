@@ -24,6 +24,11 @@ export function GetNames(): Promise<string[] | null> & { cancel(): void } {
     return $resultPromise;
 }
 
+export function ListBase(): Promise<$models.BusBase[] | null> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3115506830) as any;
+    return $resultPromise;
+}
+
 export function UpdateDesc(entityID: string, desc: string): Promise<$models.Bus> & { cancel(): void } {
     let $resultPromise = $Call.ByID(982331387, entityID, desc) as any;
     return $resultPromise;
