@@ -1,5 +1,14 @@
 # Canturin
 
+## Status
+
+-   Bus (WIP)
+-   Node (WIP)
+-   Message (WIP)
+-   Signal Types (Done)
+-   Signal Unit (dai cazzo martina)
+-   Signal Enum (Done)
+
 ## Prerequirements
 
 -   [go](https://go.dev/) at least v1.22.4
