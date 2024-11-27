@@ -32,6 +32,16 @@ class SignalUnitState extends EntityState<SignalUnit> {
 		loadSignalUnit(entityId);
 	}
 
+	async getInvalidNames() {
+		const invalidNames = await SignalUnitService.GetInvalidNames(this.entity.entityId);
+
+		if (invalidNames) {
+			return invalidNames;
+		}
+
+		return [];
+	}
+
 	updateName(name: string) {
 		this.update(SignalUnitService.UpdateName(this.entity.entityId, name));
 	}

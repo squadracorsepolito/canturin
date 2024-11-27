@@ -34,6 +34,22 @@ func newSignalUnitService() *SignalUnitService {
 	}
 }
 
+func (s *SignalUnitService) GetInvalidNames(entityID string) []string {
+	s.mux.RLock()
+	defer s.mux.RUnlock()
+
+	names := []string{}
+	for _, tmpSigUnit := range s.pool {
+		if tmpSigUnit.EntityID() == acmelib.EntityID(entityID) {
+			continue
+		}
+
+		names = append(names, tmpSigUnit.Name())
+	}
+
+	return names
+}
+
 func (s *SignalUnitService) UpdateName(entityID string, name string) (SignalUnit, error) {
     // retrieve the signal unit
     sigUnit, err := s.getEntity(entityID)

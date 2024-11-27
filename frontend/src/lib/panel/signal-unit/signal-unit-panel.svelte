@@ -10,21 +10,49 @@
 	import { text } from './signal-unit-text';
 	import Attribute from '$lib/components/attribute/attribute.svelte';
 	import Readonly from '$lib/components/readonly/readonly.svelte';
+	import { z } from 'zod';
 
 	let { entityId }: PanelSectionProps = $props();
 
-	let state = getSignalUnitState(entityId);
+	let sus = getSignalUnitState(entityId);
+
+	let invalidNames = $state<string[]>([]);
+
+	async function loadInvalidNames() {
+		const res = await sus.getInvalidNames();
+		invalidNames = res;
+	}
+
+	$effect(() => {
+		loadInvalidNames();
+	});
 
 	function handleName(name: string) {
-		state.updateName(name);
+		sus.updateName(name);
+	}
+
+	// Define the schema for name validation
+	const nameSchema = z.object({
+		name: z
+		.string()
+		.min(1, { message: 'Name is required' })
+		.refine((n) => !invalidNames.includes(n), { message: 'Name already exists' })
+	});
+
+	function validateName(name: string) {
+		const res = nameSchema.safeParse({ name: name });
+		if (res.success) {
+			return undefined;
+		}
+		return res.error.flatten().fieldErrors.name;
 	}
 
 	function handleDesc(desc: string) {
-		state.updateDesc(desc);
+		sus.updateDesc(desc);
 	}
 
 	function handleSymbol(sym: string) {
-		state.updateSymbol(sym);
+		sus.updateSymbol(sym);
 	}
 
 </script>
@@ -35,12 +63,12 @@
 		<SignalTypeIcon width="48" height="48" />
 		
 		<TextEditable
-			validator={() => undefined}
+			validator={validateName}
 			name="signal-type-name"
 			initialValue={sigUnit.name}
 			onsubmit={handleName}
 			placeholder="Name"
-		/>csrd
+		/>
 	</div>
 
 	<!-- description box -->
@@ -86,5 +114,5 @@
 {/snippet}
 
 <section>
-	{@render sigUnitPanel(state.entity)}
+	{@render sigUnitPanel(sus.entity)}
 </section>
