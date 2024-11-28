@@ -346,13 +346,13 @@ func (s *SignalEnumService) AddValue(enumEntID string) (SignalEnum, error) {
 }
 
 func (s *SignalEnumService) RemoveValues(enumEntID string, valueEntIDs ...string) (SignalEnum, error) {
-	if len(valueEntIDs) == 0 {
-		return s.converterFn(nil), nil
-	}
-
 	sigEnum, err := s.getEntity(enumEntID)
 	if err != nil {
 		return SignalEnum{}, err
+	}
+
+	if len(valueEntIDs) == 0 {
+		return s.converterFn(sigEnum), nil
 	}
 
 	s.mux.Lock()
@@ -364,7 +364,6 @@ func (s *SignalEnumService) RemoveValues(enumEntID string, valueEntIDs ...string
 	}
 
 	sigEnumValues := []*acmelib.SignalEnumValue{}
-
 	for _, tmpValue := range sigEnum.Values() {
 		tmpEntID := tmpValue.EntityID()
 

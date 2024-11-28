@@ -1,13 +1,15 @@
 <script lang="ts">
 	import { colorByName } from '$lib/actions/color-name.svelte';
-	import type { BusBase, NodeInterface } from '$lib/api/canturin';
+	import type { BusBase, NodeInterface, NodeMessage } from '$lib/api/canturin';
 	import { Attribute } from '$lib/components/attribute';
-	import { UnderlinedButton } from '$lib/components/button';
+	import { IconButton, UnderlinedButton } from '$lib/components/button';
 	import { Collapsible } from '$lib/components/collapsible';
 	import Divider from '$lib/components/divider/divider.svelte';
+	import { AddIcon, DeleteIcon } from '$lib/components/icon';
 	import { Readonly } from '$lib/components/readonly';
 	import { Select } from '$lib/components/select';
 	import { Table, TableField, TableTitle } from '$lib/components/table';
+	import layout from '$lib/state/layout-state.svelte';
 	import type { PanelSectionProps } from '../types';
 	import { getNodeState } from './state.svelte';
 
@@ -40,6 +42,28 @@
 		if (!arr) return 0;
 		return arr.length;
 	}
+
+	function handleBulkDeleteSentMessages(msgs: NodeMessage[]) {
+		ns.deleteSentMessages(
+			int.number,
+			msgs.map((m) => m.entityId)
+		);
+	}
+
+	function handleDeleteSentMessage(msg: NodeMessage) {
+		ns.deleteSentMessage(int.number, msg.entityId);
+	}
+
+	function handleBulkDeleteReceivedMessages(msgs: NodeMessage[]) {
+		ns.deleteReceivedMessages(
+			int.number,
+			msgs.map((m) => m.entityId)
+		);
+	}
+
+	function handleDeleteReceivedMessage(msg: NodeMessage) {
+		ns.deleteReceivedMessage(int.number, msg.entityId);
+	}
 </script>
 
 <div class="flex gap-4">
@@ -69,7 +93,7 @@
 
 		<Divider />
 
-		<Collapsible>
+		<Collapsible initialCollapsed>
 			{#snippet trigger()}
 				<h4>Sent Messages ({getCount(int.sentMessages)})</h4>
 			{/snippet}
@@ -78,7 +102,24 @@
 				{#if int.sentMessages}
 					<Table items={int.sentMessages} idKey="entityId">
 						{#snippet bulkActions({ selectedCount, selectedItems })}
-							bulkactions
+							<div class="flex gap-5">
+								<IconButton
+									onclick={() => layout.openMessageDraftPanel()}
+									label="Add Sent Message"
+									color="primary"
+								>
+									<AddIcon />
+								</IconButton>
+
+								<IconButton
+									onclick={() => handleBulkDeleteSentMessages(selectedItems)}
+									color="error"
+									disabled={selectedCount === 0}
+									label={`Delete Sent Messages ${selectedCount > 0 ? ` (${selectedCount})` : ''}`}
+								>
+									<DeleteIcon />
+								</IconButton>
+							</div>
 						{/snippet}
 
 						{#snippet header()}
@@ -89,16 +130,15 @@
 							<TableField>
 								<UnderlinedButton
 									label={msg.name}
-									onclick={() => {
-										// TODO! open message panel
-										console.log('open message panel');
-									}}
+									onclick={() => layout.openMessagePanel(msg.entityId)}
 								/>
 							</TableField>
 						{/snippet}
 
 						{#snippet rowActions(msg)}
-							actions
+							<IconButton onclick={() => handleDeleteSentMessage(msg)} color="error">
+								<DeleteIcon />
+							</IconButton>
 						{/snippet}
 					</Table>
 				{/if}
@@ -107,7 +147,7 @@
 
 		<Divider />
 
-		<Collapsible>
+		<Collapsible initialCollapsed>
 			{#snippet trigger()}
 				<h4>Received Messages ({getCount(int.receivedMessages)})</h4>
 			{/snippet}
@@ -116,7 +156,14 @@
 				{#if int.receivedMessages}
 					<Table items={int.receivedMessages} idKey="entityId">
 						{#snippet bulkActions({ selectedCount, selectedItems })}
-							bulkactions
+							<IconButton
+								onclick={() => handleBulkDeleteReceivedMessages(selectedItems)}
+								color="error"
+								disabled={selectedCount === 0}
+								label={`Delete Received Messages ${selectedCount > 0 ? ` (${selectedCount})` : ''}`}
+							>
+								<DeleteIcon />
+							</IconButton>
 						{/snippet}
 
 						{#snippet header()}
@@ -127,16 +174,15 @@
 							<TableField>
 								<UnderlinedButton
 									label={msg.name}
-									onclick={() => {
-										// TODO! open message panel
-										console.log('open message panel');
-									}}
+									onclick={() => layout.openMessagePanel(msg.entityId)}
 								/>
 							</TableField>
 						{/snippet}
 
 						{#snippet rowActions(msg)}
-							actions
+							<IconButton onclick={() => handleDeleteReceivedMessage(msg)} color="error">
+								<DeleteIcon />
+							</IconButton>
 						{/snippet}
 					</Table>
 				{/if}

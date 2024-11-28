@@ -237,18 +237,18 @@ func (s *NodeService) UpdateID(entityID string, id uint) (Node, error) {
 	return s.converterFn(node), nil
 }
 
-func (s *NodeService) AttachBus(entityID string, interfaceNumber int, busEntityID string) (Node, error) {
-	node, err := s.getEntity(entityID)
+func (s *NodeService) AttachBus(nodeEntID string, intNumber int, busEntID string) (Node, error) {
+	node, err := s.getEntity(nodeEntID)
 	if err != nil {
 		return Node{}, err
 	}
 
-	nodeInt, err := node.GetInterface(interfaceNumber)
+	nodeInt, err := node.GetInterface(intNumber)
 	if err != nil {
 		return Node{}, err
 	}
 
-	bus, err := manager.busService.getEntity(busEntityID)
+	bus, err := manager.busService.getEntity(busEntID)
 	if err != nil {
 		return Node{}, err
 	}
@@ -289,6 +289,160 @@ func (s *NodeService) AttachBus(entityID string, interfaceNumber int, busEntityI
 
 			if err := bus.AddNodeInterface(nodeInt); err != nil {
 				return Node{}, err
+			}
+
+			return s.converterFn(node), nil
+		},
+	)
+
+	return s.converterFn(node), nil
+}
+
+func (s *NodeService) RemoveSentMessages(nodeEntID string, intNumber int, messageEntIDs ...string) (Node, error) {
+	node, err := s.getEntity(nodeEntID)
+	if err != nil {
+		return Node{}, err
+	}
+
+	if len(messageEntIDs) == 0 {
+		return s.converterFn(node), nil
+	}
+
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	nodeInt, err := node.GetInterface(intNumber)
+	if err != nil {
+		return Node{}, err
+	}
+
+	targetIDs := make(map[string]struct{})
+	for _, messageEntID := range messageEntIDs {
+		targetIDs[messageEntID] = struct{}{}
+	}
+
+	sentMessages := []*acmelib.Message{}
+	for _, tmpMsg := range nodeInt.SentMessages() {
+		tmpEntID := tmpMsg.EntityID()
+
+		_, ok := targetIDs[tmpEntID.String()]
+		if !ok {
+			continue
+		}
+
+		sentMessages = append(sentMessages, tmpMsg)
+	}
+
+	for _, tmpMsg := range sentMessages {
+		tmpEntID := tmpMsg.EntityID()
+
+		if err := nodeInt.RemoveSentMessage(tmpEntID); err != nil {
+			return Node{}, err
+		}
+
+		proxy.pushSidebarRemove(tmpEntID)
+	}
+
+	proxy.pushHistoryOperation(
+		operationDomainNode,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			for _, tmpMsg := range sentMessages {
+				if err := nodeInt.AddSentMessage(tmpMsg); err != nil {
+					return Node{}, err
+				}
+
+				proxy.pushSidebarAdd(SidebarNodeKindMessage, tmpMsg.EntityID(), node.EntityID(), tmpMsg.Name())
+			}
+
+			return s.converterFn(node), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			for _, tmpMsg := range sentMessages {
+				tmpEntID := tmpMsg.EntityID()
+
+				if err := nodeInt.RemoveSentMessage(tmpMsg.EntityID()); err != nil {
+					return Node{}, err
+				}
+
+				proxy.pushSidebarRemove(tmpEntID)
+			}
+
+			return s.converterFn(node), nil
+		},
+	)
+
+	return s.converterFn(node), nil
+}
+
+func (s *NodeService) RemoveReceivedMessages(nodeEntID string, intNumber int, messageEntIDs ...string) (Node, error) {
+	node, err := s.getEntity(nodeEntID)
+	if err != nil {
+		return Node{}, err
+	}
+
+	if len(messageEntIDs) == 0 {
+		return s.converterFn(node), nil
+	}
+
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	nodeInt, err := node.GetInterface(intNumber)
+	if err != nil {
+		return Node{}, err
+	}
+
+	targetIDs := make(map[string]struct{})
+	for _, messageEntID := range messageEntIDs {
+		targetIDs[messageEntID] = struct{}{}
+	}
+
+	receivedMessages := []*acmelib.Message{}
+	for _, tmpMsg := range nodeInt.ReceivedMessages() {
+		tmpEntID := tmpMsg.EntityID()
+
+		_, ok := targetIDs[tmpEntID.String()]
+		if !ok {
+			continue
+		}
+
+		receivedMessages = append(receivedMessages, tmpMsg)
+	}
+
+	for _, tmpMsg := range receivedMessages {
+		if err := nodeInt.RemoveReceivedMessage(tmpMsg.EntityID()); err != nil {
+			return Node{}, err
+		}
+	}
+
+	proxy.pushHistoryOperation(
+		operationDomainNode,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			for _, tmpMsg := range receivedMessages {
+				if err := nodeInt.AddReceivedMessage(tmpMsg); err != nil {
+					return Node{}, err
+				}
+			}
+
+			return s.converterFn(node), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			for _, tmpMsg := range receivedMessages {
+				if err := nodeInt.RemoveReceivedMessage(tmpMsg.EntityID()); err != nil {
+					return Node{}, err
+				}
 			}
 
 			return s.converterFn(node), nil

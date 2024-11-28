@@ -9,8 +9,8 @@ import {Call as $Call} from "@wailsio/runtime";
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
-export function AttachBus(entityID: string, interfaceNumber: number, busEntityID: string): Promise<$models.Node> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(2185278590, entityID, interfaceNumber, busEntityID) as any;
+export function AttachBus(nodeEntID: string, intNumber: number, busEntID: string): Promise<$models.Node> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(2185278590, nodeEntID, intNumber, busEntID) as any;
     return $resultPromise;
 }
 
@@ -31,6 +31,16 @@ export function GetInvalidNames(entityID: string): Promise<string[] | null> & { 
 
 export function GetNames(): Promise<string[] | null> & { cancel(): void } {
     let $resultPromise = $Call.ByID(2126753985) as any;
+    return $resultPromise;
+}
+
+export function RemoveReceivedMessages(nodeEntID: string, intNumber: number, ...messageEntIDs: string[]): Promise<$models.Node> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(507733122, nodeEntID, intNumber, messageEntIDs) as any;
+    return $resultPromise;
+}
+
+export function RemoveSentMessages(nodeEntID: string, intNumber: number, ...messageEntIDs: string[]): Promise<$models.Node> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(377191259, nodeEntID, intNumber, messageEntIDs) as any;
     return $resultPromise;
 }
 

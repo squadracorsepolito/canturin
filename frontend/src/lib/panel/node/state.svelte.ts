@@ -58,4 +58,22 @@ class NodeState extends EntityState<Node> {
 	attachBus(interfaceNumber: number, busEntityID: string) {
 		this.update(NodeService.AttachBus(this.entity.entityId, interfaceNumber, busEntityID));
 	}
+
+	deleteSentMessages(intNumber: number, messageEntIDs: string[]) {
+		this.update(NodeService.RemoveSentMessages(this.entity.entityId, intNumber, ...messageEntIDs));
+	}
+
+	deleteSentMessage(intNumber: number, messageEntID: string) {
+		this.update(NodeService.RemoveSentMessages(this.entity.entityId, intNumber, messageEntID));
+	}
+
+	deleteReceivedMessages(intNumber: number, messageEntIDs: string[]) {
+		this.update(
+			NodeService.RemoveReceivedMessages(this.entity.entityId, intNumber, ...messageEntIDs)
+		);
+	}
+
+	deleteReceivedMessage(intNumber: number, messageEntID: string) {
+		this.update(NodeService.RemoveReceivedMessages(this.entity.entityId, intNumber, messageEntID));
+	}
 }

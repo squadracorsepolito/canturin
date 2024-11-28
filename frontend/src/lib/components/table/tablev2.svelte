@@ -46,6 +46,12 @@
 	let allItemsSelected = $state(false);
 	let selectedCount = $state(0);
 
+	$effect(() => {
+		if (items.length === 0) {
+			handleSelectAll(false);
+		}
+	});
+
 	function handleSelectAll(checked: boolean) {
 		if (checked) {
 			selectedCount = itemSelector.items.length;
@@ -55,6 +61,10 @@
 
 		for (const item of itemSelector.items) {
 			item.selected = checked;
+		}
+
+		if (allItemsSelected !== checked) {
+			allItemsSelected = checked;
 		}
 	}
 
