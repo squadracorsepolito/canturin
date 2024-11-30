@@ -31,7 +31,7 @@ func main() {
 	proxy = newAppProxy()
 
 	// Path to the file used for loading network data.
-	infilepath := "./testdata/SC24.binpb"
+	// infilepath := "./testdata/SC24.binpb"
 
 	// Initialize the services
 	sidebarSrv := newSidebarService()
@@ -117,7 +117,7 @@ func main() {
 
 	// Emit an application event to load network data when the application starts.
 	app.OnApplicationEvent(events.Common.ApplicationStarted, func(_ *application.ApplicationEvent) {
-		loadNetwork(infilepath)
+		// loadNetwork(infilepath)
 	})
 
 	// Run the application. This blocks until the application has been exited.
