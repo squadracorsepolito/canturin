@@ -3,6 +3,7 @@ package main
 import "github.com/wailsapp/wails/v3/pkg/application"
 
 type serviceManager struct {
+	sidebar        *SidebarService0
 	sidebarService *SidebarService
 	historyService *HistoryService
 
@@ -16,6 +17,7 @@ type serviceManager struct {
 
 func newServiceManager() *serviceManager {
 	return &serviceManager{
+		sidebar:        newSidebarService0(),
 		sidebarService: newSidebarService(),
 		historyService: newHistoryService(),
 
@@ -30,6 +32,7 @@ func newServiceManager() *serviceManager {
 
 func (m *serviceManager) getServices() []application.Service {
 	return []application.Service{
+		application.NewService(m.sidebar),
 		application.NewService(manager.sidebarService),
 		application.NewService(manager.historyService),
 

@@ -20,6 +20,7 @@
 	import history from '$lib/state/history-state.svelte';
 	import { PaneGroup, Pane, PaneResizer } from 'paneforge';
 	import TickIcon from '$lib/components/icon/tick-icon.svelte';
+	import Sidebar from '$lib/components/sidebar/sidebar.svelte';
 
 	let { children } = $props();
 
@@ -237,6 +238,8 @@
 <PaneGroup direction="horizontal" class="h-full w-full">
 	<Pane defaultSize={15} class="h-full bg-base-200 flex flex-col">
 		<div class="h-12 block bg-base-300 sticky top-0"></div>
+
+		<Sidebar />
 
 		<div class="flex-1 overflow-y-auto overflow-x-hidden">
 			{#if sidebarState.tree}

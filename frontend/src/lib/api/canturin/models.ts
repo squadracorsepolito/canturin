@@ -78,6 +78,34 @@ export interface NodeMessage {
     "createTime": time$0.Time;
 }
 
+export interface Sidebar {
+    "root": SidebarItem;
+}
+
+export interface SidebarItem {
+    "kind": SidebarItemKind;
+    "prefix": string;
+    "id": string;
+    "name": string;
+    "children": SidebarItem[] | null;
+}
+
+export enum SidebarItemKind {
+    /**
+     * The Go zero value for the underlying type of the enum.
+     */
+    $zero = "",
+
+    SidebarItemKindGroup = "group",
+    SidebarItemKindNetwork = "network",
+    SidebarItemKindBus = "bus",
+    SidebarItemKindNode = "node",
+    SidebarItemKindMessage = "message",
+    SidebarItemKindSignalType = "signal-type",
+    SidebarItemKindSignalUnit = "signal-unit",
+    SidebarItemKindSignalEnum = "signal-enum",
+};
+
 export interface SidebarNode {
     "kind": SidebarNodeKind;
     "name": string;

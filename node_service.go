@@ -4,6 +4,20 @@ import (
 	"github.com/squadracorsepolito/acmelib"
 )
 
+type NodeBase struct {
+	base
+}
+
+func getNodeBase(node *acmelib.Node) NodeBase {
+	if node == nil {
+		return NodeBase{}
+	}
+
+	return NodeBase{
+		base: getBase(node),
+	}
+}
+
 type NodeMessage struct {
 	base
 }
@@ -72,6 +86,17 @@ func newNodeService() *NodeService {
 	}
 }
 
+func (s *NodeService) sendSidebarUpdateName(node *acmelib.Node) {
+	manager.sidebar.sendUpdateName(newSidebarUpdateNameReq(node.EntityID().String(), node.Name()))
+
+	for _, nodeInt := range node.Interfaces() {
+		nodeIntKey := manager.sidebar.getMessageNodeGroupKey(nodeInt)
+		nodeIntName := manager.sidebar.getMessageNodeGroupName(nodeInt)
+
+		manager.sidebar.sendUpdateName(newSidebarUpdateNameReq(nodeIntKey, nodeIntName))
+	}
+}
+
 func (s *NodeService) GetInvalidNames(entityID string) []string {
 	s.mux.Lock()
 	defer s.mux.Unlock()
@@ -118,7 +143,7 @@ func (s *NodeService) UpdateName(entityID, name string) (Node, error) {
 		return Node{}, err
 	}
 
-	proxy.pushSidebarUpdate(node.EntityID(), name)
+	s.sendSidebarUpdateName(node)
 
 	proxy.pushHistoryOperation(
 		operationDomainNode,
@@ -130,7 +155,7 @@ func (s *NodeService) UpdateName(entityID, name string) (Node, error) {
 				return Node{}, err
 			}
 
-			proxy.pushSidebarUpdate(node.EntityID(), oldName)
+			s.sendSidebarUpdateName(node)
 
 			return s.converterFn(node), nil
 		},
@@ -142,7 +167,7 @@ func (s *NodeService) UpdateName(entityID, name string) (Node, error) {
 				return Node{}, err
 			}
 
-			proxy.pushSidebarUpdate(node.EntityID(), name)
+			s.sendSidebarUpdateName(node)
 
 			return s.converterFn(node), nil
 		},

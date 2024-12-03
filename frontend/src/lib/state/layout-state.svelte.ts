@@ -1,4 +1,4 @@
-type PanelType =
+export type PanelType =
 	| 'none'
 	| 'bus'
 	| 'node'

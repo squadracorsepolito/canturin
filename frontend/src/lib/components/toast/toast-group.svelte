@@ -3,7 +3,7 @@
 	import { normalizeProps, useMachine } from '@zag-js/svelte';
 	import * as toast from '@zag-js/toast';
 	import Toast from './toast.svelte';
-	import { createToastProvider, pushToast } from './toast-provider.svelte';
+	import { createToastProvider } from './toast-provider.svelte';
 
 	const [snapshot, send] = useMachine(
 		toast.group.machine({

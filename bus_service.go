@@ -72,6 +72,13 @@ func (s *BusService) ListBase() []BusBase {
 	return briefs
 }
 
+func (s *BusService) sendSidebarUpdateName(bus *acmelib.Bus) {
+	manager.sidebar.sendUpdateName(newSidebarUpdateNameReq(bus.EntityID().String(), bus.Name()))
+
+	msgBusGroupKey := manager.sidebar.getMessageBusGroupKey(bus)
+	manager.sidebar.sendUpdateName(newSidebarUpdateNameReq(msgBusGroupKey, bus.Name()))
+}
+
 func (s *BusService) UpdateName(entityID string, name string) (Bus, error) {
 	bus, err := s.getEntity(entityID)
 	if err != nil {
@@ -90,7 +97,7 @@ func (s *BusService) UpdateName(entityID string, name string) (Bus, error) {
 		return Bus{}, err
 	}
 
-	proxy.pushSidebarUpdate(bus.EntityID(), name)
+	s.sendSidebarUpdateName(bus)
 
 	proxy.pushHistoryOperation(
 		operationDomainBus,
@@ -102,7 +109,7 @@ func (s *BusService) UpdateName(entityID string, name string) (Bus, error) {
 				return Bus{}, err
 			}
 
-			proxy.pushSidebarUpdate(bus.EntityID(), oldName)
+			s.sendSidebarUpdateName(bus)
 
 			return s.converterFn(bus), nil
 		},
@@ -114,7 +121,7 @@ func (s *BusService) UpdateName(entityID string, name string) (Bus, error) {
 				return Bus{}, err
 			}
 
-			proxy.pushSidebarUpdate(bus.EntityID(), name)
+			s.sendSidebarUpdateName(bus)
 
 			return s.converterFn(bus), nil
 		},

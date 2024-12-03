@@ -73,6 +73,19 @@ func newSignalEnumService() *SignalEnumService {
 	}
 }
 
+func (s *SignalEnumService) sendSidebarAdd(sigEnum *acmelib.SignalEnum) {
+	item := newSignalEnumSidebarItem(sigEnum)
+	manager.sidebar.sendAdd(newSidebarAddReq(item, SidebarSignalEnumsPrefix))
+}
+
+func (s *SignalEnumService) sendSidebarUpdateName(sigEnum *acmelib.SignalEnum) {
+	manager.sidebar.sendUpdateName(newSidebarUpdateNameReq(sigEnum.EntityID().String(), sigEnum.Name()))
+}
+
+func (s *SignalEnumService) sendSidebarDelete(sigEnum *acmelib.SignalEnum) {
+	manager.sidebar.sendDelete(newSidebarDeleteReq(sigEnum.EntityID().String()))
+}
+
 func (s *SignalEnumService) Create(name, desc string, minSize int) (SignalEnum, error) {
 	sigEnum := acmelib.NewSignalEnum(name)
 
@@ -84,7 +97,7 @@ func (s *SignalEnumService) Create(name, desc string, minSize int) (SignalEnum, 
 	defer s.mux.Unlock()
 	s.pool[sigEnum.EntityID()] = sigEnum
 
-	proxy.pushSidebarAdd(SidebarNodeKindSignalEnum, sigEnum.EntityID(), proxy.network.EntityID(), name)
+	s.sendSidebarAdd(sigEnum)
 
 	return s.converterFn(sigEnum), nil
 }
@@ -121,7 +134,7 @@ func (s *SignalEnumService) UpdateName(entityID string, name string) (SignalEnum
 
 	sigEnum.UpdateName(name)
 
-	proxy.pushSidebarUpdate(sigEnum.EntityID(), name)
+	s.sendSidebarUpdateName(sigEnum)
 
 	proxy.pushHistoryOperation(
 		operationDomainSignalEnum,
@@ -130,7 +143,7 @@ func (s *SignalEnumService) UpdateName(entityID string, name string) (SignalEnum
 			defer s.mux.Unlock()
 
 			sigEnum.UpdateName(oldName)
-			proxy.pushSidebarUpdate(sigEnum.EntityID(), oldName)
+			s.sendSidebarUpdateName(sigEnum)
 
 			return s.converterFn(sigEnum), nil
 		},
@@ -139,7 +152,7 @@ func (s *SignalEnumService) UpdateName(entityID string, name string) (SignalEnum
 			defer s.mux.Unlock()
 
 			sigEnum.UpdateName(name)
-			proxy.pushSidebarUpdate(sigEnum.EntityID(), name)
+			s.sendSidebarUpdateName(sigEnum)
 
 			return s.converterFn(sigEnum), nil
 		},

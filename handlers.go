@@ -18,7 +18,16 @@ func loadNetwork(path string) {
 		panic(err)
 	}
 
+	manager.sidebar.sendLoad(newSidebarLoadReq(net))
+
+	//
+	//
+	//
 	proxy.pushSidebarLoad(net)
+	//
+	//
+	//
+
 	proxy.network = net
 
 	nodes := make(map[acmelib.EntityID]*acmelib.Node)

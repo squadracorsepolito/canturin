@@ -59,6 +59,19 @@ func newSignalTypeService() *SignalTypeService {
 	}
 }
 
+func (s *SignalTypeService) sendSidebarAdd(sigType *acmelib.SignalType) {
+	item := newSignalTypeSidebarItem(sigType)
+	manager.sidebar.sendAdd(newSidebarAddReq(item, SidebarSignalTypesPrefix))
+}
+
+func (s *SignalTypeService) sendSidebarUpdateName(sigType *acmelib.SignalType) {
+	manager.sidebar.sendUpdateName(newSidebarUpdateNameReq(sigType.EntityID().String(), sigType.Name()))
+}
+
+func (s *SignalTypeService) sendSidebarDelete(sigType *acmelib.SignalType) {
+	manager.sidebar.sendDelete(newSidebarDeleteReq(sigType.EntityID().String()))
+}
+
 func (s *SignalTypeService) Create(kind SignalTypeKind, name, desc string, size int, signed bool, min, max, scale, offset float64) (SignalType, error) {
 	sigType := &acmelib.SignalType{}
 	switch kind {
@@ -100,7 +113,7 @@ func (s *SignalTypeService) Create(kind SignalTypeKind, name, desc string, size 
 	defer s.mux.Unlock()
 	s.pool[sigType.EntityID()] = sigType
 
-	proxy.pushSidebarAdd(SidebarNodeKindSignalType, sigType.EntityID(), proxy.network.EntityID(), sigType.Name())
+	s.sendSidebarAdd(sigType)
 
 	return s.converterFn(sigType), nil
 }
@@ -139,7 +152,7 @@ func (s *SignalTypeService) UpdateName(entityID string, name string) (SignalType
 	sigType.SetName(name)
 
 	// push the new name in the sidebar
-	proxy.pushSidebarUpdate(sigType.EntityID(), name)
+	s.sendSidebarUpdateName(sigType)
 
 	// add to the history
 	proxy.pushHistoryOperation(
@@ -149,7 +162,7 @@ func (s *SignalTypeService) UpdateName(entityID string, name string) (SignalType
 			defer s.mux.Unlock()
 
 			sigType.SetName(oldName)
-			proxy.pushSidebarUpdate(sigType.EntityID(), oldName)
+			s.sendSidebarUpdateName(sigType)
 
 			return s.converterFn(sigType), nil
 		},
@@ -158,7 +171,7 @@ func (s *SignalTypeService) UpdateName(entityID string, name string) (SignalType
 			defer s.mux.Unlock()
 
 			sigType.SetName(name)
-			proxy.pushSidebarUpdate(sigType.EntityID(), name)
+			s.sendSidebarUpdateName(sigType)
 
 			return s.converterFn(sigType), nil
 		},

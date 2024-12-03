@@ -6,6 +6,8 @@ const (
 	SidebarAdd    = "sidebar-add"
 	SidebarRemove = "sidebar-remove"
 
+	SidebarUpdateName = "sidebar-update-name"
+
 	HistoryChange           = "history-change"
 	HistoryBusModify        = "history-bus-modify"
 	HistoryNodeModify       = "history-node-modify"

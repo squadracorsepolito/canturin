@@ -102,7 +102,7 @@
 				@apply border-2 border-neutral-content px-2 py-1 rounded-btn transition-colors flex items-center justify-between gap-3;
 
 				&:focus {
-					@apply focus-ring-primary;
+					@apply ring-2 ring-primary/25;
 				}
 
 				&:hover {
@@ -129,7 +129,7 @@
 			}
 
 			&:focus {
-				@apply focus-ring-primary;
+				@apply ring-2 ring-primary/25;
 			}
 
 			[data-part='item'] {

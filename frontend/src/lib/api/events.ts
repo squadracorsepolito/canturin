@@ -2,6 +2,7 @@ export const SidebarLoad = "sidebar-load";
 export const SidebarUpdate = "sidebar-update";
 export const SidebarAdd = "sidebar-add";
 export const SidebarRemove = "sidebar-remove";
+export const SidebarUpdateName = "sidebar-update-name";
 export const HistoryChange = "history-change";
 export const HistoryBusModify = "history-bus-modify";
 export const HistoryNodeModify = "history-node-modify";

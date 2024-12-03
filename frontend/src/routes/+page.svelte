@@ -38,7 +38,7 @@
 		items = updatedItems;
 	}
 
-	let selectData = $state([
+	let selectData = [
 		{ label: 'Nigeria', value: 'NG' },
 		{ label: 'Japan', value: 'JP' },
 		{ label: 'Korea', value: 'KO' },
@@ -46,7 +46,7 @@
 		{ label: 'United Kingdom', value: 'UK' },
 		{ label: 'Ghana', value: 'GH' },
 		{ label: 'Uganda', value: 'UG' }
-	]);
+	];
 
 	let selected = $state(selectData[0]);
 
