@@ -1,5 +1,7 @@
 import { SignalEnumService, type SignalEnum } from '$lib/api/canturin';
 import { HistorySignalEnumModify } from '$lib/api/events';
+import { pushToast } from '$lib/components/toast/toast-provider.svelte';
+import layout from '$lib/state/layout-state.svelte';
 import { EntityState } from '../../state/entity-state.svelte';
 import { StateProvider } from '../../state/state-provider.svelte';
 
@@ -15,6 +17,17 @@ export function getSignalEnumState(entityId: string) {
 export async function loadSignalEnum(entityId: string) {
 	const signalEnum = await SignalEnumService.Get(entityId);
 	provider.add(signalEnum);
+}
+
+export async function deleteSignalEnum(entityId: string) {
+	try {
+		await SignalEnumService.Delete(entityId);
+		provider.remove(entityId);
+		layout.closeIfOpen(entityId);
+	} catch (error) {
+		pushToast('error', 'Error', 'Operation failed');
+		console.error(error);
+	}
 }
 
 class SignalEnumState extends EntityState<SignalEnum> {

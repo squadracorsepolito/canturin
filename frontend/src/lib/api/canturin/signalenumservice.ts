@@ -19,6 +19,11 @@ export function Create(name: string, desc: string, minSize: number): Promise<$mo
     return $resultPromise;
 }
 
+export function Delete(entityID: string): Promise<void> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1564009523, entityID) as any;
+    return $resultPromise;
+}
+
 export function Get(entityID: string): Promise<$models.SignalEnum> & { cancel(): void } {
     let $resultPromise = $Call.ByID(62675348, entityID) as any;
     return $resultPromise;

@@ -23,6 +23,12 @@ class LayoutState {
 	openMessageDraftPanel() {
 		this.openPanel('message', 'draft');
 	}
+
+	closeIfOpen(panelId: string) {
+		if (this.openPanelId === panelId) {
+			this.openPanel('none', '');
+		}
+	}
 }
 
 export default new LayoutState();

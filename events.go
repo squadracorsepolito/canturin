@@ -1,12 +1,10 @@
 package main
 
 const (
-	SidebarLoad   = "sidebar-load"
-	SidebarUpdate = "sidebar-update"
-	SidebarAdd    = "sidebar-add"
-	SidebarRemove = "sidebar-remove"
-
+	SidebarLoad       = "sidebar-load"
 	SidebarUpdateName = "sidebar-update-name"
+	SidebarAdd        = "sidebar-add"
+	SidebarRemove     = "sidebar-remove"
 
 	HistoryChange           = "history-change"
 	HistoryBusModify        = "history-bus-modify"

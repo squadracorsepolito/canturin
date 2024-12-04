@@ -1,9 +1,4 @@
-import {
-	SidebarItemKind,
-	SidebarService0,
-	type Sidebar,
-	type SidebarItem
-} from '$lib/api/canturin';
+import { SidebarItemKind, SidebarService, type Sidebar, type SidebarItem } from '$lib/api/canturin';
 import {
 	SidebarBusesPrefix,
 	SidebarMessagesPrefix,
@@ -12,12 +7,25 @@ import {
 	SidebarSignalTypesPrefix,
 	SidebarSignalUnitsPrefix
 } from '$lib/api/constants';
-import { SidebarAdd, SidebarLoad, SidebarUpdateName } from '$lib/api/events';
+import { SidebarAdd, SidebarLoad, SidebarRemove, SidebarUpdateName } from '$lib/api/events';
 import type { PanelType } from '$lib/state/layout-state.svelte';
 import { Events as wails } from '@wailsio/runtime';
 
 export class SidebarState {
-	#items = new Map<string, SidebarItem>();
+	#items = $derived.by(() => {
+		const m = new Map<string, SidebarItem>();
+
+		if (this.sidebar) {
+			const flattenedItems: SidebarItem[] = [];
+			this.flattenItems(this.sidebar.root, flattenedItems);
+
+			for (const item of flattenedItems) {
+				m.set(item.id, item);
+			}
+		}
+
+		return m;
+	});
 
 	sidebar = $state<Sidebar>();
 
@@ -31,58 +39,30 @@ export class SidebarState {
 		});
 
 		wails.On(SidebarAdd, (e: wails.WailsEvent) => {
-			this.add(e.data[0] as SidebarItem);
+			this.update(e.data[0] as SidebarItem);
+		});
+
+		wails.On(SidebarRemove, (e: wails.WailsEvent) => {
+			this.update(e.data[0] as SidebarItem);
 		});
 
 		// TODO! Remove this line in production
 		this.load();
 	}
 
-	private loadItem(item: SidebarItem) {
+	private flattenItems(item: SidebarItem, acc: SidebarItem[]) {
 		if (item.kind !== SidebarItemKind.SidebarItemKindGroup) {
-			this.#items.set(item.id, item);
+			acc.push(item);
 		}
 
-		if (item.children) {
-			for (const child of item.children) {
-				this.loadItem(child);
-			}
+		for (const child of item.children || []) {
+			this.flattenItems(child, acc);
 		}
 	}
 
 	async load() {
-		const sidebar = await SidebarService0.Get();
+		const sidebar = await SidebarService.Get();
 		this.sidebar = sidebar;
-
-		this.loadItem(sidebar.root);
-	}
-
-	add(item: SidebarItem) {
-		if (!this.sidebar) return;
-
-		let parentItem = this.sidebar.root;
-		for (const prefix of item.prefix.split(':')) {
-			for (const child of parentItem.children || []) {
-				const tmpSplitId = child.id.split(':');
-				if (tmpSplitId.length < 2) {
-					continue;
-				}
-
-				if (tmpSplitId[1] === prefix) {
-					parentItem = child;
-					break;
-				}
-			}
-		}
-
-		if (!parentItem.children) return;
-
-		for (let i = 0; i < parentItem.children.length; i++) {
-			if (parentItem.children[i].id === item.id) {
-				parentItem.children[i] = item;
-				break;
-			}
-		}
 	}
 
 	private updateName(item: SidebarItem) {
@@ -114,7 +94,9 @@ export class SidebarState {
 			}
 		}
 
-		for (const child of parentItem.children || []) {
+		if (!parentItem.children) return;
+
+		for (const child of parentItem.children) {
 			if (child.id === item.id) {
 				child.name = item.name;
 
@@ -123,6 +105,36 @@ export class SidebarState {
 					mappedItem.name = item.name;
 				}
 
+				break;
+			}
+		}
+
+		parentItem.children.sort((a, b) => a.name.localeCompare(b.name));
+	}
+
+	private update(item: SidebarItem) {
+		if (!this.sidebar) return;
+
+		let parentItem = this.sidebar.root;
+		for (const prefix of item.prefix.split(':')) {
+			for (const child of parentItem.children || []) {
+				const tmpSplitId = child.id.split(':');
+				if (tmpSplitId.length < 2) {
+					continue;
+				}
+
+				if (tmpSplitId[1] === prefix) {
+					parentItem = child;
+					break;
+				}
+			}
+		}
+
+		if (!parentItem.children) return;
+
+		for (let i = 0; i < parentItem.children.length; i++) {
+			if (parentItem.children[i].id === item.id) {
+				parentItem.children[i] = item;
 				break;
 			}
 		}

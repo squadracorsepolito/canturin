@@ -6,7 +6,6 @@ import * as HistoryService from "./historyservice.js";
 import * as MessageService from "./messageservice.js";
 import * as NodeService from "./nodeservice.js";
 import * as SidebarService from "./sidebarservice.js";
-import * as SidebarService0 from "./sidebarservice0.js";
 import * as SignalEnumService from "./signalenumservice.js";
 import * as SignalTypeService from "./signaltypeservice.js";
 import * as SignalUnitService from "./signalunitservice.js";
@@ -16,7 +15,6 @@ export {
     MessageService,
     NodeService,
     SidebarService,
-    SidebarService0,
     SignalEnumService,
     SignalTypeService,
     SignalUnitService

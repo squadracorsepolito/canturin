@@ -106,29 +106,6 @@ export enum SidebarItemKind {
     SidebarItemKindSignalEnum = "signal-enum",
 };
 
-export interface SidebarNode {
-    "kind": SidebarNodeKind;
-    "name": string;
-    "entityId": string;
-    "parentEntityIds": string[] | null;
-    "children": SidebarNode[] | null;
-}
-
-export enum SidebarNodeKind {
-    /**
-     * The Go zero value for the underlying type of the enum.
-     */
-    $zero = "",
-
-    SidebarNodeKindNetwork = "network",
-    SidebarNodeKindBus = "bus",
-    SidebarNodeKindNode = "node",
-    SidebarNodeKindMessage = "message",
-    SidebarNodeKindSignalType = "signal-type",
-    SidebarNodeKindSignalUnit = "signal-unit",
-    SidebarNodeKindSignalEnum = "signal-enum",
-};
-
 export interface Signal {
     "entityId": string;
     "name": string;

@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { SidebarItemKind, type SidebarItem } from '$lib/api/canturin';
+	import { deleteSignalEnum } from '$lib/panel/signal-enum/state.svelte';
 	import layout from '$lib/state/layout-state.svelte';
+	import { deleteSignalType } from '$lib/state/signal-type-state.svelte';
 	import {
 		AltArrowIcon,
 		BusIcon,
@@ -11,7 +13,7 @@
 		SignalTypeIcon,
 		SignalUnitIcon
 	} from '../icon';
-	import TreeView from '../tree/tree-view.svelte';
+	import { TreeView } from '../tree';
 	import { SidebarState } from './state.svelte';
 
 	const s = new SidebarState();
@@ -44,8 +46,6 @@
 		}
 	}
 
-	let selectedId = $state('');
-
 	function handleSelect(id: string) {
 		const item = s.getItem(id);
 		if (!item) return;
@@ -53,18 +53,32 @@
 		layout.openPanel(s.getPanelType(item.kind), item.id);
 	}
 
-	function handleAdd() {
-		if (!selectedId) return;
-
-		const leafItem = s.getItem(selectedId);
+	function handleAdd(id: string) {
+		const leafItem = s.getItem(id);
 		if (leafItem) {
 			layout.openPanel(s.getPanelType(leafItem.kind), 'draft');
 			return;
 		}
 
 		// a group is selected
-		const itemKind = s.getKindOfGroup(selectedId);
+		const itemKind = s.getKindOfGroup(id);
 		layout.openPanel(s.getPanelType(itemKind), 'draft');
+	}
+
+	function handleDelete(id: string) {
+		const item = s.getItem(id);
+		// it happens when a group is selected
+		if (!item) return;
+
+		switch (item.kind) {
+			case SidebarItemKind.SidebarItemKindSignalType:
+				deleteSignalType(item.id);
+				break;
+
+			case SidebarItemKind.SidebarItemKindSignalEnum:
+				deleteSignalEnum(item.id);
+				break;
+		}
 	}
 </script>
 
@@ -72,12 +86,12 @@
 	{#if s.sidebar}
 		<TreeView
 			root={s.sidebar.root}
-			bind:selectedValue={selectedId}
 			valueKey="id"
 			labelKey="name"
 			getIcon={getTreeViewIcon}
 			onselect={handleSelect}
 			onadd={handleAdd}
+			ondelete={handleDelete}
 		/>
 	{/if}
 </div>

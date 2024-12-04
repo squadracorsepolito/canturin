@@ -3,44 +3,41 @@ package main
 import "github.com/wailsapp/wails/v3/pkg/application"
 
 type serviceManager struct {
-	sidebar        *SidebarService0
-	sidebarService *SidebarService
-	historyService *HistoryService
+	sidebar *SidebarService
+	history *HistoryService
 
-	busService        *BusService
-	nodeService       *NodeService
-	messageService    *MessageService
-	signalTypeService *SignalTypeService
-	signalUnitService *SignalUnitService
-	signalEnumService *SignalEnumService
+	bus        *BusService
+	node       *NodeService
+	message    *MessageService
+	signalType *SignalTypeService
+	signalUnit *SignalUnitService
+	signalEnum *SignalEnumService
 }
 
 func newServiceManager() *serviceManager {
 	return &serviceManager{
-		sidebar:        newSidebarService0(),
-		sidebarService: newSidebarService(),
-		historyService: newHistoryService(),
+		sidebar: newSidebarService(),
+		history: newHistoryService(),
 
-		busService:        newBusService(),
-		nodeService:       newNodeService(),
-		messageService:    newMessageService(),
-		signalTypeService: newSignalTypeService(),
-		signalUnitService: newSignalUnitService(),
-		signalEnumService: newSignalEnumService(),
+		bus:        newBusService(),
+		node:       newNodeService(),
+		message:    newMessageService(),
+		signalType: newSignalTypeService(),
+		signalUnit: newSignalUnitService(),
+		signalEnum: newSignalEnumService(),
 	}
 }
 
 func (m *serviceManager) getServices() []application.Service {
 	return []application.Service{
 		application.NewService(m.sidebar),
-		application.NewService(manager.sidebarService),
-		application.NewService(manager.historyService),
+		application.NewService(manager.history),
 
-		application.NewService(manager.busService),
-		application.NewService(manager.nodeService),
-		application.NewService(manager.messageService),
-		application.NewService(manager.signalTypeService),
-		application.NewService(manager.signalUnitService),
-		application.NewService(manager.signalEnumService),
+		application.NewService(manager.bus),
+		application.NewService(manager.node),
+		application.NewService(manager.message),
+		application.NewService(manager.signalType),
+		application.NewService(manager.signalUnit),
+		application.NewService(manager.signalEnum),
 	}
 }

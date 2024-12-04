@@ -1,6 +1,8 @@
 import { SignalTypeService, type SignalType } from '$lib/api/canturin';
 import { HistorySignalTypeModify } from '$lib/api/events';
+import { pushToast } from '$lib/components/toast/toast-provider.svelte';
 import { EntityState } from './entity-state.svelte';
+import layout from './layout-state.svelte';
 import { StateProvider } from './state-provider.svelte';
 
 const provider = new StateProvider(
@@ -15,6 +17,17 @@ export function getSignalTypeState(entityId: string) {
 export async function loadSignalType(entityId: string) {
 	const signalType = await SignalTypeService.Get(entityId);
 	provider.add(signalType);
+}
+
+export async function deleteSignalType(entityId: string) {
+	try {
+		await SignalTypeService.Delete(entityId);
+		provider.remove(entityId);
+		layout.closeIfOpen(entityId);
+	} catch (error) {
+		pushToast('error', 'Error', 'Operation failed');
+		console.error(error);
+	}
 }
 
 class SignalTypeState extends EntityState<SignalType> {

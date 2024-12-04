@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/squadracorsepolito/acmelib"
 )
 
@@ -111,27 +113,74 @@ func (s *SignalTypeService) Create(kind SignalTypeKind, name, desc string, size 
 
 	s.mux.Lock()
 	defer s.mux.Unlock()
-	s.pool[sigType.EntityID()] = sigType
 
+	s.addEntity(sigType)
 	s.sendSidebarAdd(sigType)
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalType,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			s.deleteEntity(sigType.EntityID().String())
+			s.sendSidebarDelete(sigType)
+
+			return s.converterFn(sigType), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			s.addEntity(sigType)
+			s.sendSidebarAdd(sigType)
+
+			return s.converterFn(sigType), nil
+		},
+	)
 
 	return s.converterFn(sigType), nil
 }
 
-func (s *SignalTypeService) GetInvalidNames(entityID string) []string {
-	s.mux.RLock()
-	defer s.mux.RUnlock()
-
-	names := []string{}
-	for _, tmpSigType := range s.pool {
-		if tmpSigType.EntityID() == acmelib.EntityID(entityID) {
-			continue
-		}
-
-		names = append(names, tmpSigType.Name())
+func (s *SignalTypeService) Delete(entityID string) error {
+	sigType, err := s.getEntity(entityID)
+	if err != nil {
+		return err
 	}
 
-	return names
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	if sigType.ReferenceCount() > 0 {
+		return fmt.Errorf("signal type %s is referenced %d times", sigType.Name(), sigType.ReferenceCount())
+	}
+
+	s.deleteEntity(entityID)
+	s.sendSidebarDelete(sigType)
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalType,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			s.addEntity(sigType)
+			s.sendSidebarAdd(sigType)
+
+			return s.converterFn(sigType), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			s.deleteEntity(sigType.EntityID().String())
+			s.sendSidebarDelete(sigType)
+
+			return s.converterFn(sigType), nil
+		},
+	)
+
+	return nil
 }
 
 func (s *SignalTypeService) UpdateName(entityID string, name string) (SignalType, error) {

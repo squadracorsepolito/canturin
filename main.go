@@ -70,14 +70,14 @@ func main() {
 			"ctrl+z": func(w *application.WebviewWindow) {
 				// historyService.Undo()
 				// historyService.emitHistoryChange()
-				manager.historyService.Undo()
-				manager.historyService.emitHistoryChange()
+				manager.history.Undo()
+				manager.history.emitHistoryChange()
 			},
 			"ctrl+y": func(w *application.WebviewWindow) {
 				// historyService.Redo()
 				// historyService.emitHistoryChange()
-				manager.historyService.Redo()
-				manager.historyService.emitHistoryChange()
+				manager.history.Redo()
+				manager.history.emitHistoryChange()
 			},
 		},
 

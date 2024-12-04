@@ -86,6 +86,16 @@ func newNodeService() *NodeService {
 	}
 }
 
+func (s *NodeService) sendSidebarAdd(node *acmelib.Node) {
+	item := newNodeSidebarItem(node)
+	manager.sidebar.sendAdd(newSidebarAddReq(item, SidebarNodesPrefix))
+
+	for _, nodeInt := range node.Interfaces() {
+		tmpItem := newMessageNodeGroupSidebarItem(nodeInt)
+		manager.sidebar.sendAdd(newSidebarAddReq(tmpItem, nodeInt.ParentBus().String()))
+	}
+}
+
 func (s *NodeService) sendSidebarUpdateName(node *acmelib.Node) {
 	manager.sidebar.sendUpdateName(newSidebarUpdateNameReq(node.EntityID().String(), node.Name()))
 
@@ -97,18 +107,13 @@ func (s *NodeService) sendSidebarUpdateName(node *acmelib.Node) {
 	}
 }
 
-func (s *NodeService) GetInvalidNames(entityID string) []string {
-	s.mux.Lock()
-	defer s.mux.Unlock()
+func (s *NodeService) sendSidebarDelete(node *acmelib.Node) {
+	manager.sidebar.sendDelete(newSidebarDeleteReq(node.EntityID().String()))
 
-	names := []string{}
-	for _, tmpNode := range s.pool {
-		if tmpNode.EntityID() != acmelib.EntityID(entityID) {
-			names = append(names, tmpNode.Name())
-		}
+	for _, nodeInt := range node.Interfaces() {
+		nodeIntKey := manager.sidebar.getMessageNodeGroupKey(nodeInt)
+		manager.sidebar.sendDelete(newSidebarDeleteReq(nodeIntKey))
 	}
-
-	return names
 }
 
 func (s *NodeService) GetInvalidIDs(entityID string) []uint {
@@ -273,7 +278,7 @@ func (s *NodeService) AttachBus(nodeEntID string, intNumber int, busEntID string
 		return Node{}, err
 	}
 
-	bus, err := manager.busService.getEntity(busEntID)
+	bus, err := manager.bus.getEntity(busEntID)
 	if err != nil {
 		return Node{}, err
 	}
@@ -365,7 +370,7 @@ func (s *NodeService) RemoveSentMessages(nodeEntID string, intNumber int, messag
 			return Node{}, err
 		}
 
-		proxy.pushSidebarRemove(tmpEntID)
+		manager.sidebar.sendDelete(newSidebarDeleteReq(tmpEntID.String()))
 	}
 
 	proxy.pushHistoryOperation(
@@ -379,7 +384,8 @@ func (s *NodeService) RemoveSentMessages(nodeEntID string, intNumber int, messag
 					return Node{}, err
 				}
 
-				proxy.pushSidebarAdd(SidebarNodeKindMessage, tmpMsg.EntityID(), node.EntityID(), tmpMsg.Name())
+				msgNodeKey := manager.sidebar.getMessageNodeGroupKey(nodeInt)
+				manager.sidebar.sendAdd(newSidebarAddReq(newMessageSidebarItem(tmpMsg), msgNodeKey))
 			}
 
 			return s.converterFn(node), nil
@@ -395,7 +401,7 @@ func (s *NodeService) RemoveSentMessages(nodeEntID string, intNumber int, messag
 					return Node{}, err
 				}
 
-				proxy.pushSidebarRemove(tmpEntID)
+				manager.sidebar.sendDelete(newSidebarDeleteReq(tmpEntID.String()))
 			}
 
 			return s.converterFn(node), nil

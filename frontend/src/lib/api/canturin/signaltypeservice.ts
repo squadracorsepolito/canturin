@@ -14,6 +14,11 @@ export function Create(kind: $models.SignalTypeKind, name: string, desc: string,
     return $resultPromise;
 }
 
+export function Delete(entityID: string): Promise<void> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(2278708154, entityID) as any;
+    return $resultPromise;
+}
+
 export function Get(entityID: string): Promise<$models.SignalType> & { cancel(): void } {
     let $resultPromise = $Call.ByID(2443930791, entityID) as any;
     return $resultPromise;

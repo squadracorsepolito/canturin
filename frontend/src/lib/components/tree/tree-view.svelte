@@ -1,6 +1,6 @@
 <script lang="ts" generics="T extends {[K in keyof T]: any } & {children?: T[] | null} ">
 	import { uniqueId, type KeyOfString } from '$lib/utils';
-	import { normalizeProps, useMachine } from '@zag-js/svelte';
+	import { mergeProps, normalizeProps, useMachine } from '@zag-js/svelte';
 	import * as tree from '@zag-js/tree-view';
 	import { AddIcon, AltArrowIcon, CollapseIcon } from '../icon';
 	import type { Component } from 'svelte';
@@ -8,23 +8,17 @@
 
 	type Props = {
 		root: T;
-		selectedValue: string;
 		valueKey: KeyOfString<T>;
 		labelKey: KeyOfString<T>;
 		getIcon: (node: T) => Component<IconProps>;
-		onadd?: () => void;
 		onselect?: (value: string) => void;
+		onadd?: (value: string) => void;
+		ondelete?: (value: string) => void;
 	};
 
-	let {
-		root,
-		selectedValue = $bindable(),
-		valueKey,
-		labelKey,
-		getIcon,
-		onselect,
-		onadd
-	}: Props = $props();
+	let { root, valueKey, labelKey, getIcon, onselect, onadd, ondelete }: Props = $props();
+
+	let selectedValue = $state('');
 
 	const collection = tree.collection({
 		rootNode: root,
@@ -46,6 +40,19 @@
 	const api = $derived(tree.connect(snapshot, send, normalizeProps));
 
 	const RootIcon = getIcon(root);
+
+	const treeProps = $derived(
+		mergeProps(api.getTreeProps(), {
+			onkeydown: (event: KeyboardEvent) => {
+				if (event.key !== 'Delete' || !selectedValue) {
+					return;
+				}
+
+				ondelete?.(selectedValue);
+				selectedValue = '';
+			}
+		})
+	);
 </script>
 
 {#snippet treeNode(node: T, indexPath: number[])}
@@ -105,7 +112,9 @@
 
 		<button
 			onclick={() => {
-				onadd?.();
+				if (!selectedValue) return;
+
+				onadd?.(selectedValue);
 			}}
 			class="rounded-btn btn-ghost p-1"
 		>
@@ -117,7 +126,7 @@
 		</button>
 	</div>
 
-	<div {...api.getTreeProps()}>
+	<div {...treeProps}>
 		{#if collection.rootNode.children}
 			{#each collection.rootNode.children as child, idx}
 				{@render treeNode(child, [idx])}

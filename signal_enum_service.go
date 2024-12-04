@@ -95,27 +95,74 @@ func (s *SignalEnumService) Create(name, desc string, minSize int) (SignalEnum, 
 
 	s.mux.Lock()
 	defer s.mux.Unlock()
-	s.pool[sigEnum.EntityID()] = sigEnum
 
+	s.addEntity(sigEnum)
 	s.sendSidebarAdd(sigEnum)
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalEnum,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			s.deleteEntity(sigEnum.EntityID().String())
+			s.sendSidebarDelete(sigEnum)
+
+			return s.converterFn(sigEnum), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			s.addEntity(sigEnum)
+			s.sendSidebarAdd(sigEnum)
+
+			return s.converterFn(sigEnum), nil
+		},
+	)
 
 	return s.converterFn(sigEnum), nil
 }
 
-func (s *SignalEnumService) GetInvalidNames(entityID string) []string {
-	s.mux.RLock()
-	defer s.mux.RUnlock()
-
-	names := []string{}
-	for _, tmpSigType := range s.pool {
-		if tmpSigType.EntityID() == acmelib.EntityID(entityID) {
-			continue
-		}
-
-		names = append(names, tmpSigType.Name())
+func (s *SignalEnumService) Delete(entityID string) error {
+	sigEnum, err := s.getEntity(entityID)
+	if err != nil {
+		return err
 	}
 
-	return names
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	if sigEnum.ReferenceCount() > 0 {
+		return fmt.Errorf("signal enum %s is referenced %d times", sigEnum.Name(), sigEnum.ReferenceCount())
+	}
+
+	s.deleteEntity(entityID)
+	s.sendSidebarDelete(sigEnum)
+
+	proxy.pushHistoryOperation(
+		operationDomainSignalEnum,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			s.addEntity(sigEnum)
+			s.sendSidebarAdd(sigEnum)
+
+			return s.converterFn(sigEnum), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
+
+			s.deleteEntity(sigEnum.EntityID().String())
+			s.sendSidebarDelete(sigEnum)
+
+			return s.converterFn(sigEnum), nil
+		},
+	)
+
+	return nil
 }
 
 func (s *SignalEnumService) UpdateName(entityID string, name string) (SignalEnum, error) {

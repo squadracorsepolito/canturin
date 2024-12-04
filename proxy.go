@@ -7,11 +7,6 @@ import (
 type appProxy struct {
 	network *acmelib.Network
 
-	sidebarLoadCh   chan *sidebarLoadReq
-	sidebarUpdateCh chan *sidebarUpdateReq
-	sidebarAddCh    chan *sidebarAddReq
-	sidebarRemoveCh chan *sidebarRemoveReq
-
 	historyOperationCh chan *operation
 
 	busCh     chan *acmelib.Bus
@@ -25,10 +20,6 @@ type appProxy struct {
 
 func newAppProxy() *appProxy {
 	return &appProxy{
-		sidebarLoadCh:   make(chan *sidebarLoadReq),
-		sidebarUpdateCh: make(chan *sidebarUpdateReq),
-		sidebarAddCh:    make(chan *sidebarAddReq),
-		sidebarRemoveCh: make(chan *sidebarRemoveReq),
 
 		historyOperationCh: make(chan *operation),
 
@@ -39,34 +30,6 @@ func newAppProxy() *appProxy {
 		sigTypeCh:    make(chan *acmelib.SignalType),
 		sigUnitCh:    make(chan *acmelib.SignalUnit),
 		signalEnumCh: make(chan *acmelib.SignalEnum),
-	}
-}
-
-func (p *appProxy) pushSidebarLoad(network *acmelib.Network) {
-	p.sidebarLoadCh <- &sidebarLoadReq{
-		network: network,
-	}
-}
-
-func (p *appProxy) pushSidebarUpdate(entID acmelib.EntityID, name string) {
-	p.sidebarUpdateCh <- &sidebarUpdateReq{
-		entityID: entID,
-		name:     name,
-	}
-}
-
-func (p *appProxy) pushSidebarAdd(kind SidebarNodeKind, entID, parentID acmelib.EntityID, name string) {
-	p.sidebarAddCh <- &sidebarAddReq{
-		kind:     kind,
-		entityID: entID,
-		name:     name,
-		parentID: parentID,
-	}
-}
-
-func (p *appProxy) pushSidebarRemove(entID acmelib.EntityID) {
-	p.sidebarRemoveCh <- &sidebarRemoveReq{
-		entityID: entID,
 	}
 }
 

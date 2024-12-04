@@ -46,20 +46,6 @@ func newBusService() *BusService {
 	}
 }
 
-func (s *BusService) GetInvalidNames(entityID string) []string {
-	s.mux.Lock()
-	defer s.mux.Unlock()
-
-	names := []string{}
-	for _, tmpBus := range s.pool {
-		if tmpBus.EntityID() != acmelib.EntityID(entityID) {
-			names = append(names, tmpBus.Name())
-		}
-	}
-
-	return names
-}
-
 func (s *BusService) ListBase() []BusBase {
 	s.mux.Lock()
 	defer s.mux.Unlock()

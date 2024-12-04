@@ -57,6 +57,10 @@ func (s *service[T, M]) OnShutdown() {
 	close(s.poolInsCh)
 }
 
+func (s *service[T, M]) addEntity(item T) {
+	s.pool[item.EntityID()] = item
+}
+
 func (s *service[T, M]) getEntity(entityID string) (T, error) {
 	s.mux.RLock()
 	defer s.mux.RUnlock()
@@ -67,6 +71,10 @@ func (s *service[T, M]) getEntity(entityID string) (T, error) {
 	}
 
 	return item, nil
+}
+
+func (s *service[T, M]) deleteEntity(entityID string) {
+	delete(s.pool, acmelib.EntityID(entityID))
 }
 
 func (s *service[T, M]) Get(entityID string) (dummyRes M, _ error) {
@@ -85,5 +93,21 @@ func (s *service[T, M]) GetNames() []string {
 	for _, item := range s.pool {
 		names = append(names, item.Name())
 	}
+	return names
+}
+
+func (s *service[T, M]) GetInvalidNames(entityID string) []string {
+	s.mux.RLock()
+	defer s.mux.RUnlock()
+
+	names := []string{}
+	for _, tmpEnt := range s.pool {
+		if tmpEnt.EntityID() == acmelib.EntityID(entityID) {
+			continue
+		}
+
+		names = append(names, tmpEnt.Name())
+	}
+
 	return names
 }
