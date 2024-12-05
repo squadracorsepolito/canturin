@@ -44,12 +44,14 @@
 	const treeProps = $derived(
 		mergeProps(api.getTreeProps(), {
 			onkeydown: (event: KeyboardEvent) => {
-				if (event.key !== 'Delete' || !selectedValue) {
+				if (!selectedValue) {
 					return;
 				}
 
-				ondelete?.(selectedValue);
-				selectedValue = '';
+				if (event.key === 'Delete' || (event.metaKey && event.key === 'Backspace')) {
+					ondelete?.(selectedValue);
+					selectedValue = '';
+				}
 			}
 		})
 	);
