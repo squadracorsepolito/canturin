@@ -114,7 +114,7 @@
 				}
 
 				&[data-placeholder-shown] {
-					@apply text-dimmed italic;
+					@apply opacity-85 italic;
 				}
 			}
 		}

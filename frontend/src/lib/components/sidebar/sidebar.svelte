@@ -80,12 +80,17 @@
 				break;
 		}
 	}
+
+	$effect(() => {
+		s.setSelectedItemId(layout.openPanelId);
+	});
 </script>
 
 <div class="overflow-y-auto">
 	{#if s.sidebar}
 		<TreeView
 			root={s.sidebar.root}
+			bind:selectedValue={s.selectedItemId}
 			valueKey="id"
 			labelKey="name"
 			getIcon={getTreeViewIcon}

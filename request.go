@@ -4,7 +4,7 @@ type request struct {
 	data any
 }
 
-// newRequest returns a new request generic request.
+// newRequest returns a new generic request.
 //
 // IMPORTANT: the data attribute must be a pointer.
 func newRequest(data any) *request {
@@ -56,7 +56,7 @@ func (r *request) toUpdateBaudrate() *UpdateBaudrateReq {
 }
 
 type UpdateBusTypeReq struct {
-	BusType BusType `json:"busType"`
+	Type BusType `json:"type"`
 }
 
 func (r *request) toUpdateBusType() *UpdateBusTypeReq {

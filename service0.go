@@ -184,7 +184,7 @@ func (s *service0[E, R, H]) sendHistoryOp(undo, redo func() (E, error)) {
 	)
 }
 
-func (s *service0[E, R, H]) process(entityID string, req *request, handler func(E, *request) (*response[E], error)) (dummyRes R, _ error) {
+func (s *service0[E, R, H]) handle(entityID string, reqDataPtr any, handler func(E, *request, *response[E]) error) (dummyRes R, _ error) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
@@ -193,13 +193,15 @@ func (s *service0[E, R, H]) process(entityID string, req *request, handler func(
 		return dummyRes, err
 	}
 
-	handlerRes, err := handler(ent, req)
-	if err != nil {
+	req := newRequest(reqDataPtr)
+	res := newResponse[E]()
+
+	if err := handler(ent, req, res); err != nil {
 		return dummyRes, err
 	}
 
-	if handlerRes.changed {
-		s.sendHistoryOp(handlerRes.undo, handlerRes.redo)
+	if res.changed {
+		s.sendHistoryOp(res.undo, res.redo)
 	}
 
 	return s.hanlders.toResponse(ent), nil

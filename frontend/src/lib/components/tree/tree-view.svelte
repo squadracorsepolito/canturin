@@ -3,11 +3,12 @@
 	import { mergeProps, normalizeProps, useMachine } from '@zag-js/svelte';
 	import * as tree from '@zag-js/tree-view';
 	import { AddIcon, AltArrowIcon, CollapseIcon } from '../icon';
-	import type { Component } from 'svelte';
+	import { untrack, type Component } from 'svelte';
 	import type { IconProps } from '../icon/types';
 
 	type Props = {
 		root: T;
+		selectedValue: string;
 		valueKey: KeyOfString<T>;
 		labelKey: KeyOfString<T>;
 		getIcon: (node: T) => Component<IconProps>;
@@ -16,9 +17,16 @@
 		ondelete?: (value: string) => void;
 	};
 
-	let { root, valueKey, labelKey, getIcon, onselect, onadd, ondelete }: Props = $props();
-
-	let selectedValue = $state('');
+	let {
+		root,
+		selectedValue = $bindable(),
+		valueKey,
+		labelKey,
+		getIcon,
+		onselect,
+		onadd,
+		ondelete
+	}: Props = $props();
 
 	const collection = tree.collection({
 		rootNode: root,
@@ -34,10 +42,21 @@
 				onselect?.(details.selectedValue[0]);
 				selectedValue = details.selectedValue[0];
 			}
-		})
+		}),
+		{
+			context: {
+				get selectedValue() {
+					return [selectedValue];
+				}
+			}
+		}
 	);
 
 	const api = $derived(tree.connect(snapshot, send, normalizeProps));
+
+	$effect(() => {
+		untrack(() => api.expandParent)(selectedValue);
+	});
 
 	const RootIcon = getIcon(root);
 

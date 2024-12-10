@@ -37,8 +37,8 @@ class BusState extends EntityState<Bus> {
 		this.update(BusService.UpdateDesc(this.entity.entityId, { desc }));
 	}
 
-	updateBusType(busType: BusType) {
-		this.update(BusService.UpdateBusType(this.entity.entityId, { busType }));
+	updateType(type: BusType) {
+		this.update(BusService.UpdateType(this.entity.entityId, { type: type }));
 	}
 
 	updateBaudrate(baudrate: number) {

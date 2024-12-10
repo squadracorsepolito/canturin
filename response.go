@@ -6,10 +6,16 @@ type response[T entity] struct {
 	redo    func() (T, error)
 }
 
-func newUnchangedResponse[T entity]() *response[T] {
+func newResponse[T entity]() *response[T] {
 	return &response[T]{changed: false}
 }
 
-func newResponse[T entity](undo, redo func() (T, error)) *response[T] {
-	return &response[T]{changed: true, undo: undo, redo: redo}
+func (r *response[T]) setUndo(undo func() (T, error)) {
+	r.undo = undo
+	r.changed = true
+}
+
+func (r *response[T]) setRedo(redo func() (T, error)) {
+	r.redo = redo
+	r.changed = true
 }

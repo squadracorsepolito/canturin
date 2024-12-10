@@ -13,6 +13,15 @@ import * as time$0 from "../time/models.js";
 // @ts-ignore: Unused imports
 import * as $internal from "./internal.js";
 
+export interface AttachedNode {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+    "id": number;
+    "interfaceNumber": number;
+}
+
 export interface BaseEntity {
     "entityId": string;
     "name": string;
@@ -27,7 +36,7 @@ export interface Bus {
     "createTime": time$0.Time;
     "type": BusType;
     "baudrate": number;
-    "attachedInterfaces": NodeInterface[] | null;
+    "attachedNodes": AttachedNode[] | null;
 }
 
 export enum BusType {
@@ -197,7 +206,7 @@ export interface UpdateBaudrateReq {
 }
 
 export interface UpdateBusTypeReq {
-    "busType": BusType;
+    "type": BusType;
 }
 
 export interface UpdateDescReq {

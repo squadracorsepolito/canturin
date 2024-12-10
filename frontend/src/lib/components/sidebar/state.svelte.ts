@@ -28,6 +28,7 @@ export class SidebarState {
 	});
 
 	sidebar = $state<Sidebar>();
+	selectedItemId = $state('');
 
 	constructor() {
 		wails.On(SidebarLoad, () => {
@@ -190,5 +191,9 @@ export class SidebarState {
 		}
 
 		return 'none';
+	}
+
+	setSelectedItemId(id: string) {
+		this.selectedItemId = id;
 	}
 }
