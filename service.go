@@ -12,8 +12,8 @@ import (
 type serviceConverterFn[T entity, M any] func(T) M
 
 type service[T entity, M any] struct {
-	pool      map[acmelib.EntityID]T
-	poolInsCh chan T
+	pool   map[acmelib.EntityID]T
+	loadCh chan T
 
 	mux sync.RWMutex
 
@@ -22,10 +22,10 @@ type service[T entity, M any] struct {
 	stopCh chan struct{}
 }
 
-func newService[T entity, M any](poolInsCh chan T, converterFn serviceConverterFn[T, M]) *service[T, M] {
+func newService[T entity, M any](converterFn serviceConverterFn[T, M]) *service[T, M] {
 	return &service[T, M]{
-		pool:      make(map[acmelib.EntityID]T),
-		poolInsCh: poolInsCh,
+		pool:   make(map[acmelib.EntityID]T),
+		loadCh: make(chan T),
 
 		converterFn: converterFn,
 
@@ -36,7 +36,7 @@ func newService[T entity, M any](poolInsCh chan T, converterFn serviceConverterF
 func (s *service[T, M]) run() {
 	for {
 		select {
-		case item := <-s.poolInsCh:
+		case item := <-s.loadCh:
 			s.mux.Lock()
 			s.pool[item.EntityID()] = item
 			s.mux.Unlock()
@@ -54,7 +54,11 @@ func (s *service[T, M]) OnStartup(_ context.Context, _ application.ServiceOption
 
 func (s *service[T, M]) OnShutdown() {
 	s.stopCh <- struct{}{}
-	close(s.poolInsCh)
+	close(s.loadCh)
+}
+
+func (s *service[T, M]) sendLoad(item T) {
+	s.loadCh <- item
 }
 
 func (s *service[T, M]) addEntity(item T) {

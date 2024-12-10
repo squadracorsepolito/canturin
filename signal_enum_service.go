@@ -69,7 +69,7 @@ type SignalEnumService struct {
 
 func newSignalEnumService() *SignalEnumService {
 	return &SignalEnumService{
-		service: newService(proxy.signalEnumCh, signalEnumConverter),
+		service: newService(signalEnumConverter),
 	}
 }
 

@@ -30,7 +30,7 @@ func getNodeMessage(msg *acmelib.Message) NodeMessage {
 
 type NodeInterface struct {
 	Number           int           `json:"number"`
-	AttachedBus      BusBase       `json:"attachedBus"`
+	AttachedBus      BaseEntity    `json:"attachedBus"`
 	SentMessages     []NodeMessage `json:"sentMessages"`
 	ReceivedMessages []NodeMessage `json:"receivedMessages"`
 }
@@ -47,7 +47,7 @@ func getNodeInterface(nodeInt *acmelib.NodeInterface) NodeInterface {
 	}
 
 	return NodeInterface{
-		AttachedBus:      getBusBase(nodeInt.ParentBus()),
+		AttachedBus:      getBaseEntity(nodeInt.ParentBus()),
 		Number:           nodeInt.Number(),
 		SentMessages:     sentMessages,
 		ReceivedMessages: receivedMessages,
@@ -82,7 +82,7 @@ func getNode(node *acmelib.Node) Node {
 
 func newNodeService() *NodeService {
 	return &NodeService{
-		service: newService(proxy.nodeCh, getNode),
+		service: newService(getNode),
 	}
 }
 
@@ -91,6 +91,10 @@ func (s *NodeService) sendSidebarAdd(node *acmelib.Node) {
 	manager.sidebar.sendAdd(newSidebarAddReq(item, SidebarNodesPrefix))
 
 	for _, nodeInt := range node.Interfaces() {
+		if nodeInt.ParentBus() == nil {
+			continue
+		}
+
 		tmpItem := newMessageNodeGroupSidebarItem(nodeInt)
 		manager.sidebar.sendAdd(newSidebarAddReq(tmpItem, nodeInt.ParentBus().String()))
 	}
@@ -100,6 +104,10 @@ func (s *NodeService) sendSidebarUpdateName(node *acmelib.Node) {
 	manager.sidebar.sendUpdateName(newSidebarUpdateNameReq(node.EntityID().String(), node.Name()))
 
 	for _, nodeInt := range node.Interfaces() {
+		if nodeInt.ParentBus() == nil {
+			continue
+		}
+
 		nodeIntKey := manager.sidebar.getMessageNodeGroupKey(nodeInt)
 		nodeIntName := manager.sidebar.getMessageNodeGroupName(nodeInt)
 
@@ -111,6 +119,10 @@ func (s *NodeService) sendSidebarDelete(node *acmelib.Node) {
 	manager.sidebar.sendDelete(newSidebarDeleteReq(node.EntityID().String()))
 
 	for _, nodeInt := range node.Interfaces() {
+		if nodeInt.ParentBus() == nil {
+			continue
+		}
+
 		nodeIntKey := manager.sidebar.getMessageNodeGroupKey(nodeInt)
 		manager.sidebar.sendDelete(newSidebarDeleteReq(nodeIntKey))
 	}
@@ -128,6 +140,18 @@ func (s *NodeService) GetInvalidIDs(entityID string) []uint {
 	}
 
 	return ids
+}
+
+func (s *NodeService) Create(name, desc string, id, interfaceCount int) (Node, error) {
+	node := acmelib.NewNode(name, acmelib.NodeID(id), interfaceCount)
+	node.SetDesc(desc)
+
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	s.sendSidebarAdd(node)
+
+	return s.converterFn(node), nil
 }
 
 func (s *NodeService) UpdateName(entityID, name string) (Node, error) {

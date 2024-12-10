@@ -13,20 +13,31 @@ import * as time$0 from "../time/models.js";
 // @ts-ignore: Unused imports
 import * as $internal from "./internal.js";
 
+export interface BaseEntity {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+}
+
 export interface Bus {
     "entityId": string;
     "name": string;
     "desc": string;
     "createTime": time$0.Time;
-    "nodeInterfaces": NodeInterface[] | null;
+    "type": BusType;
+    "baudrate": number;
+    "attachedInterfaces": NodeInterface[] | null;
 }
 
-export interface BusBase {
-    "entityId": string;
-    "name": string;
-    "desc": string;
-    "createTime": time$0.Time;
-}
+export enum BusType {
+    /**
+     * The Go zero value for the underlying type of the enum.
+     */
+    $zero = "",
+
+    BusTypeCAN2A = "CAN_2.0A",
+};
 
 export interface History {
     "operationCount": number;
@@ -66,7 +77,7 @@ export interface Node0 {
 
 export interface NodeInterface {
     "number": number;
-    "attachedBus": BusBase;
+    "attachedBus": BaseEntity;
     "sentMessages": NodeMessage[] | null;
     "receivedMessages": NodeMessage[] | null;
 }
@@ -179,4 +190,16 @@ export interface SignalUnit {
     "symbol": string;
     "referenceCount": number;
     "references": SignalReference[] | null;
+}
+
+export interface UpdateBaudrateReq {
+    "baudrate": number;
+}
+
+export interface UpdateBusTypeReq {
+    "busType": BusType;
+}
+
+export interface UpdateDescReq {
+    "desc": string;
 }

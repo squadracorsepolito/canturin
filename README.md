@@ -13,6 +13,7 @@
 
 -   [go](https://go.dev/) at least v1.22.4
 -   [node js](https://nodejs.org/en) at least v20.16.0
+-   [pnpm](https://pnpm.io/installation) at least v9.x
 
 ## Run the Project
 
@@ -21,6 +22,9 @@
     ```
     go install -v github.com/wailsapp/wails/v3/cmd/wails3@latest
     ```
+
+> [!IMPORTANT]
+> Check wails3 is at version `v3.0.0-alpha.8.3` with the command `wails3 version`.
 
 2. Clone this repo.
 

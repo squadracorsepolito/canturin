@@ -3,6 +3,10 @@
 	import Select from '$lib/components/select/select.svelte';
 	import SortableList from '$lib/components/sortable/sortable-list.svelte';
 	import { reorder } from '@atlaskit/pragmatic-drag-and-drop/reorder';
+	import { SignalEnumPanel, SignalTypePanel, BusPanel, NodePanel } from '$lib/panel';
+	import MessagePanel from '$lib/panel/message-panel.svelte';
+	import SignalUnitPanel from '$lib/panel/signal-unit-panel.svelte';
+	import layout from '$lib/state/layout-state.svelte';
 
 	let items = $state([
 		{
@@ -53,12 +57,26 @@
 	$inspect(selected);
 </script>
 
-<Select items={selectData} bind:selected labelKey="label" valueKey="value" />
+{#if layout.openPanelType === 'bus'}
+	<BusPanel entityId={layout.openPanelId} />
+{:else if layout.openPanelType === 'node'}
+	<NodePanel entityId={layout.openPanelId} />
+{:else if layout.openPanelType === 'message'}
+	<MessagePanel entityId={layout.openPanelId} />
+{:else if layout.openPanelType === 'signal_type'}
+	<SignalTypePanel entityId={layout.openPanelId} />
+{:else if layout.openPanelType === 'signal_unit'}
+	<SignalUnitPanel entityId={layout.openPanelId} />
+{:else if layout.openPanelType === 'signal_enum'}
+	<SignalEnumPanel entityId={layout.openPanelId} />
+{:else}
+	<Select items={selectData} bind:selected labelKey="label" valueKey="value" />
 
-<Divider></Divider>
+	<Divider></Divider>
 
-<SortableList {items} instanceId="items" reorder={reorderItems}>
-	{#snippet itemBody({ item: { label } })}
-		<div class="p-3">{label}</div>
-	{/snippet}
-</SortableList>
+	<SortableList {items} instanceId="items" reorder={reorderItems}>
+		{#snippet itemBody({ item: { label } })}
+			<div class="p-3">{label}</div>
+		{/snippet}
+	</SortableList>
+{/if}

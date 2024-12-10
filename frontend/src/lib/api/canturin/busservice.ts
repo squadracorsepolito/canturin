@@ -19,18 +19,23 @@ export function GetInvalidNames(entityID: string): Promise<string[] | null> & { 
     return $resultPromise;
 }
 
-export function GetNames(): Promise<string[] | null> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(1992496223) as any;
-    return $resultPromise;
-}
-
-export function ListBase(): Promise<$models.BusBase[] | null> & { cancel(): void } {
+export function ListBase(): Promise<$models.BaseEntity[] | null> & { cancel(): void } {
     let $resultPromise = $Call.ByID(3115506830) as any;
     return $resultPromise;
 }
 
-export function UpdateDesc(entityID: string, desc: string): Promise<$models.Bus> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(982331387, entityID, desc) as any;
+export function UpdateBaudrate(entityID: string, req: $models.UpdateBaudrateReq): Promise<$models.Bus> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(4227651016, entityID, req) as any;
+    return $resultPromise;
+}
+
+export function UpdateBusType(entityID: string, req: $models.UpdateBusTypeReq): Promise<$models.Bus> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1520949396, entityID, req) as any;
+    return $resultPromise;
+}
+
+export function UpdateDesc(entityID: string, req: $models.UpdateDescReq): Promise<$models.Bus> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(982331387, entityID, req) as any;
     return $resultPromise;
 }
 

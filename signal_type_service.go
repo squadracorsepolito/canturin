@@ -57,7 +57,7 @@ func signalTypeConverter(sigType *acmelib.SignalType) SignalType {
 
 func newSignalTypeService() *SignalTypeService {
 	return &SignalTypeService{
-		service: newService(proxy.sigTypeCh, signalTypeConverter),
+		service: newService(signalTypeConverter),
 	}
 }
 

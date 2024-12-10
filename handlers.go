@@ -29,14 +29,14 @@ func loadNetwork(path string) {
 	sigEnums := make(map[acmelib.EntityID]*acmelib.SignalEnum)
 
 	for _, bus := range net.Buses() {
-		proxy.pushBus(bus)
+		manager.bus.sendLoad(bus)
 
 		for _, nodeInt := range bus.NodeInterfaces() {
 			tmpNode := nodeInt.Node()
 			nodes[tmpNode.EntityID()] = tmpNode
 
 			for _, msg := range nodeInt.SentMessages() {
-				proxy.pushMessage(msg)
+				manager.message.sendLoad(msg)
 
 				for _, sig := range msg.Signals() {
 					switch sig.Kind() {
@@ -64,18 +64,18 @@ func loadNetwork(path string) {
 	}
 
 	for _, node := range nodes {
-		proxy.pushNode(node)
+		manager.node.sendLoad(node)
 	}
 
 	for _, sigType := range sigTypes {
-		proxy.pushSignalType(sigType)
+		manager.signalType.sendLoad(sigType)
 	}
 
 	for _, sigUnit := range sigUnits {
-		proxy.pushSignalUnit(sigUnit)
+		manager.signalUnit.sendLoad(sigUnit)
 	}
 
 	for _, sigEnum := range sigEnums {
-		proxy.pushSignalEnum(sigEnum)
+		manager.signalEnum.sendLoad(sigEnum)
 	}
 }

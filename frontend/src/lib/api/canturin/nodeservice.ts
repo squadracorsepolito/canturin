@@ -14,6 +14,11 @@ export function AttachBus(nodeEntID: string, intNumber: number, busEntID: string
     return $resultPromise;
 }
 
+export function Create(name: string, desc: string, id: number, interfaceCount: number): Promise<$models.Node> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3044972449, name, desc, id, interfaceCount) as any;
+    return $resultPromise;
+}
+
 export function Get(entityID: string): Promise<$models.Node> & { cancel(): void } {
     let $resultPromise = $Call.ByID(963582531, entityID) as any;
     return $resultPromise;

@@ -1,4 +1,4 @@
-import { BusService, type Bus } from '$lib/api/canturin';
+import { BusService, BusType, type Bus } from '$lib/api/canturin';
 import { HistoryBusModify } from '$lib/api/events';
 import { EntityState } from '$lib/state/entity-state.svelte';
 import { StateProvider } from '$lib/state/state-provider.svelte';
@@ -34,6 +34,14 @@ class BusState extends EntityState<Bus> {
 	}
 
 	updateDesc(desc: string) {
-		this.update(BusService.UpdateDesc(this.entity.entityId, desc));
+		this.update(BusService.UpdateDesc(this.entity.entityId, { desc }));
+	}
+
+	updateBusType(busType: BusType) {
+		this.update(BusService.UpdateBusType(this.entity.entityId, { busType }));
+	}
+
+	updateBaudrate(baudrate: number) {
+		this.update(BusService.UpdateBaudrate(this.entity.entityId, { baudrate }));
 	}
 }

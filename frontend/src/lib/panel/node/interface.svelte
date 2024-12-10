@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { colorByName } from '$lib/actions/color-name.svelte';
-	import type { BusBase, NodeInterface, NodeMessage } from '$lib/api/canturin';
+	import type { BaseEntity, NodeInterface, NodeMessage } from '$lib/api/canturin';
 	import { Attribute } from '$lib/components/attribute';
 	import { IconButton, UnderlinedButton } from '$lib/components/button';
 	import { Collapsible } from '$lib/components/collapsible';
@@ -14,7 +14,7 @@
 	import { getNodeState } from './state.svelte';
 
 	type Props = {
-		buses: BusBase[];
+		buses: BaseEntity[];
 		int: NodeInterface;
 	} & PanelSectionProps;
 
@@ -22,7 +22,7 @@
 
 	const ns = getNodeState(entityId);
 
-	function handleAttachBus(bus: BusBase) {
+	function handleAttachBus(bus: BaseEntity) {
 		ns.attachBus(int.number, bus.entityId);
 	}
 
