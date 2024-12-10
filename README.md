@@ -40,7 +40,7 @@
 
     ```
     cd frontend
-    npm install
+    pnpm install
     ```
 
 5. Run the application in development mode (in the root folder):
