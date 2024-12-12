@@ -1,3 +1,6 @@
+import { BusType } from '$lib/api/canturin';
+import type { SegmentedControlOption } from '$lib/components/segmented-control/types';
+
 export type BaudrateSelectItem = {
 	label: string;
 	value: string;
@@ -29,4 +32,12 @@ export const baudrateItems = [
 	getSelectItemFromBaudrate(250_000),
 	getSelectItemFromBaudrate(500_000),
 	getSelectItemFromBaudrate(1_000_000)
+];
+
+export const busTypeOptions: SegmentedControlOption[] = [
+	{
+		label: 'CAN 2.0 A',
+		value: BusType.BusTypeCAN2A,
+		desc: '11 bit identifier, max payload 8 bytes, max speed 1 Mbit/s'
+	}
 ];

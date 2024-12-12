@@ -51,9 +51,11 @@ type service0[E entity, R any, H serviceHandler[E, R]] struct {
 
 	loadCh chan E
 	stopCh chan struct{}
+
+	sidebar *sidebarController
 }
 
-func newService0[E entity, R any, H serviceHandler[E, R]](kind serviceKind, handlers H) *service0[E, R, H] {
+func newService0[E entity, R any, H serviceHandler[E, R]](kind serviceKind, handlers H, sidebar *sidebarController) *service0[E, R, H] {
 	return &service0[E, R, H]{
 		kind: kind,
 
@@ -63,6 +65,8 @@ func newService0[E entity, R any, H serviceHandler[E, R]](kind serviceKind, hand
 
 		loadCh: make(chan E),
 		stopCh: make(chan struct{}),
+
+		sidebar: sidebar,
 	}
 }
 
@@ -75,7 +79,7 @@ func (s *service0[E, R, H]) run() {
 		select {
 		case ent := <-s.loadCh:
 			s.mux.Lock()
-			s.entities[ent.EntityID()] = ent
+			s.addEntity(ent)
 			s.mux.Unlock()
 
 		case <-s.stopCh:
@@ -94,46 +98,46 @@ func (s *service0[E, R, H]) OnShutdown() {
 	close(s.loadCh)
 }
 
-func (s *service0[E, R, H]) sendSidebarAdd(ent E) {
-	var item *sidebarItem
-	var parItemKey string
+// func (s *service0[E, R, H]) sendSidebarAdd(ent E) {
+// 	var item *sidebarItem
+// 	var parItemKey string
 
-	switch s.kind {
-	case serviceKindBus:
-		item = newSidebarItem(SidebarItemKindBus, ent.EntityID(), SidebarBusesPrefix, ent.Name())
-		parItemKey = SidebarBusesPrefix
+// 	switch s.kind {
+// 	case serviceKindBus:
+// 		item = newSidebarItem(SidebarItemKindBus, ent.EntityID(), SidebarBusesPrefix, ent.Name())
+// 		parItemKey = SidebarBusesPrefix
 
-	case serviceKindNode:
-		item = newSidebarItem(SidebarItemKindNode, ent.EntityID(), SidebarNodesPrefix, ent.Name())
-		parItemKey = SidebarNodesPrefix
+// 	case serviceKindNode:
+// 		item = newSidebarItem(SidebarItemKindNode, ent.EntityID(), SidebarNodesPrefix, ent.Name())
+// 		parItemKey = SidebarNodesPrefix
 
-	case serviceKindMessage:
-		item = newSidebarItem(SidebarItemKindMessage, ent.EntityID(), SidebarMessagesPrefix, ent.Name())
-		parItemKey = SidebarMessagesPrefix
+// 	case serviceKindMessage:
+// 		item = newSidebarItem(SidebarItemKindMessage, ent.EntityID(), SidebarMessagesPrefix, ent.Name())
+// 		parItemKey = SidebarMessagesPrefix
 
-	case serviceKindSignalType:
-		item = newSidebarItem(SidebarItemKindSignalType, ent.EntityID(), SidebarSignalTypesPrefix, ent.Name())
-		parItemKey = SidebarSignalTypesPrefix
+// 	case serviceKindSignalType:
+// 		item = newSidebarItem(SidebarItemKindSignalType, ent.EntityID(), SidebarSignalTypesPrefix, ent.Name())
+// 		parItemKey = SidebarSignalTypesPrefix
 
-	case serviceKindSignalUnit:
-		item = newSidebarItem(SidebarItemKindSignalUnit, ent.EntityID(), SidebarSignalUnitsPrefix, ent.Name())
-		parItemKey = SidebarSignalUnitsPrefix
+// 	case serviceKindSignalUnit:
+// 		item = newSidebarItem(SidebarItemKindSignalUnit, ent.EntityID(), SidebarSignalUnitsPrefix, ent.Name())
+// 		parItemKey = SidebarSignalUnitsPrefix
 
-	case serviceKindSignalEnum:
-		item = newSidebarItem(SidebarItemKindSignalEnum, ent.EntityID(), SidebarSignalEnumsPrefix, ent.Name())
-		parItemKey = SidebarSignalEnumsPrefix
-	}
+// 	case serviceKindSignalEnum:
+// 		item = newSidebarItem(SidebarItemKindSignalEnum, ent.EntityID(), SidebarSignalEnumsPrefix, ent.Name())
+// 		parItemKey = SidebarSignalEnumsPrefix
+// 	}
 
-	manager.sidebar.sendAdd(newSidebarAddReq(item, parItemKey))
-}
+// 	manager.sidebar.sendAdd(newSidebarAddReq(item, parItemKey))
+// }
 
-func (s *service0[E, R, H]) sendSidebarUpdateName(ent E) {
-	manager.sidebar.sendUpdateName(newSidebarUpdateNameReq(ent.EntityID().String(), ent.Name()))
-}
+// func (s *service0[E, R, H]) sendSidebarUpdateName(ent E) {
+// 	manager.sidebar.sendUpdateName(newSidebarUpdateNameReq(ent.EntityID().String(), ent.Name()))
+// }
 
-func (s *service0[E, R, H]) sendSidebarRemove(ent E) {
-	manager.sidebar.sendDelete(newSidebarDeleteReq(ent.EntityID().String()))
-}
+// func (s *service0[E, R, H]) sendSidebarRemove(ent E) {
+// 	manager.sidebar.sendDelete(newSidebarDeleteReq(ent.EntityID().String()))
+// }
 
 func (s *service0[E, R, H]) sendHistoryOp(undo, redo func() (E, error)) {
 	var opDomain operationDomain
@@ -207,6 +211,10 @@ func (s *service0[E, R, H]) handle(entityID string, reqDataPtr any, handler func
 	return s.hanlders.toResponse(ent), nil
 }
 
+func (s *service0[E, R, H]) addEntity(ent E) {
+	s.entities[ent.EntityID()] = ent
+}
+
 func (s *service0[E, R, H]) getEntity(entityID string) (E, error) {
 	ent, ok := s.entities[acmelib.EntityID(entityID)]
 	if !ok {
@@ -214,6 +222,10 @@ func (s *service0[E, R, H]) getEntity(entityID string) (E, error) {
 	}
 
 	return ent, nil
+}
+
+func (s *service0[E, R, H]) removeEntity(entityID string) {
+	delete(s.entities, acmelib.EntityID(entityID))
 }
 
 func (s *service0[E, R, H]) Get(entityID string) (dummyRes R, _ error) {

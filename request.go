@@ -15,6 +15,11 @@ func newRequest(data any) *request {
 // COMMON REQUESTS //
 /////////////////////
 
+type commonCreateReq struct {
+	Name string `json:"name"`
+	Desc string `json:"desc"`
+}
+
 type UpdateNameReq struct {
 	Name string `json:"name"`
 }
@@ -43,6 +48,21 @@ func (r *request) toUpdateDesc() *UpdateDescReq {
 // BUS REQUESTS //
 //////////////////
 
+type CreateBusReq struct {
+	commonCreateReq
+
+	BusType  BusType `json:"busType"`
+	Baudrate int     `json:"baudrate"`
+}
+
+func (r *request) toCreateBus() *CreateBusReq {
+	req, ok := r.data.(*CreateBusReq)
+	if !ok {
+		panic("cannot convert to CreateBusReq")
+	}
+	return req
+}
+
 type UpdateBaudrateReq struct {
 	Baudrate int `json:"baudrate"`
 }
@@ -56,7 +76,7 @@ func (r *request) toUpdateBaudrate() *UpdateBaudrateReq {
 }
 
 type UpdateBusTypeReq struct {
-	Type BusType `json:"type"`
+	BusType BusType `json:"busType"`
 }
 
 func (r *request) toUpdateBusType() *UpdateBusTypeReq {

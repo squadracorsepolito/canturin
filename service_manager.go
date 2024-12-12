@@ -15,11 +15,14 @@ type serviceManager struct {
 }
 
 func newServiceManager() *serviceManager {
+	sidebar := newSidebarService()
+	sidebarController := sidebar.getController()
+
 	return &serviceManager{
-		sidebar: newSidebarService(),
+		sidebar: sidebar,
 		history: newHistoryService(),
 
-		bus:        newBusService(),
+		bus:        newBusService(sidebarController),
 		node:       newNodeService(),
 		message:    newMessageService(),
 		signalType: newSignalTypeService(),

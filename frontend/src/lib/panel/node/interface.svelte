@@ -81,6 +81,7 @@
 				<Select
 					items={buses}
 					valueKey="entityId"
+					name={`node-${int.number}-bus`}
 					labelKey="name"
 					bind:selected={int.attachedBus}
 					filter={(item) => {

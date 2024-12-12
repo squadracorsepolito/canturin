@@ -83,6 +83,8 @@
 		</FormField>
 	</div>
 
+	<Divider />
+
 	<FormField {...text.kind}>
 		<SegmentedControl
 			name="signal-type-kind"

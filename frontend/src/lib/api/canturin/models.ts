@@ -48,6 +48,13 @@ export enum BusType {
     BusTypeCAN2A = "CAN_2.0A",
 };
 
+export interface CreateBusReq {
+    "name": string;
+    "desc": string;
+    "busType": BusType;
+    "baudrate": number;
+}
+
 export interface History {
     "operationCount": number;
     "currentIndex": number;
@@ -206,7 +213,7 @@ export interface UpdateBaudrateReq {
 }
 
 export interface UpdateBusTypeReq {
-    "type": BusType;
+    "busType": BusType;
 }
 
 export interface UpdateDescReq {

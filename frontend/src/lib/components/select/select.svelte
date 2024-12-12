@@ -7,9 +7,9 @@
 	type Props = {
 		items: T[];
 		selected: T;
+		name: string;
 		valueKey: KeyOfString<T>;
 		labelKey: KeyOfString<T>;
-		label?: string;
 		onselect?: (item: T) => void;
 		filter?: (item: T) => boolean;
 	};
@@ -17,9 +17,9 @@
 	let {
 		items,
 		selected = $bindable(),
+		name,
 		valueKey,
 		labelKey,
-		label,
 		onselect,
 		filter
 	}: Props = $props();
@@ -35,6 +35,7 @@
 		select.machine({
 			id: uniqueId(),
 			collection,
+			name: name,
 			onValueChange: (details) => {
 				if (details.items.length === 0) {
 					return;
@@ -57,12 +58,15 @@
 </script>
 
 <div {...api.getRootProps()}>
-	<div {...api.getControlProps()}>
-		{#if label}
-			<!-- svelte-ignore a11y_label_has_associated_control -->
-			<label {...api.getLabelProps()}>{label}</label>
-		{/if}
+	<select {...api.getHiddenSelectProps()}>
+		{#each items as item}
+			<option value={item[valueKey]}>
+				{item[labelKey]}
+			</option>
+		{/each}
+	</select>
 
+	<div {...api.getControlProps()}>
 		<button {...api.getTriggerProps()}>
 			<span>
 				{api.valueAsString || 'Select Option'}

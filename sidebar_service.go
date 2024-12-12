@@ -161,12 +161,21 @@ func newSidebarUpdateNameReq(itemKey string, name string) *sidebarUpdateNameReq 
 
 type sidebarAddReq struct {
 	item          *sidebarItem
+	itemKey       string
 	parentItemKey string
 }
 
 func newSidebarAddReq(item *sidebarItem, parentItemKey string) *sidebarAddReq {
 	return &sidebarAddReq{
 		item:          item,
+		parentItemKey: parentItemKey,
+	}
+}
+
+func newSidebarAddReq0(item *sidebarItem, itemKey, parentItemKey string) *sidebarAddReq {
+	return &sidebarAddReq{
+		item:          item,
+		itemKey:       itemKey,
 		parentItemKey: parentItemKey,
 	}
 }
@@ -237,7 +246,12 @@ func (s *SidebarService) OnShutdown() {
 }
 
 func (s *SidebarService) addItem(item *sidebarItem) {
-	s.items[item.entityID.String()] = item
+	itemKey := item.entityID.String()
+	s.items[itemKey] = item
+}
+
+func (s *SidebarService) addItem0(itemKey string, item *sidebarItem) {
+	s.items[itemKey] = item
 }
 
 func (s *SidebarService) getMessageBusGroupKey(bus *acmelib.Bus) string {
@@ -426,7 +440,12 @@ func (s *SidebarService) add(req *sidebarAddReq) {
 		return
 	}
 
-	s.addItem(req.item)
+	itemKey := req.item.entityID.String()
+	if req.itemKey != "" {
+		itemKey = req.itemKey
+	}
+	s.addItem0(itemKey, req.item)
+	// s.addItem(req.item)
 	parent.addChild(req.item)
 
 	app.EmitEvent(SidebarAdd, parent.convert())
@@ -453,6 +472,14 @@ func (s *SidebarService) delete(req *sidebarDeleteReq) {
 	app.EmitEvent(SidebarRemove, parent.convert())
 }
 
+func (s *SidebarService) getController() *sidebarController {
+	return &sidebarController{
+		updateNameCh: s.updateNameCh,
+		addCh:        s.addCh,
+		deleteCh:     s.deleteCh,
+	}
+}
+
 func (s *SidebarService) Get() Sidebar {
 	s.mux.RLock()
 	defer s.mux.RUnlock()
@@ -464,49 +491,65 @@ func (s *SidebarService) Get() Sidebar {
 	return Sidebar{Root: s.root.convert()}
 }
 
-type sidebarControlles struct {
+type sidebarController struct {
 	updateNameCh chan<- *sidebarUpdateNameReq
 	addCh        chan<- *sidebarAddReq
 	deleteCh     chan<- *sidebarDeleteReq
 }
 
-func (s *sidebarControlles) sendUpdateName(ent entity) {
+func (s *sidebarController) sendUpdateName(ent entity) {
 	s.updateNameCh <- newSidebarUpdateNameReq(ent.EntityID().String(), ent.Name())
-}
-
-func (s *sidebarControlles) sendAdd(ent entity) {
-	var item *sidebarItem
-	var parItemKey string
 
 	switch ent.EntityKind() {
 	case acmelib.EntityKindBus:
-		item = newSidebarItem(SidebarItemKindBus, ent.EntityID(), SidebarBusesPrefix, ent.Name())
-		parItemKey = SidebarBusesPrefix
+		s.updateNameCh <- newSidebarUpdateNameReq(fmt.Sprintf("%s:%s", ent.EntityID(), SidebarMessagesPrefix), ent.Name())
 
 	case acmelib.EntityKindNode:
-		item = newSidebarItem(SidebarItemKindNode, ent.EntityID(), SidebarNodesPrefix, ent.Name())
-		parItemKey = SidebarNodesPrefix
-
-	case acmelib.EntityKindMessage:
-		item = newSidebarItem(SidebarItemKindMessage, ent.EntityID(), SidebarMessagesPrefix, ent.Name())
-		parItemKey = SidebarMessagesPrefix
-
-	case acmelib.EntityKindSignalType:
-		item = newSidebarItem(SidebarItemKindSignalType, ent.EntityID(), SidebarSignalTypesPrefix, ent.Name())
-		parItemKey = SidebarSignalTypesPrefix
-
-	case acmelib.EntityKindSignalUnit:
-		item = newSidebarItem(SidebarItemKindSignalUnit, ent.EntityID(), SidebarSignalUnitsPrefix, ent.Name())
-		parItemKey = SidebarSignalUnitsPrefix
-
-	case acmelib.EntityKindSignalEnum:
-		item = newSidebarItem(SidebarItemKindSignalEnum, ent.EntityID(), SidebarSignalEnumsPrefix, ent.Name())
-		parItemKey = SidebarSignalEnumsPrefix
+		s.updateNameCh <- newSidebarUpdateNameReq(fmt.Sprintf("%s:%s", ent.EntityID(), SidebarMessagesPrefix), ent.Name())
 	}
-
-	s.addCh <- newSidebarAddReq(item, parItemKey)
 }
 
-func (s *sidebarControlles) sendDelete(ent entity) {
+func (s *sidebarController) sendAdd(ent entity) {
+	baseItemKey := ent.EntityID().String()
+
+	switch ent.EntityKind() {
+	case acmelib.EntityKindBus:
+		busItem := newSidebarItem(SidebarItemKindBus, ent.EntityID(), SidebarBusesPrefix, ent.Name())
+		s.addCh <- newSidebarAddReq0(busItem, baseItemKey, SidebarBusesPrefix)
+
+		msgGroupItem := newSidebarItem(SidebarItemKindGroup, ent.EntityID(), SidebarMessagesPrefix, ent.Name())
+		s.addCh <- newSidebarAddReq0(msgGroupItem, fmt.Sprintf("%s:%s", ent.EntityID(), SidebarMessagesPrefix), SidebarMessagesPrefix)
+
+	case acmelib.EntityKindNode:
+		nodeItem := newSidebarItem(SidebarItemKindNode, ent.EntityID(), SidebarNodesPrefix, ent.Name())
+		s.addCh <- newSidebarAddReq0(nodeItem, baseItemKey, SidebarNodesPrefix)
+
+	case acmelib.EntityKindMessage:
+		msgItem := newSidebarItem(SidebarItemKindMessage, ent.EntityID(), SidebarMessagesPrefix, ent.Name())
+		s.addCh <- newSidebarAddReq0(msgItem, baseItemKey, SidebarMessagesPrefix)
+
+	case acmelib.EntityKindSignalType:
+		sigTypeItem := newSidebarItem(SidebarItemKindSignalType, ent.EntityID(), SidebarSignalTypesPrefix, ent.Name())
+		s.addCh <- newSidebarAddReq0(sigTypeItem, baseItemKey, SidebarSignalTypesPrefix)
+
+	case acmelib.EntityKindSignalUnit:
+		sigUnitItem := newSidebarItem(SidebarItemKindSignalUnit, ent.EntityID(), SidebarSignalUnitsPrefix, ent.Name())
+		s.addCh <- newSidebarAddReq0(sigUnitItem, baseItemKey, SidebarSignalUnitsPrefix)
+
+	case acmelib.EntityKindSignalEnum:
+		sigEnumItem := newSidebarItem(SidebarItemKindSignalEnum, ent.EntityID(), SidebarSignalEnumsPrefix, ent.Name())
+		s.addCh <- newSidebarAddReq0(sigEnumItem, baseItemKey, SidebarSignalEnumsPrefix)
+	}
+}
+
+func (s *sidebarController) sendDelete(ent entity) {
 	s.deleteCh <- newSidebarDeleteReq(ent.EntityID().String())
+
+	switch ent.EntityKind() {
+	case acmelib.EntityKindBus:
+		s.deleteCh <- newSidebarDeleteReq(fmt.Sprintf("%s:%s", ent.EntityID(), SidebarMessagesPrefix))
+
+	case acmelib.EntityKindNode:
+		s.deleteCh <- newSidebarDeleteReq(fmt.Sprintf("%s:%s", ent.EntityID(), SidebarMessagesPrefix))
+	}
 }

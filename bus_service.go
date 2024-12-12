@@ -8,6 +8,15 @@ const (
 	BusTypeCAN2A BusType = "CAN_2.0A"
 )
 
+func (bt BusType) parse() acmelib.BusType {
+	switch bt {
+	case BusTypeCAN2A:
+		return acmelib.BusTypeCAN2A
+	default:
+		return acmelib.BusTypeCAN2A
+	}
+}
+
 func getBusType(typ acmelib.BusType) BusType {
 	return BusType(typ.String())
 }
@@ -43,19 +52,61 @@ type BusService struct {
 	*service0[*acmelib.Bus, Bus, *busHandlers]
 }
 
-func newBusService() *BusService {
+func newBusService(sidebar *sidebarController) *BusService {
 	handler := &busHandlers{}
 
 	return &BusService{
-		service0: newService0(serviceKindBus, handler),
+		service0: newService0(serviceKindBus, handler, sidebar),
 	}
 }
 
-func (s *BusService) sendSidebarUpdateName(bus *acmelib.Bus) {
-	s.service0.sendSidebarUpdateName(bus)
+// func (s *BusService) sendSidebarUpdateName(bus *acmelib.Bus) {
+// 	s.service0.sendSidebarUpdateName(bus)
 
-	msgBusKey := manager.sidebar.getMessageBusGroupKey(bus)
-	manager.sidebar.sendUpdateName(newSidebarUpdateNameReq(msgBusKey, bus.Name()))
+// 	msgBusKey := manager.sidebar.getMessageBusGroupKey(bus)
+// 	manager.sidebar.sendUpdateName(newSidebarUpdateNameReq(msgBusKey, bus.Name()))
+// }
+
+func (s *BusService) Create(req CreateBusReq) (Bus, error) {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	bus := acmelib.NewBus(req.Name)
+	bus.SetDesc(req.Desc)
+	bus.SetType(req.BusType.parse())
+	bus.SetBaudrate(req.Baudrate)
+
+	s.addEntity(bus)
+
+	s.sidebar.sendAdd(bus)
+
+	// manager.sidebar.sendAdd(newSidebarAddReq(newBusSidebarItem(bus), SidebarBusesPrefix))
+	// manager.sidebar.sendAdd(newSidebarAddReq(newMessageBusGroupSidebarItem(bus), SidebarMessagesPrefix))
+
+	s.sendHistoryOp(
+		func() (*acmelib.Bus, error) {
+			s.removeEntity(bus.EntityID().String())
+
+			// manager.sidebar.sendDelete(newSidebarDeleteReq(bus.EntityID().String()))
+			// manager.sidebar.sendDelete(newSidebarDeleteReq(manager.sidebar.getMessageBusGroupKey(bus)))
+
+			s.sidebar.sendDelete(bus)
+
+			return bus, nil
+		},
+		func() (*acmelib.Bus, error) {
+			s.addEntity(bus)
+
+			// manager.sidebar.sendAdd(newSidebarAddReq(newBusSidebarItem(bus), SidebarBusesPrefix))
+			// manager.sidebar.sendAdd(newSidebarAddReq(newMessageBusGroupSidebarItem(bus), SidebarMessagesPrefix))
+
+			s.sidebar.sendAdd(bus)
+
+			return bus, nil
+		},
+	)
+
+	return s.hanlders.toResponse(bus), nil
 }
 
 func (s *BusService) UpdateName(entityID string, name string) (Bus, error) {
@@ -76,18 +127,21 @@ func (s *BusService) UpdateName(entityID string, name string) (Bus, error) {
 		return Bus{}, err
 	}
 
-	s.sendSidebarUpdateName(bus)
+	// s.sendSidebarUpdateName(bus)
+	s.sidebar.sendUpdateName(bus)
 
 	s.sendHistoryOp(
 		func() (*acmelib.Bus, error) {
 			s.hanlders.updateName(bus, oldName)
-			s.sendSidebarUpdateName(bus)
+			// s.sendSidebarUpdateName(bus)
+			s.sidebar.sendUpdateName(bus)
 
 			return bus, nil
 		},
 		func() (*acmelib.Bus, error) {
 			s.hanlders.updateName(bus, name)
-			s.sendSidebarUpdateName(bus)
+			// s.sendSidebarUpdateName(bus)
+			s.sidebar.sendUpdateName(bus)
 
 			return bus, nil
 		},
@@ -100,8 +154,8 @@ func (s *BusService) UpdateDesc(entityID string, req UpdateDescReq) (Bus, error)
 	return s.handle(entityID, &req, s.hanlders.updateDesc)
 }
 
-func (s *BusService) UpdateType(entityID string, req UpdateBusTypeReq) (Bus, error) {
-	return s.handle(entityID, &req, s.hanlders.updateType)
+func (s *BusService) UpdateBusType(entityID string, req UpdateBusTypeReq) (Bus, error) {
+	return s.handle(entityID, &req, s.hanlders.updateBusType)
 }
 
 func (s *BusService) UpdateBaudrate(entityID string, req UpdateBaudrateReq) (Bus, error) {
@@ -162,10 +216,10 @@ func (h *busHandlers) updateDesc(bus *acmelib.Bus, req *request, res *busRes) er
 	return nil
 }
 
-func (h *busHandlers) updateType(bus *acmelib.Bus, req *request, res *busRes) error {
+func (h *busHandlers) updateBusType(bus *acmelib.Bus, req *request, res *busRes) error {
 	parsedReq := req.toUpdateBusType()
 
-	typ := parsedReq.Type
+	typ := parsedReq.BusType
 
 	var busType acmelib.BusType
 	switch typ {

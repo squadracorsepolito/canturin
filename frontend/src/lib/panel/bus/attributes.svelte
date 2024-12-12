@@ -7,19 +7,16 @@
 	import { Select } from '$lib/components/select';
 	import type { PanelSectionProps } from '../types';
 	import { getBusState } from './state.svelte';
-	import { baudrateItems, getSelectItemFromBaudrate, type BaudrateSelectItem } from './utils';
+	import {
+		baudrateItems,
+		busTypeOptions,
+		getSelectItemFromBaudrate,
+		type BaudrateSelectItem
+	} from './utils';
 
 	let { entityId }: PanelSectionProps = $props();
 
 	const bs = getBusState(entityId);
-
-	const busTypeOptions: SegmentedControlOption[] = [
-		{
-			label: 'CAN 2.0 A',
-			value: BusType.BusTypeCAN2A,
-			desc: '11 bit identifier, max payload 8 bytes, max speed 1 Mbit/s'
-		}
-	];
 
 	let selectedBaudrate = $state(getSelectItemFromBaudrate(bs.entity.baudrate));
 
@@ -43,6 +40,7 @@
 	<Attribute label="Baudrate" desc="The baudrate of the bus">
 		<Select
 			items={baudrateItems}
+			name="bus-baudrate"
 			labelKey="label"
 			valueKey="value"
 			bind:selected={selectedBaudrate}

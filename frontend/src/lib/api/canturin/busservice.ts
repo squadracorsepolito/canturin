@@ -9,6 +9,11 @@ import {Call as $Call} from "@wailsio/runtime";
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+export function Create(req: $models.CreateBusReq): Promise<$models.Bus> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3897245259, req) as any;
+    return $resultPromise;
+}
+
 export function Get(entityID: string): Promise<$models.Bus> & { cancel(): void } {
     let $resultPromise = $Call.ByID(920363765, entityID) as any;
     return $resultPromise;
@@ -29,6 +34,11 @@ export function UpdateBaudrate(entityID: string, req: $models.UpdateBaudrateReq)
     return $resultPromise;
 }
 
+export function UpdateBusType(entityID: string, req: $models.UpdateBusTypeReq): Promise<$models.Bus> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1520949396, entityID, req) as any;
+    return $resultPromise;
+}
+
 export function UpdateDesc(entityID: string, req: $models.UpdateDescReq): Promise<$models.Bus> & { cancel(): void } {
     let $resultPromise = $Call.ByID(982331387, entityID, req) as any;
     return $resultPromise;
@@ -36,10 +46,5 @@ export function UpdateDesc(entityID: string, req: $models.UpdateDescReq): Promis
 
 export function UpdateName(entityID: string, name: string): Promise<$models.Bus> & { cancel(): void } {
     let $resultPromise = $Call.ByID(3117407681, entityID, name) as any;
-    return $resultPromise;
-}
-
-export function UpdateType(entityID: string, req: $models.UpdateBusTypeReq): Promise<$models.Bus> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(2332952058, entityID, req) as any;
     return $resultPromise;
 }

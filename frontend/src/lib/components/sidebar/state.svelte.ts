@@ -44,6 +44,7 @@ export class SidebarState {
 		});
 
 		wails.On(SidebarRemove, (e: wails.WailsEvent) => {
+			console.log(e);
 			this.update(e.data[0] as SidebarItem);
 		});
 

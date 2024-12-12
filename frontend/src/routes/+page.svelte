@@ -70,7 +70,7 @@
 {:else if layout.openPanelType === 'signal_enum'}
 	<SignalEnumPanel entityId={layout.openPanelId} />
 {:else}
-	<Select items={selectData} bind:selected labelKey="label" valueKey="value" />
+	<Select name="select-test" items={selectData} bind:selected labelKey="label" valueKey="value" />
 
 	<Divider></Divider>
 
