@@ -60,13 +60,6 @@ func newBusService(sidebar *sidebarController) *BusService {
 	}
 }
 
-// func (s *BusService) sendSidebarUpdateName(bus *acmelib.Bus) {
-// 	s.service0.sendSidebarUpdateName(bus)
-
-// 	msgBusKey := manager.sidebar.getMessageBusGroupKey(bus)
-// 	manager.sidebar.sendUpdateName(newSidebarUpdateNameReq(msgBusKey, bus.Name()))
-// }
-
 func (s *BusService) Create(req CreateBusReq) (Bus, error) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
@@ -77,29 +70,17 @@ func (s *BusService) Create(req CreateBusReq) (Bus, error) {
 	bus.SetBaudrate(req.Baudrate)
 
 	s.addEntity(bus)
-
 	s.sidebar.sendAdd(bus)
-
-	// manager.sidebar.sendAdd(newSidebarAddReq(newBusSidebarItem(bus), SidebarBusesPrefix))
-	// manager.sidebar.sendAdd(newSidebarAddReq(newMessageBusGroupSidebarItem(bus), SidebarMessagesPrefix))
 
 	s.sendHistoryOp(
 		func() (*acmelib.Bus, error) {
 			s.removeEntity(bus.EntityID().String())
-
-			// manager.sidebar.sendDelete(newSidebarDeleteReq(bus.EntityID().String()))
-			// manager.sidebar.sendDelete(newSidebarDeleteReq(manager.sidebar.getMessageBusGroupKey(bus)))
-
 			s.sidebar.sendDelete(bus)
 
 			return bus, nil
 		},
 		func() (*acmelib.Bus, error) {
 			s.addEntity(bus)
-
-			// manager.sidebar.sendAdd(newSidebarAddReq(newBusSidebarItem(bus), SidebarBusesPrefix))
-			// manager.sidebar.sendAdd(newSidebarAddReq(newMessageBusGroupSidebarItem(bus), SidebarMessagesPrefix))
-
 			s.sidebar.sendAdd(bus)
 
 			return bus, nil
@@ -107,6 +88,36 @@ func (s *BusService) Create(req CreateBusReq) (Bus, error) {
 	)
 
 	return s.hanlders.toResponse(bus), nil
+}
+
+func (s *BusService) Delete(entityID string) error {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	bus, err := s.getEntity(entityID)
+	if err != nil {
+		return err
+	}
+
+	s.removeEntity(entityID)
+	s.sidebar.sendDelete(bus)
+
+	s.sendHistoryOp(
+		func() (*acmelib.Bus, error) {
+			s.addEntity(bus)
+			s.sidebar.sendAdd(bus)
+
+			return bus, nil
+		},
+		func() (*acmelib.Bus, error) {
+			s.removeEntity(entityID)
+			s.sidebar.sendDelete(bus)
+
+			return bus, nil
+		},
+	)
+
+	return nil
 }
 
 func (s *BusService) UpdateName(entityID string, name string) (Bus, error) {
