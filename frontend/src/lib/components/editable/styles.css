@@ -2,7 +2,7 @@
 	@apply relative;
 
 	[data-part='area'] {
-		@apply rounded-btn border-2 border-transparent px-2 py-1 transition-colors;
+		@apply rounded-btn border-2 px-2 py-1 transition-colors;
 
 		&[data-error] {
 			@apply focus-ring-warning border-warning bg-warning-ghost text-warning;
@@ -36,6 +36,14 @@
 
 		&[data-font-weight='semibold'] {
 			@apply font-semibold;
+		}
+
+		&[data-border='transparent'] {
+			@apply border-transparent;
+		}
+
+		&[data-border='visible'] {
+			@apply border-neutral-content;
 		}
 	}
 

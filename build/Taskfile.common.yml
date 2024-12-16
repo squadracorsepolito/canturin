@@ -1,0 +1,88 @@
+version: '3'
+
+tasks:
+  go:mod:tidy:
+    summary: Runs `go mod tidy`
+    internal: true
+    generates:
+      - go.sum
+    sources:
+      - go.mod
+    cmds:
+      - go mod tidy
+
+  install:frontend:deps:
+    summary: Install frontend dependencies
+    dir: frontend
+    sources:
+      - package.json
+      - pnpm-lock.json
+    generates:
+      - node_modules/*
+    preconditions:
+      - sh: pnpm version
+        msg: "Looks like pnpm isn't installed. Install pnpm: https://pnpm.io/installation"
+    cmds:
+      - pnpm install
+
+  build:frontend:
+    summary: Build the frontend project
+    dir: frontend
+    sources:
+      - "**/*"
+    generates:
+      - build/*
+    deps:
+      - task: install:frontend:deps
+      - task: generate:bindings
+      - task: generate:constants
+    cmds:
+      - pnpm run build
+
+  generate:bindings:
+    summary: Generates bindings for the frontend
+    sources:
+      - "**/*.go"
+      - go.mod
+      - go.sum
+    generates:
+      - "frontend/src/lib/api/**/*"
+    cmds:
+      - wails3 generate bindings -silent -ts -i -d frontend/src/lib/api -f '{{.BUILD_FLAGS}}'
+
+  generate:constants:
+    summary: Generates constants for the frontend
+    sources:
+      - "**/*.go"
+      - go.mod
+      - go.sum
+    generates:
+      - "frontend/src/lib/api/**/*"
+    cmds:
+      - wails3 generate constants -f events.go -o frontend/src/lib/api/events.ts
+      - wails3 generate constants -f constants.go -o frontend/src/lib/api/constants.ts
+
+  generate:icons:
+    summary: Generates Windows `.ico` and Mac `.icns` files from an image
+    dir: build
+    sources:
+      - "appicon.png"
+    generates:
+      - "icons.icns"
+      - "icons.ico"
+    cmds:
+      - wails3 generate icons -input appicon.png
+
+  dev:frontend:
+    summary: Runs the frontend in development mode
+    dir: frontend
+    deps:
+      - task: install:frontend:deps
+    cmds:
+      - pnpm run dev --port {{.VITE_PORT}} --strictPort
+
+  update:build-assets:
+    summary: Updates the build assets
+    dir: build
+    cmds:
+      - wails3 update build-assets -name "{{.APP_NAME}}" -binaryname "{{.APP_NAME}}" -config config.yml -dir .

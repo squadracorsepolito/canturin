@@ -81,16 +81,16 @@ func getBase(e entity) base {
 type Network struct {
 	base
 
-	Buses []Bus `json:"buses"`
+	Buses []Bus0 `json:"buses"`
 }
 
-type Bus struct {
+type Bus0 struct {
 	base
 
-	Nodes []Node `json:"nodes"`
+	Nodes []Node0 `json:"nodes"`
 }
 
-type Node struct {
+type Node0 struct {
 	base
 
 	SendedMessages []Message `json:"sendedMessages"`
@@ -107,7 +107,7 @@ type Message struct {
 	ByteOrder acmelib.MessageByteOrder `json:"byteOrder"`
 	Signals   []Signal                 `json:"signals"`
 
-	Receivers []Node `json:"receivers"`
+	Receivers []Node0 `json:"receivers"`
 }
 
 type Signal struct {

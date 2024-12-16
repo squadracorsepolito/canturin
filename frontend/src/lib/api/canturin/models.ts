@@ -13,6 +13,73 @@ import * as time$0 from "../time/models.js";
 // @ts-ignore: Unused imports
 import * as $internal from "./internal.js";
 
+export interface AttachedNode {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+    "id": number;
+    "interfaceNumber": number;
+}
+
+export interface BaseEntity {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+}
+
+export interface Bus {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+    "type": BusType;
+    "baudrate": number;
+    "attachedNodes": AttachedNode[] | null;
+}
+
+export enum BusType {
+    /**
+     * The Go zero value for the underlying type of the enum.
+     */
+    $zero = "",
+
+    BusTypeCAN2A = "CAN_2.0A",
+};
+
+export interface CreateBusReq {
+    "name": string;
+    "desc": string;
+    "busType": BusType;
+    "baudrate": number;
+}
+
+export interface CreateNodeReq {
+    "name": string;
+    "desc": string;
+    "nodeId": number;
+    "interfaceCount": number;
+}
+
+export interface CreateSignalEnumReq {
+    "name": string;
+    "desc": string;
+    "minSize": number;
+}
+
+export interface CreateSignalTypeReq {
+    "name": string;
+    "desc": string;
+    "kind": SignalTypeKind;
+    "size": number;
+    "signed": boolean;
+    "min": number;
+    "max": number;
+    "scale": number;
+    "offset": number;
+}
+
 export interface History {
     "operationCount": number;
     "currentIndex": number;
@@ -29,7 +96,7 @@ export interface Message {
     "sizeByte": number;
     "byteOrder": acmelib$0.MessageByteOrder;
     "signals": Signal[] | null;
-    "receivers": Node[] | null;
+    "receivers": Node0[] | null;
 }
 
 export interface Node {
@@ -37,30 +104,71 @@ export interface Node {
     "name": string;
     "desc": string;
     "createTime": time$0.Time;
+    "id": number;
+    "interfaces": NodeInterface[] | null;
+}
+
+export interface Node0 {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
     "sendedMessages": Message[] | null;
 }
 
-export interface SidebarNode {
-    "kind": SidebarNodeKind;
-    "name": string;
-    "entityId": string;
-    "parentEntityIds": string[] | null;
-    "children": SidebarNode[] | null;
+export interface NodeInterface {
+    "number": number;
+    "attachedBus": BaseEntity;
+    "sentMessages": BaseEntity[] | null;
+    "receivedMessages": BaseEntity[] | null;
 }
 
-export enum SidebarNodeKind {
+export interface RemoveReceivedMessagesReq {
+    "interfaceNumber": number;
+    "messageEntityIds": string[] | null;
+}
+
+export interface RemoveSentMessagesReq {
+    "interfaceNumber": number;
+    "messageEntityIds": string[] | null;
+}
+
+export interface RemoveValuesReq {
+    "valueEntityIds": string[] | null;
+}
+
+export interface ReorderValueReq {
+    "valueEntityId": string;
+    "from": number;
+    "to": number;
+}
+
+export interface Sidebar {
+    "root": SidebarItem;
+}
+
+export interface SidebarItem {
+    "kind": SidebarItemKind;
+    "prefix": string;
+    "id": string;
+    "name": string;
+    "children": SidebarItem[] | null;
+}
+
+export enum SidebarItemKind {
     /**
      * The Go zero value for the underlying type of the enum.
      */
     $zero = "",
 
-    SidebarNodeKindNetwork = "network",
-    SidebarNodeKindBus = "bus",
-    SidebarNodeKindNode = "node",
-    SidebarNodeKindMessage = "message",
-    SidebarNodeKindSignalType = "signal-type",
-    SidebarNodeKindSignalUnit = "signal-unit",
-    SidebarNodeKindSignalEnum = "signal-enum",
+    SidebarItemKindGroup = "group",
+    SidebarItemKindNetwork = "network",
+    SidebarItemKindBus = "bus",
+    SidebarItemKindNode = "node",
+    SidebarItemKindMessage = "message",
+    SidebarItemKindSignalType = "signal-type",
+    SidebarItemKindSignalUnit = "signal-unit",
+    SidebarItemKindSignalEnum = "signal-enum",
 };
 
 export interface Signal {
@@ -136,4 +244,60 @@ export interface SignalUnit {
     "symbol": string;
     "referenceCount": number;
     "references": SignalReference[] | null;
+}
+
+export interface UpdateAttachedBusReq {
+    "busEntityId": string;
+    "interfaceNumber": number;
+}
+
+export interface UpdateBaudrateReq {
+    "baudrate": number;
+}
+
+export interface UpdateBusTypeReq {
+    "busType": BusType;
+}
+
+export interface UpdateDescReq {
+    "desc": string;
+}
+
+export interface UpdateMaxReq {
+    "max": number;
+}
+
+export interface UpdateMinReq {
+    "min": number;
+}
+
+export interface UpdateNameReq {
+    "name": string;
+}
+
+export interface UpdateNodeIDReq {
+    "nodeId": number;
+}
+
+export interface UpdateOffsetReq {
+    "offset": number;
+}
+
+export interface UpdateScaleReq {
+    "scale": number;
+}
+
+export interface UpdateValueDescReq {
+    "valueEntityId": string;
+    "desc": string;
+}
+
+export interface UpdateValueIndexReq {
+    "valueEntityId": string;
+    "index": number;
+}
+
+export interface UpdateValueNameReq {
+    "valueEntityId": string;
+    "name": string;
 }

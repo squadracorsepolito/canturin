@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	_ "embed"
+
 	// "fmt"
 	"log"
 	// "os"
@@ -23,6 +24,8 @@ var app *application.App
 
 var proxy *appProxy
 
+var manager *serviceManager
+
 // main function serves as the application's entry point.
 // Main initializes the application, creates a window,
 // and starts a goroutine that emits a time-based event every second.
@@ -30,17 +33,21 @@ var proxy *appProxy
 func main() {
 	proxy = newAppProxy()
 
+	manager = newServiceManager()
+
 	// Path to the file used for loading network data.
 	// infilepath := "./testdata/SC24.binpb"
 
 	// Initialize the services
-	sidebarSrv := newSidebarService()
-	historySrv := newHistoryService()
+	// sidebarService := newSidebarService()
+	// historyService := newHistoryService()
 
-	msgServ := newMessageService()
-	sigTypeServ := newSignalTypeService()
-	sigUnitServ := newSignalUnitService()
-	signalEnumService := newSignalEnumService()
+	// busService := newBusService()
+	// nodeService := newNodeService()
+	// messageService := newMessageService()
+	// signalTypeService := newSignalTypeService()
+	// signalUnitService := newSignalUnitService()
+	// signalEnumService := newSignalEnumService()
 
 	// Create a new Wails application by providing the necesvar (sary options.
 	// Variables 'Name' and 'Description' are for application metadata.
@@ -51,26 +58,34 @@ func main() {
 		Name:        "canturin",
 		Description: "",
 
-		Services: []application.Service{
+		Services: manager.getServices(),
 
-			application.NewService(sidebarSrv),
-			application.NewService(historySrv),
+		// Services: []application.Service{
 
-			application.NewService(msgServ),
-			application.NewService(sigTypeServ),
-			application.NewService(sigUnitServ),
-			application.NewService(signalEnumService),
-		},
+		// 	application.NewService(sidebarService),
+		// 	application.NewService(historyService),
+
+		// 	application.NewService(busService),
+		// 	application.NewService(nodeService),
+		// 	application.NewService(messageService),
+		// 	application.NewService(signalTypeService),
+		// 	application.NewService(signalUnitService),
+		// 	application.NewService(signalEnumService),
+		// },
 
 		// Key bindings for undo/redo actions, triggering functions on specific key combinations.
 		KeyBindings: map[string]func(window *application.WebviewWindow){
 			"ctrl+z": func(w *application.WebviewWindow) {
-				historySrv.Undo()
-				historySrv.emitHistoryChange()
+				// historyService.Undo()
+				// historyService.emitHistoryChange()
+				manager.history.Undo()
+				manager.history.emitHistoryChange()
 			},
 			"ctrl+y": func(w *application.WebviewWindow) {
-				historySrv.Redo()
-				historySrv.emitHistoryChange()
+				// historyService.Redo()
+				// historyService.emitHistoryChange()
+				manager.history.Redo()
+				manager.history.emitHistoryChange()
 			},
 		},
 
@@ -101,19 +116,6 @@ func main() {
 		BackgroundColour: application.NewRGB(27, 38, 54),
 		URL:              "/",
 	})
-
-	// // Create a goroutine that emits an event containing the current time every second.
-	// // The frontend can listen to this event and update the UI accordingly.
-	// go func() {
-	// 	for {
-	// 		now := time.Now().Format(time.RFC1123)
-	// 		app.Events.Emit(&application.WailsEvent{
-	// 			Name: "time",
-	// 			Data: now,
-	// 		})
-	// 		time.Sleep(time.Second)
-	// 	}
-	// }()
 
 	// Emit an application event to load network data when the application starts.
 	app.OnApplicationEvent(events.Common.ApplicationStarted, func(_ *application.ApplicationEvent) {

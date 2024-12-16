@@ -1,9 +1,8 @@
 <script lang="ts">
 	import type { SignalEnumValue } from '$lib/api/canturin';
-	import NumberEditablev2 from '$lib/components/editable/number-editablev2.svelte';
-	import TextEditablev2 from '$lib/components/editable/text-editablev2.svelte';
+	import { TextEditable, NumberEditable } from '$lib/components/editable';
 	import { TableField } from '$lib/components/table';
-	import { getSignalEnumState } from '$lib/state/signal-enum-state.svelte';
+	import { getSignalEnumState } from '$lib/panel/signal-enum/state.svelte';
 	import { z } from 'zod';
 
 	type Props = {
@@ -76,7 +75,7 @@
 </script>
 
 <TableField>
-	<TextEditablev2
+	<TextEditable
 		bind:value={value.name}
 		oncommit={handleName}
 		name="signal-enum-value-name"
@@ -86,7 +85,7 @@
 </TableField>
 
 <TableField>
-	<NumberEditablev2
+	<NumberEditable
 		bind:value={value.index}
 		oncommit={handleIndex}
 		name="signal-enum-value-index"
@@ -95,7 +94,7 @@
 </TableField>
 
 <TableField>
-	<TextEditablev2
+	<TextEditable
 		bind:value={value.desc}
 		oncommit={handleDesc}
 		name="signal-enum-value-desc"

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os"
 
 	"github.com/squadracorsepolito/acmelib"
@@ -24,12 +23,11 @@ func loadNetwork(path string) {
 		panic(err)
 	}
 
-	// Push the network data to the frontend
-	proxy.pushSidebarLoad(net)
+	manager.sidebar.sendLoad(newSidebarLoadReq(net))
+
 	proxy.network = net
 
-	// Log the network data
-    log.Println("Network data loaded and pushed to frontend")
+	nodes := make(map[acmelib.EntityID]*acmelib.Node)
 
 	// Push the signal types, units, and enums to the frontend
 	sigTypes := make(map[acmelib.EntityID]*acmelib.SignalType)
@@ -38,54 +36,57 @@ func loadNetwork(path string) {
 
 	// Iterate over the buses, node interfaces and messages
 	for _, bus := range net.Buses() {
-		
+		manager.bus.sendLoad(bus)
+
 		for _, nodeInt := range bus.NodeInterfaces() {
-			
-			for _, msg := range nodeInt.Messages() {
-				// Push the message to the frontend
-				proxy.pushMessage(msg)
-				log.Println("Message pushed to frontend:", msg)
+			tmpNode := nodeInt.Node()
+			nodes[tmpNode.EntityID()] = tmpNode
+
+			for _, msg := range nodeInt.SentMessages() {
+				manager.message.sendLoad(msg)
 
 				// Iterate over the signals
 				for _, sig := range msg.Signals() {
 					switch sig.Kind() {
-						// Standard signal
-						case acmelib.SignalKindStandard:
-							stdSig, err := sig.ToStandard()
-							if err != nil {
-								panic(err)
-							}
-							sigTypes[stdSig.Type().EntityID()] = stdSig.Type()
+					// Standard signal
+					case acmelib.SignalKindStandard:
+						stdSig, err := sig.ToStandard()
+						if err != nil {
+							panic(err)
+						}
+						sigTypes[stdSig.Type().EntityID()] = stdSig.Type()
 
-							if stdSig.Unit() != nil {
-								sigUnits[stdSig.Unit().EntityID()] = stdSig.Unit()
-							}
+						if stdSig.Unit() != nil {
+							sigUnits[stdSig.Unit().EntityID()] = stdSig.Unit()
+						}
 
-						// Enum signal
-						case acmelib.SignalKindEnum:
-							enumSig, err := sig.ToEnum()
-							if err != nil {
-								panic(err)
-							}
-							sigEnums[enumSig.Enum().EntityID()] = enumSig.Enum()
+					// Enum signal
+					case acmelib.SignalKindEnum:
+						enumSig, err := sig.ToEnum()
+						if err != nil {
+							panic(err)
+						}
+						sigEnums[enumSig.Enum().EntityID()] = enumSig.Enum()
 					}
 				}
 			}
 		}
 	}
-	// Log the signal types, units, and enums
-    log.Println("Signal types, units, and enums processed and pushed to frontend")
+
+	for _, node := range nodes {
+		manager.node.sendLoad(node)
+	}
 
 	// Push the signal types, units, and enums to the frontend
 	for _, sigType := range sigTypes {
-		proxy.pushSignalType(sigType)
+		manager.signalType.sendLoad(sigType)
 	}
 
 	for _, sigUnit := range sigUnits {
-		proxy.pushSignalUnit(sigUnit)
+		manager.signalUnit.sendLoad(sigUnit)
 	}
 
 	for _, sigEnum := range sigEnums {
-		proxy.pushSignalEnum(sigEnum)
+		manager.signalEnum.sendLoad(sigEnum)
 	}
 }

@@ -1,46 +1,72 @@
-<script lang="ts" generics="T extends {label: string; value: string}">
-	import { uniqueId } from '$lib/utils';
+<script lang="ts" generics="T extends { [K in keyof T]: any }">
+	import { uniqueId, type KeyOfString } from '$lib/utils';
 	import * as select from '@zag-js/select';
 	import { normalizeProps, portal, useMachine } from '@zag-js/svelte';
 	import { AltArrowIcon, CheckIcon } from '../icon';
 
 	type Props = {
 		items: T[];
-		selected: string;
-		disable?: (item: T) => boolean;
+		selected: T;
+		name: string;
+		valueKey: KeyOfString<T>;
+		labelKey: KeyOfString<T>;
+		onselect?: (item: T) => void;
+		filter?: (item: T) => boolean;
 	};
 
-	let { items, selected = $bindable(), disable }: Props = $props();
+	let {
+		items,
+		selected = $bindable(),
+		name,
+		valueKey,
+		labelKey,
+		onselect,
+		filter
+	}: Props = $props();
 
 	const collection = select.collection({
 		items,
-		isItemDisabled: disable,
-		itemToString: (item) => item.label,
-		itemToValue: (item) => item.value
+		isItemDisabled: filter,
+		itemToString: (item) => item[labelKey],
+		itemToValue: (item) => item[valueKey]
 	});
 
 	const [snapshot, send] = useMachine(
 		select.machine({
 			id: uniqueId(),
 			collection,
-			onValueChange: ({ value }) => {
-				if (value.length === 0) {
+			name: name,
+			onValueChange: (details) => {
+				if (details.items.length === 0) {
 					return;
 				}
 
-				selected = value[0];
+				selected = details.items[0] as T;
+				onselect?.(details.items[0] as T);
 			}
-		})
+		}),
+		{
+			context: {
+				get value() {
+					return [selected[valueKey]];
+				}
+			}
+		}
 	);
 
 	const api = $derived(select.connect(snapshot, send, normalizeProps));
 </script>
 
 <div {...api.getRootProps()}>
-	<div {...api.getControlProps()}>
-		<!-- svelte-ignore a11y_label_has_associated_control -->
-		<label {...api.getLabelProps()}>Label</label>
+	<select {...api.getHiddenSelectProps()}>
+		{#each items as item}
+			<option value={item[valueKey]}>
+				{item[labelKey]}
+			</option>
+		{/each}
+	</select>
 
+	<div {...api.getControlProps()}>
 		<button {...api.getTriggerProps()}>
 			<span>
 				{api.valueAsString || 'Select Option'}
@@ -54,9 +80,9 @@
 
 	<div use:portal {...api.getPositionerProps()}>
 		<ul {...api.getContentProps()}>
-			{#each items as item (item.value)}
+			{#each items as item (item[valueKey])}
 				<li {...api.getItemProps({ item })}>
-					<span {...api.getItemTextProps({ item })}>{item.label}</span>
+					<span {...api.getItemTextProps({ item })}>{item[labelKey]}</span>
 
 					<span {...api.getItemIndicatorProps({ item })}>
 						<CheckIcon height={18} width={18} />
@@ -80,7 +106,7 @@
 				@apply border-2 border-neutral-content px-2 py-1 rounded-btn transition-colors flex items-center justify-between gap-3;
 
 				&:focus {
-					@apply focus-ring-primary;
+					@apply ring-2 ring-primary/25;
 				}
 
 				&:hover {
@@ -92,7 +118,7 @@
 				}
 
 				&[data-placeholder-shown] {
-					@apply text-dimmed italic;
+					@apply opacity-85 italic;
 				}
 			}
 		}
@@ -107,7 +133,7 @@
 			}
 
 			&:focus {
-				@apply focus-ring-primary;
+				@apply ring-2 ring-primary/25;
 			}
 
 			[data-part='item'] {

@@ -77,3 +77,7 @@ export function getSignalReferenceTree(sigRefs: SignalReference[]): ReferenceTre
 export function uniqueId() {
 	return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
+
+export type KeyOfString<T> = {
+	[K in keyof T]: T[K] extends string ? K : never;
+}[keyof T];

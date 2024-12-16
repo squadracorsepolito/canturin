@@ -1,3 +1,5 @@
-export { default as SignalTypePanel } from '$lib/panel/signal-type/signal-type-proxy.svelte';
+export { default as NodePanel } from './node/proxy.svelte';
+export { default as BusPanel } from './bus/proxy.svelte';
+export { default as SignalTypePanel } from './signal-type/proxy.svelte';
+export { default as SignalEnumPanel } from './signal-enum/proxy.svelte';
 export { default as SignalUnitPanel } from '$lib/panel/signal-unit/signal-unit-proxy.svelte';
-export { default as SignalEnumPanel } from '$lib/panel/signal-enum/signal-enum-proxy.svelte';

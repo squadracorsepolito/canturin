@@ -51,56 +51,56 @@ func (s *SignalUnitService) GetInvalidNames(entityID string) []string {
 }
 
 func (s *SignalUnitService) UpdateName(entityID string, name string) (SignalUnit, error) {
-    // retrieve the signal unit
-    sigUnit, err := s.getEntity(entityID)
-    if err != nil {
-        return SignalUnit{}, err
-    }
+	// retrieve the signal unit
+	sigUnit, err := s.getEntity(entityID)
+	if err != nil {
+		return SignalUnit{}, err
+	}
 
-    // Lock to guarantee unique access
-    s.mux.Lock()
-    defer s.mux.Unlock()
+	// Lock to guarantee unique access
+	s.mux.Lock()
+	defer s.mux.Unlock()
 
-    // Actual signal unit name
-    oldName := sigUnit.Name()
-    
-    if name == oldName {
-        return s.converterFn(sigUnit), nil
-    }
+	// Actual signal unit name
+	oldName := sigUnit.Name()
 
-    // Update name
-    sigUnit.SetName(name)
-    
-    // Push the new name to the sideBar
-    proxy.pushSidebarUpdate(sigUnit.EntityID(), name)
+	if name == oldName {
+		return s.converterFn(sigUnit), nil
+	}
 
-    // Add history operation
-    proxy.pushHistoryOperation(
-        operationDomainSignalUnit,
-        func() (any, error) {
-            s.mux.Lock()
-            defer s.mux.Unlock()
+	// Update name
+	sigUnit.SetName(name)
 
-            // Rollback of the name
-            sigUnit.SetName(oldName)
-            proxy.pushSidebarUpdate(sigUnit.EntityID(), oldName)
+	// Push the new name to the sideBar
+	proxy.pushSidebarUpdate(sigUnit.EntityID(), name)
 
-            return s.converterFn(sigUnit), nil
-        },
-        func() (any, error) {
-            s.mux.Lock()
-            defer s.mux.Unlock()
+	// Add history operation
+	proxy.pushHistoryOperation(
+		operationDomainSignalUnit,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
 
-            // Final update
-            sigUnit.SetName(name)
-            proxy.pushSidebarUpdate(sigUnit.EntityID(), name)
+			// Rollback of the name
+			sigUnit.SetName(oldName)
+			proxy.pushSidebarUpdate(sigUnit.EntityID(), oldName)
 
-            return s.converterFn(sigUnit), nil
-        },
-    )
+			return s.converterFn(sigUnit), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
 
-    // return the updated entity
-    return s.converterFn(sigUnit), nil
+			// Final update
+			sigUnit.SetName(name)
+			proxy.pushSidebarUpdate(sigUnit.EntityID(), name)
+
+			return s.converterFn(sigUnit), nil
+		},
+	)
+
+	// return the updated entity
+	return s.converterFn(sigUnit), nil
 }
 
 func (s *SignalUnitService) UpdateDesc(entityID string, desc string) (SignalUnit, error) {
@@ -143,40 +143,38 @@ func (s *SignalUnitService) UpdateDesc(entityID string, desc string) (SignalUnit
 }
 
 func (s *SignalUnitService) UpdateSymbol(entityID string, symbol string) (SignalUnit, error) {
-    sigUnit, err := s.getEntity(entityID)
-    if err != nil {
-        return SignalUnit{}, err
-    }
+	sigUnit, err := s.getEntity(entityID)
+	if err != nil {
+		return SignalUnit{}, err
+	}
 
-    s.mux.Lock()
-    defer s.mux.Unlock()
+	s.mux.Lock()
+	defer s.mux.Unlock()
 
-    oldSymbol := sigUnit.Symbol()
-    if symbol == oldSymbol {
-        return s.converterFn(sigUnit), nil
-    }
+	oldSymbol := sigUnit.Symbol()
+	if symbol == oldSymbol {
+		return s.converterFn(sigUnit), nil
+	}
 
-    sigUnit.SetSymbol(symbol)
+	sigUnit.SetSymbol(symbol)
 
-    proxy.pushHistoryOperation(
-        operationDomainSignalUnit,
-        func() (any, error) {
-            s.mux.Lock()
-            defer s.mux.Unlock()
+	proxy.pushHistoryOperation(
+		operationDomainSignalUnit,
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
 
-            sigUnit.SetSymbol(oldSymbol)
-            return s.converterFn(sigUnit), nil
-        },
-        func() (any, error) {
-            s.mux.Lock()
-            defer s.mux.Unlock()
+			sigUnit.SetSymbol(oldSymbol)
+			return s.converterFn(sigUnit), nil
+		},
+		func() (any, error) {
+			s.mux.Lock()
+			defer s.mux.Unlock()
 
-            sigUnit.SetSymbol(symbol)
-            return s.converterFn(sigUnit), nil
-        },
-    )
+			sigUnit.SetSymbol(symbol)
+			return s.converterFn(sigUnit), nil
+		},
+	)
 
-    return s.converterFn(sigUnit), nil
+	return s.converterFn(sigUnit), nil
 }
-
-
