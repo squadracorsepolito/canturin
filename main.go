@@ -3,7 +3,9 @@ package main
 import (
 	"embed"
 	_ "embed"
+	// "fmt"
 	"log"
+	// "os"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
@@ -21,11 +23,15 @@ var app *application.App
 
 var proxy *appProxy
 
-// main function serves as the application's entry point. It initializes the application, creates a window,
-// and starts a goroutine that emits a time-based event every second. It subsequently runs the application and
-// logs any error that might occur.
+// main function serves as the application's entry point.
+// Main initializes the application, creates a window,
+// and starts a goroutine that emits a time-based event every second.
+// It subsequently runs the application and logs any error that might occur.
 func main() {
 	proxy = newAppProxy()
+
+	// Path to the file used for loading network data.
+	// infilepath := "./testdata/SC24.binpb"
 
 	// Initialize the services
 	sidebarSrv := newSidebarService()
@@ -56,6 +62,7 @@ func main() {
 			application.NewService(signalEnumService),
 		},
 
+		// Key bindings for undo/redo actions, triggering functions on specific key combinations.
 		KeyBindings: map[string]func(window *application.WebviewWindow){
 			"ctrl+z": func(w *application.WebviewWindow) {
 				historySrv.Undo()
@@ -67,10 +74,12 @@ func main() {
 			},
 		},
 
+		// Configure the asset handler to serve embedded frontend files.
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
 		},
 
+		// macOS-specific options: close the app when the last window is closed.
 		Mac: application.MacOptions{
 			ApplicationShouldTerminateAfterLastWindowClosed: true,
 		},
@@ -106,8 +115,9 @@ func main() {
 	// 	}
 	// }()
 
+	// Emit an application event to load network data when the application starts.
 	app.OnApplicationEvent(events.Common.ApplicationStarted, func(_ *application.ApplicationEvent) {
-		loadNetwork("./testdata/SC24.binpb")
+		// loadNetwork(infilepath)
 	})
 
 	// Run the application. This blocks until the application has been exited.
@@ -116,3 +126,16 @@ func main() {
 		log.Fatal(err)
 	}
 }
+
+// function to process and read files
+// func processFile(filePath string) {
+// 	// read selected file
+// 	data, err := os.ReadFile(filePath)
+// 	if err != nil {
+// 		fmt.Println("Error reading file:", err)
+// 		return
+// 	}
+
+// 	// Show file content on the terminal
+// 	fmt.Printf("File %s loaded successfully! Content:\n%s\n", filePath, string(data))
+// }

@@ -1,32 +1,57 @@
 import { SignalUnitService, type SignalUnit } from '$lib/api/canturin';
-import { AsyncState } from './async-state.svelte';
+import { HistorySignalUnitModify } from '$lib/api/events';
+import { EntityState } from './entity-state.svelte';
+import { StateProvider } from './state-provider.svelte';
 
-async function loadSignalUnit(state: SignalUnitState, entityId: string) {
-	state.isLoading = true;
+const provider = new StateProvider(
+	(signalUnit: SignalUnit) => new SignalUnitState(signalUnit),
+	HistorySignalUnitModify
+);
 
-	try {
-		const sigUnit = await SignalUnitService.Get(entityId);
-		state.signalUnit = sigUnit;
-	} catch (error) {
-		state.signalUnit = undefined;
-		console.error(error);
-	}
-
-	state.isLoading = false;
+export function getSignalUnitState(entityId: string) {
+	return provider.get(entityId);
 }
 
-class SignalUnitState extends AsyncState {
-	signalUnit = $state<SignalUnit | undefined>();
-
-	reload(entityId: string) {
-		loadSignalUnit(this, entityId);
-	}
+export async function loadSignalUnit(entityId: string) {
+	const signalUnit = await SignalUnitService.Get(entityId);
+	provider.add(signalUnit);
 }
 
 export function useSignalUnit(entityId: string) {
-	const state = new SignalUnitState();
+	loadSignalUnit(entityId);
+}
 
-	loadSignalUnit(state, entityId);
+class SignalUnitState extends EntityState<SignalUnit> {
+	// signalUnit = $state<SignalUnit | undefined>();
 
-	return state;
+	constructor(signalUnit: SignalUnit) {
+		super(signalUnit);
+	}
+
+	reload(entityId: string) {
+		loadSignalUnit(entityId);
+	}
+
+	async getInvalidNames() {
+		const invalidNames = await SignalUnitService.GetInvalidNames(this.entity.entityId);
+
+		if (invalidNames) {
+			return invalidNames;
+		}
+
+		return [];
+	}
+
+	updateName(name: string) {
+		this.update(SignalUnitService.UpdateName(this.entity.entityId, name));
+	}
+
+	updateDesc(desc: string) {
+		this.update(SignalUnitService.UpdateDesc(this.entity.entityId, desc));
+	}
+
+	updateSymbol(sym: string) {
+		this.update(SignalUnitService.UpdateSymbol(this.entity.entityId, sym));
+	}
+	
 }
