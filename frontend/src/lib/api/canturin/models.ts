@@ -287,6 +287,10 @@ export interface UpdateScaleReq {
     "scale": number;
 }
 
+export interface UpdateSymbolReq {
+    "symbol": string;
+}
+
 export interface UpdateValueDescReq {
     "valueEntityId": string;
     "desc": string;

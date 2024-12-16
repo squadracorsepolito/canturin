@@ -230,6 +230,22 @@ func (r *request) toUpdateOffset() *UpdateOffsetReq {
 }
 
 //////////////////////////
+// SIGNAL UNIT REQUESTS //
+//////////////////////////
+
+type UpdateSymbolReq struct {
+	Symbol string `json:"symbol"`
+}
+
+func (r *request) toUpdateSymbol() *UpdateSymbolReq {
+	req, ok := r.data.(*UpdateSymbolReq)
+	if !ok {
+		panic("cannot convert to UpdateSymbolReq")
+	}
+	return req
+}
+
+//////////////////////////
 // SIGNAL ENUM REQUESTS //
 //////////////////////////
 

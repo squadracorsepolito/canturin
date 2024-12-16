@@ -1,7 +1,7 @@
 import { SignalUnitService, type SignalUnit } from '$lib/api/canturin';
 import { HistorySignalUnitModify } from '$lib/api/events';
-import { EntityState } from './entity-state.svelte';
-import { StateProvider } from './state-provider.svelte';
+import { EntityState } from '../../state/entity-state.svelte';
+import { StateProvider } from '../../state/state-provider.svelte';
 
 const provider = new StateProvider(
 	(signalUnit: SignalUnit) => new SignalUnitState(signalUnit),
@@ -22,8 +22,6 @@ export function useSignalUnit(entityId: string) {
 }
 
 class SignalUnitState extends EntityState<SignalUnit> {
-	// signalUnit = $state<SignalUnit | undefined>();
-
 	constructor(signalUnit: SignalUnit) {
 		super(signalUnit);
 	}
@@ -43,15 +41,14 @@ class SignalUnitState extends EntityState<SignalUnit> {
 	}
 
 	updateName(name: string) {
-		this.update(SignalUnitService.UpdateName(this.entity.entityId, name));
+		this.update(SignalUnitService.UpdateName(this.entity.entityId, { name }));
 	}
 
 	updateDesc(desc: string) {
-		this.update(SignalUnitService.UpdateDesc(this.entity.entityId, desc));
+		this.update(SignalUnitService.UpdateDesc(this.entity.entityId, { desc }));
 	}
 
-	updateSymbol(sym: string) {
-		this.update(SignalUnitService.UpdateSymbol(this.entity.entityId, sym));
+	updateSymbol(symbol: string) {
+		this.update(SignalUnitService.UpdateSymbol(this.entity.entityId, { symbol }));
 	}
-	
 }

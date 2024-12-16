@@ -3,9 +3,14 @@
 	import Select from '$lib/components/select/select.svelte';
 	import SortableList from '$lib/components/sortable/sortable-list.svelte';
 	import { reorder } from '@atlaskit/pragmatic-drag-and-drop/reorder';
-	import { SignalEnumPanel, SignalTypePanel, BusPanel, NodePanel } from '$lib/panel';
+	import {
+		SignalEnumPanel,
+		SignalTypePanel,
+		BusPanel,
+		NodePanel,
+		SignalUnitPanel
+	} from '$lib/panel';
 	import MessagePanel from '$lib/panel/message-panel.svelte';
-	import SignalUnitPanel from '$lib/panel/signal-unit-panel.svelte';
 	import layout from '$lib/state/layout-state.svelte';
 
 	let items = $state([

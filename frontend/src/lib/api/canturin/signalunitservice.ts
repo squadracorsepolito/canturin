@@ -19,22 +19,22 @@ export function GetInvalidNames(entityID: string): Promise<string[] | null> & { 
     return $resultPromise;
 }
 
-export function GetNames(): Promise<string[] | null> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(2566933599) as any;
+export function ListBase(): Promise<$models.BaseEntity[] | null> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3689944206) as any;
     return $resultPromise;
 }
 
-export function UpdateDesc(entityID: string, desc: string): Promise<$models.SignalUnit> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(3797493755, entityID, desc) as any;
+export function UpdateDesc(entityID: string, req: $models.UpdateDescReq): Promise<$models.SignalUnit> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3797493755, entityID, req) as any;
     return $resultPromise;
 }
 
-export function UpdateName(entityID: string, name: string): Promise<$models.SignalUnit> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(1637602753, entityID, name) as any;
+export function UpdateName(entityID: string, req: $models.UpdateNameReq): Promise<$models.SignalUnit> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1637602753, entityID, req) as any;
     return $resultPromise;
 }
 
-export function UpdateSymbol(entityID: string, $symbol: string): Promise<$models.SignalUnit> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(2276999818, entityID, $symbol) as any;
+export function UpdateSymbol(entityID: string, req: $models.UpdateSymbolReq): Promise<$models.SignalUnit> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(2276999818, entityID, req) as any;
     return $resultPromise;
 }

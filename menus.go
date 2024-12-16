@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
@@ -10,7 +8,7 @@ func initMenus() {
 	app := application.Get()
 
 	/*open file acmelib*/
-	
+
 	// Add the menu bar to perform tasks like Edit, File, Help
 	menu := app.NewMenu()
 	menu.AddRole(application.AppMenu)
@@ -32,6 +30,4 @@ func initMenus() {
 	})
 
 	app.SetMenu(menu)
-
-	log.Print(app.GetPID())
 }

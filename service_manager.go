@@ -28,7 +28,7 @@ func newServiceManager() *serviceManager {
 		node:       newNodeService(sidebarController, bus),
 		message:    newMessageService(),
 		signalType: newSignalTypeService(sidebarController),
-		signalUnit: newSignalUnitService(),
+		signalUnit: newSignalUnitService(sidebarController),
 		signalEnum: newSignalEnumService(sidebarController),
 	}
 }

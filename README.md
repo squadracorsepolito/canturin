@@ -3,10 +3,10 @@
 ## Status
 
 -   Bus (WIP)
--   Node (WIP)
+-   Node (MVP)
 -   Message (WIP)
 -   Signal Types (Done)
--   Signal Unit (dai cazzo martina)
+-   Signal Unit (WIP)
 -   Signal Enum (Done)
 
 ## Prerequirements
