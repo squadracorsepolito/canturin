@@ -1,9 +1,9 @@
 import { SignalTypeService, type SignalType } from '$lib/api/canturin';
 import { HistorySignalTypeModify } from '$lib/api/events';
 import { pushToast } from '$lib/components/toast/toast-provider.svelte';
-import { EntityState } from './entity-state.svelte';
-import layout from './layout-state.svelte';
-import { StateProvider } from './state-provider.svelte';
+import { EntityState } from '../../state/entity-state.svelte';
+import layout from '../../state/layout-state.svelte';
+import { StateProvider } from '../../state/state-provider.svelte';
 
 const provider = new StateProvider(
 	(signalType: SignalType) => new SignalTypeState(signalType),
@@ -46,26 +46,26 @@ class SignalTypeState extends EntityState<SignalType> {
 	}
 
 	updateName(name: string) {
-		this.update(SignalTypeService.UpdateName(this.entity.entityId, name));
+		this.update(SignalTypeService.UpdateName(this.entity.entityId, { name }));
 	}
 
 	updateDesc(desc: string) {
-		this.update(SignalTypeService.UpdateDesc(this.entity.entityId, desc));
+		this.update(SignalTypeService.UpdateDesc(this.entity.entityId, { desc }));
 	}
 
 	updateMin(min: number) {
-		this.update(SignalTypeService.UpdateMin(this.entity.entityId, min));
+		this.update(SignalTypeService.UpdateMin(this.entity.entityId, { min }));
 	}
 
 	updateMax(max: number) {
-		this.update(SignalTypeService.UpdateMax(this.entity.entityId, max));
+		this.update(SignalTypeService.UpdateMax(this.entity.entityId, { max }));
 	}
 
 	updateScale(scale: number) {
-		this.update(SignalTypeService.UpdateScale(this.entity.entityId, scale));
+		this.update(SignalTypeService.UpdateScale(this.entity.entityId, { scale }));
 	}
 
 	updateOffset(offset: number) {
-		this.update(SignalTypeService.UpdateOffset(this.entity.entityId, offset));
+		this.update(SignalTypeService.UpdateOffset(this.entity.entityId, { offset }));
 	}
 }

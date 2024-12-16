@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { SidebarItemKind, type SidebarItem } from '$lib/api/canturin';
+	import { deleteBus } from '$lib/panel/bus/state.svelte';
 	import { deleteSignalEnum } from '$lib/panel/signal-enum/state.svelte';
 	import layout from '$lib/state/layout-state.svelte';
-	import { deleteSignalType } from '$lib/state/signal-type-state.svelte';
+	import { deleteSignalType } from '$lib/panel/signal-type/state.svelte';
 	import {
 		AltArrowIcon,
 		BusIcon,
@@ -15,6 +16,7 @@
 	} from '../icon';
 	import { TreeView } from '../tree';
 	import { SidebarState } from './state.svelte';
+	import { deleteNode } from '$lib/panel/node/state.svelte';
 
 	const s = new SidebarState();
 
@@ -71,6 +73,14 @@
 		if (!item) return;
 
 		switch (item.kind) {
+			case SidebarItemKind.SidebarItemKindBus:
+				deleteBus(item.id);
+				break;
+
+			case SidebarItemKind.SidebarItemKindNode:
+				deleteNode(item.id);
+				break;
+
 			case SidebarItemKind.SidebarItemKindSignalType:
 				deleteSignalType(item.id);
 				break;

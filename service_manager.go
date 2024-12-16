@@ -18,16 +18,18 @@ func newServiceManager() *serviceManager {
 	sidebar := newSidebarService()
 	sidebarController := sidebar.getController()
 
+	bus := newBusService(sidebarController)
+
 	return &serviceManager{
 		sidebar: sidebar,
 		history: newHistoryService(),
 
-		bus:        newBusService(sidebarController),
-		node:       newNodeService(),
+		bus:        bus,
+		node:       newNodeService(sidebarController, bus),
 		message:    newMessageService(),
-		signalType: newSignalTypeService(),
+		signalType: newSignalTypeService(sidebarController),
 		signalUnit: newSignalUnitService(),
-		signalEnum: newSignalEnumService(),
+		signalEnum: newSignalEnumService(sidebarController),
 	}
 }
 

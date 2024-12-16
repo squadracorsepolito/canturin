@@ -1,6 +1,8 @@
 package main
 
-import "github.com/squadracorsepolito/acmelib"
+import (
+	"github.com/squadracorsepolito/acmelib"
+)
 
 type BusType string
 
@@ -49,14 +51,12 @@ type Bus struct {
 }
 
 type BusService struct {
-	*service0[*acmelib.Bus, Bus, *busHandlers]
+	*service0[*acmelib.Bus, Bus, *busHandler]
 }
 
 func newBusService(sidebar *sidebarController) *BusService {
-	handler := &busHandlers{}
-
 	return &BusService{
-		service0: newService0(serviceKindBus, handler, sidebar),
+		service0: newService0(serviceKindBus, newBusHandler(sidebar), sidebar),
 	}
 }
 
@@ -87,7 +87,7 @@ func (s *BusService) Create(req CreateBusReq) (Bus, error) {
 		},
 	)
 
-	return s.hanlders.toResponse(bus), nil
+	return s.handler.toResponse(bus), nil
 }
 
 func (s *BusService) Delete(entityID string) error {
@@ -99,17 +99,28 @@ func (s *BusService) Delete(entityID string) error {
 		return err
 	}
 
+	nodeInts := bus.NodeInterfaces()
+	bus.RemoveAllNodeInterfaces()
+
 	s.removeEntity(entityID)
 	s.sidebar.sendDelete(bus)
 
 	s.sendHistoryOp(
 		func() (*acmelib.Bus, error) {
+			for _, nodeInt := range nodeInts {
+				if err := bus.AddNodeInterface(nodeInt); err != nil {
+					return nil, err
+				}
+			}
+
 			s.addEntity(bus)
 			s.sidebar.sendAdd(bus)
 
 			return bus, nil
 		},
 		func() (*acmelib.Bus, error) {
+			bus.RemoveAllNodeInterfaces()
+
 			s.removeEntity(entityID)
 			s.sidebar.sendDelete(bus)
 
@@ -120,62 +131,35 @@ func (s *BusService) Delete(entityID string) error {
 	return nil
 }
 
-func (s *BusService) UpdateName(entityID string, name string) (Bus, error) {
-	s.mux.Lock()
-	defer s.mux.Unlock()
-
-	bus, err := s.getEntity(entityID)
-	if err != nil {
-		return Bus{}, err
-	}
-
-	oldName := bus.Name()
-	if name == oldName {
-		return s.hanlders.toResponse(bus), nil
-	}
-
-	if err := s.hanlders.updateName(bus, name); err != nil {
-		return Bus{}, err
-	}
-
-	// s.sendSidebarUpdateName(bus)
-	s.sidebar.sendUpdateName(bus)
-
-	s.sendHistoryOp(
-		func() (*acmelib.Bus, error) {
-			s.hanlders.updateName(bus, oldName)
-			// s.sendSidebarUpdateName(bus)
-			s.sidebar.sendUpdateName(bus)
-
-			return bus, nil
-		},
-		func() (*acmelib.Bus, error) {
-			s.hanlders.updateName(bus, name)
-			// s.sendSidebarUpdateName(bus)
-			s.sidebar.sendUpdateName(bus)
-
-			return bus, nil
-		},
-	)
-
-	return s.hanlders.toResponse(bus), nil
+func (s *BusService) UpdateName(entityID string, req UpdateNameReq) (Bus, error) {
+	return s.handle(entityID, &req, s.handler.updateName)
 }
 
 func (s *BusService) UpdateDesc(entityID string, req UpdateDescReq) (Bus, error) {
-	return s.handle(entityID, &req, s.hanlders.updateDesc)
+	return s.handle(entityID, &req, s.handler.updateDesc)
 }
 
 func (s *BusService) UpdateBusType(entityID string, req UpdateBusTypeReq) (Bus, error) {
-	return s.handle(entityID, &req, s.hanlders.updateBusType)
+	return s.handle(entityID, &req, s.handler.updateBusType)
 }
 
 func (s *BusService) UpdateBaudrate(entityID string, req UpdateBaudrateReq) (Bus, error) {
-	return s.handle(entityID, &req, s.hanlders.updateBaudrate)
+	return s.handle(entityID, &req, s.handler.updateBaudrate)
 }
 
-type busHandlers struct{}
+type busRes = response[*acmelib.Bus]
 
-func (h *busHandlers) toResponse(bus *acmelib.Bus) Bus {
+type busHandler struct {
+	*commonServiceHandler
+}
+
+func newBusHandler(sidebar *sidebarController) *busHandler {
+	return &busHandler{
+		commonServiceHandler: newCommonServiceHandler(sidebar),
+	}
+}
+
+func (h *busHandler) toResponse(bus *acmelib.Bus) Bus {
 	attNodes := []AttachedNode{}
 
 	for _, nodeInt := range bus.NodeInterfaces() {
@@ -192,13 +176,50 @@ func (h *busHandlers) toResponse(bus *acmelib.Bus) Bus {
 	}
 }
 
-type busRes = response[*acmelib.Bus]
+func (h *busHandler) updateName(bus *acmelib.Bus, req *request, res *busRes) error {
+	parsedReq := req.toUpdateName()
 
-func (h *busHandlers) updateName(bus *acmelib.Bus, name string) error {
-	return bus.UpdateName(name)
+	name := parsedReq.Name
+
+	oldName := bus.Name()
+	if name == oldName {
+		return nil
+	}
+
+	if err := bus.UpdateName(name); err != nil {
+		return err
+	}
+
+	h.sidebar.sendUpdateName(bus)
+
+	res.setUndo(
+		func() (*acmelib.Bus, error) {
+			if err := bus.UpdateName(oldName); err != nil {
+				return nil, err
+			}
+
+			h.sidebar.sendUpdateName(bus)
+
+			return bus, nil
+		},
+	)
+
+	res.setRedo(
+		func() (*acmelib.Bus, error) {
+			if err := bus.UpdateName(name); err != nil {
+				return nil, err
+			}
+
+			h.sidebar.sendUpdateName(bus)
+
+			return bus, nil
+		},
+	)
+
+	return nil
 }
 
-func (h *busHandlers) updateDesc(bus *acmelib.Bus, req *request, res *busRes) error {
+func (h *busHandler) updateDesc(bus *acmelib.Bus, req *request, res *busRes) error {
 	parsedReq := req.toUpdateDesc()
 
 	desc := parsedReq.Desc
@@ -227,7 +248,7 @@ func (h *busHandlers) updateDesc(bus *acmelib.Bus, req *request, res *busRes) er
 	return nil
 }
 
-func (h *busHandlers) updateBusType(bus *acmelib.Bus, req *request, res *busRes) error {
+func (h *busHandler) updateBusType(bus *acmelib.Bus, req *request, res *busRes) error {
 	parsedReq := req.toUpdateBusType()
 
 	typ := parsedReq.BusType
@@ -262,7 +283,7 @@ func (h *busHandlers) updateBusType(bus *acmelib.Bus, req *request, res *busRes)
 	return nil
 }
 
-func (h *busHandlers) updateBaudrate(bus *acmelib.Bus, req *request, res *busRes) error {
+func (h *busHandler) updateBaudrate(bus *acmelib.Bus, req *request, res *busRes) error {
 	parsedReq := req.toUpdateBaudrate()
 
 	baudrate := parsedReq.Baudrate

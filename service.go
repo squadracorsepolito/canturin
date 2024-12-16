@@ -86,6 +86,7 @@ func (s *service[T, M]) Get(entityID string) (dummyRes M, _ error) {
 	if err != nil {
 		return dummyRes, err
 	}
+
 	return s.converterFn(item), nil
 }
 

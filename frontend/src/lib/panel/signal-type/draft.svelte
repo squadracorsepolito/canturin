@@ -8,18 +8,18 @@
 	import NumberInput from '$lib/components/input/number-input.svelte';
 	import SubmitButton from '$lib/components/button/submit-button.svelte';
 	import FormField from '$lib/components/form-field/form-field.svelte';
-	import { text } from './signal-type-text';
 	import Divider from '$lib/components/divider/divider.svelte';
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';
 	import { SignalTypeIcon } from '$lib/components/icon';
 	import ToggleInput from '$lib/components/input/toggle-input.svelte';
 	import layout from '$lib/state/layout-state.svelte';
+	import { signalTypeKindOptions } from './utils';
 
 	let invalidNames = $state<string[]>([]);
 
 	onMount(async () => {
-		const res = await SignalTypeService.GetNames();
+		const res = await SignalTypeService.GetInvalidNames('');
 		if (res) {
 			invalidNames = res;
 		}
@@ -48,7 +48,7 @@
 			if (form.valid) {
 				const { name, desc, kind, size, signed, min, max, scale, offset } = form.data;
 
-				const tmpSigType = await SignalTypeService.Create(
+				const tmpSigType = await SignalTypeService.Create({
 					kind,
 					name,
 					desc,
@@ -58,7 +58,7 @@
 					max,
 					scale,
 					offset
-				);
+				});
 
 				layout.openPanel('signal_type', tmpSigType.entityId);
 			}
@@ -70,25 +70,25 @@
 	<div class="flex gap-3 items-center pb-8">
 		<SignalTypeIcon height="48" width="48" />
 
-		<h2>{text.headings.draft}</h2>
+		<h2>Create new Signal Type</h2>
 	</div>
 
-	<FormField {...text.name} cols={4}>
+	<FormField label="Name" cols={4}>
 		<TextInput name="signal-type-name" bind:value={$form.name} errors={$errors.name} />
 	</FormField>
 
 	<div class="py-5">
-		<FormField {...text.desc} cols={4}>
+		<FormField label="Description (optional)" cols={4}>
 			<Textarea name="signal-type-desc" bind:value={$form.desc} />
 		</FormField>
 	</div>
 
 	<Divider />
 
-	<FormField {...text.kind}>
+	<FormField label="Kind" desc="The kind of the type">
 		<SegmentedControl
 			name="signal-type-kind"
-			options={text.kind.options}
+			options={signalTypeKindOptions}
 			bind:selectedValue={$form.kind}
 		/>
 	</FormField>
@@ -96,11 +96,11 @@
 	<Divider />
 
 	<div class="grid grid-cols-2 gap-5">
-		<FormField {...text.size}>
+		<FormField label="Size" desc="The size in bits">
 			<NumberInput name="signal-type-size" bind:value={$form.size} errors={$errors.size} />
 		</FormField>
 
-		<FormField {...text.signed}>
+		<FormField label="Signed" desc="Whether the value is signed">
 			<ToggleInput name="signal-type-signed" bind:checked={$form.signed} />
 		</FormField>
 	</div>
@@ -108,11 +108,11 @@
 	<Divider />
 
 	<div class="grid grid-cols-2 gap-5">
-		<FormField {...text.min}>
+		<FormField label="Min" desc="The minimum value">
 			<NumberInput name="signal-type-min" bind:value={$form.min} errors={$errors.min} />
 		</FormField>
 
-		<FormField {...text.max}>
+		<FormField label="Max" desc="The maximum value">
 			<NumberInput name="signal-type-max" bind:value={$form.max} errors={$errors.max} />
 		</FormField>
 	</div>
@@ -120,16 +120,16 @@
 	<Divider />
 
 	<div class="grid grid-cols-2 gap-5">
-		<FormField {...text.scale}>
+		<FormField label="Scale" desc="The scale factor">
 			<NumberInput name="signal-type-scale" bind:value={$form.scale} errors={$errors.scale} />
 		</FormField>
 
-		<FormField {...text.offset}>
+		<FormField label="Offset" desc="The offset">
 			<NumberInput name="signal-type-offset" bind:value={$form.offset} errors={$errors.offset} />
 		</FormField>
 	</div>
 
 	<div class="flex justify-end pt-5">
-		<SubmitButton label={text.buttons.draft.submit} />
+		<SubmitButton label="Create Signal Type" />
 	</div>
 </form>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { colorByName } from '$lib/actions/color-name.svelte';
-	import type { BaseEntity, NodeInterface, NodeMessage } from '$lib/api/canturin';
+	import type { BaseEntity, NodeInterface } from '$lib/api/canturin';
 	import { Attribute } from '$lib/components/attribute';
 	import { IconButton, UnderlinedButton } from '$lib/components/button';
 	import { Collapsible } from '$lib/components/collapsible';
@@ -23,7 +23,7 @@
 	const ns = getNodeState(entityId);
 
 	function handleAttachBus(bus: BaseEntity) {
-		ns.attachBus(int.number, bus.entityId);
+		ns.updateAttachedBus(int.number, bus.entityId);
 	}
 
 	let invalidBusIds = $derived.by(() => {
@@ -43,26 +43,26 @@
 		return arr.length;
 	}
 
-	function handleBulkDeleteSentMessages(msgs: NodeMessage[]) {
-		ns.deleteSentMessages(
+	function handleBulkDeleteSentMessages(msgs: BaseEntity[]) {
+		ns.removeSentMessages(
 			int.number,
 			msgs.map((m) => m.entityId)
 		);
 	}
 
-	function handleDeleteSentMessage(msg: NodeMessage) {
-		ns.deleteSentMessage(int.number, msg.entityId);
+	function handleDeleteSentMessage(msg: BaseEntity) {
+		ns.removeSentMessage(int.number, msg.entityId);
 	}
 
-	function handleBulkDeleteReceivedMessages(msgs: NodeMessage[]) {
-		ns.deleteReceivedMessages(
+	function handleBulkDeleteReceivedMessages(msgs: BaseEntity[]) {
+		ns.removeReceivedMessages(
 			int.number,
 			msgs.map((m) => m.entityId)
 		);
 	}
 
-	function handleDeleteReceivedMessage(msg: NodeMessage) {
-		ns.deleteReceivedMessage(int.number, msg.entityId);
+	function handleDeleteReceivedMessage(msg: BaseEntity) {
+		ns.removeReceivedMessage(int.number, msg.entityId);
 	}
 </script>
 

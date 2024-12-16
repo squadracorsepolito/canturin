@@ -46,40 +46,69 @@ class SignalEnumState extends EntityState<SignalEnum> {
 	}
 
 	updateName(name: string) {
-		this.update(SignalEnumService.UpdateName(this.entity.entityId, name));
+		this.update(SignalEnumService.UpdateName(this.entity.entityId, { name }));
 	}
 
 	updateDesc(desc: string) {
-		this.update(SignalEnumService.UpdateDesc(this.entity.entityId, desc));
+		this.update(SignalEnumService.UpdateDesc(this.entity.entityId, { desc }));
 	}
 
-	reorderValue(valueEntID: string, from: number, to: number) {
+	reorderValue(valueEntityId: string, from: number, to: number) {
 		if (from === to) return;
 
-		this.update(SignalEnumService.ReorderValue(this.entity.entityId, valueEntID, from, to));
+		this.update(
+			SignalEnumService.ReorderValue(this.entity.entityId, {
+				valueEntityId: valueEntityId,
+				from,
+				to
+			})
+		);
 	}
 
 	addValue() {
 		this.update(SignalEnumService.AddValue(this.entity.entityId));
 	}
 
-	deleteValue(valueEntID: string) {
-		this.update(SignalEnumService.RemoveValues(this.entity.entityId, valueEntID));
+	deleteValue(valueEntityId: string) {
+		this.update(
+			SignalEnumService.RemoveValues(this.entity.entityId, {
+				valueEntityIds: [valueEntityId]
+			})
+		);
 	}
 
-	deleteValues(valueEntIds: string[]) {
-		this.update(SignalEnumService.RemoveValues(this.entity.entityId, ...valueEntIds));
+	deleteValues(valueEntityIds: string[]) {
+		this.update(
+			SignalEnumService.RemoveValues(this.entity.entityId, {
+				valueEntityIds
+			})
+		);
 	}
 
-	updateValueName(valueEntID: string, name: string) {
-		this.update(SignalEnumService.UpdateValueName(this.entity.entityId, valueEntID, name));
+	updateValueName(valueEntityId: string, name: string) {
+		this.update(
+			SignalEnumService.UpdateValueName(this.entity.entityId, {
+				valueEntityId,
+				name
+			})
+		);
 	}
 
-	updateValueIndex(valueEntID: string, index: number) {
-		this.update(SignalEnumService.UpdateValueIndex(this.entity.entityId, valueEntID, index));
+	updateValueDesc(valueEntityId: string, desc: string) {
+		this.update(
+			SignalEnumService.UpdateValueDesc(this.entity.entityId, {
+				valueEntityId,
+				desc
+			})
+		);
 	}
 
-	updateValueDesc(valueEntID: string, desc: string) {
-		this.update(SignalEnumService.UpdateValueDesc(this.entity.entityId, valueEntID, desc));
+	updateValueIndex(valueEntityId: string, index: number) {
+		this.update(
+			SignalEnumService.UpdateValueIndex(this.entity.entityId, {
+				valueEntityId,
+				index
+			})
+		);
 	}
 }

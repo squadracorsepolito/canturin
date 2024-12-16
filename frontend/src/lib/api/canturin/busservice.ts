@@ -14,6 +14,11 @@ export function Create(req: $models.CreateBusReq): Promise<$models.Bus> & { canc
     return $resultPromise;
 }
 
+export function Delete(entityID: string): Promise<void> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1317798280, entityID) as any;
+    return $resultPromise;
+}
+
 export function Get(entityID: string): Promise<$models.Bus> & { cancel(): void } {
     let $resultPromise = $Call.ByID(920363765, entityID) as any;
     return $resultPromise;
@@ -44,7 +49,7 @@ export function UpdateDesc(entityID: string, req: $models.UpdateDescReq): Promis
     return $resultPromise;
 }
 
-export function UpdateName(entityID: string, name: string): Promise<$models.Bus> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(3117407681, entityID, name) as any;
+export function UpdateName(entityID: string, req: $models.UpdateNameReq): Promise<$models.Bus> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3117407681, entityID, req) as any;
     return $resultPromise;
 }

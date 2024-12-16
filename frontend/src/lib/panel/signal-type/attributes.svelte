@@ -5,11 +5,11 @@
 	import { NumberEditable } from '$lib/components/editable';
 	import { Readonly } from '$lib/components/readonly';
 	import SegmentedControl from '$lib/components/segmented-control/segmented-control.svelte';
-	import { getSignalTypeState } from '$lib/state/signal-type-state.svelte';
+	import { getSignalTypeState } from '$lib/panel/signal-type/state.svelte';
 	import { z } from 'zod';
 	import type { PanelSectionProps } from '../types';
-	import { text } from './signal-type-text';
 	import { Switch } from '$lib/components/switch';
+	import { signalTypeKindOptions } from './utils';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -84,7 +84,7 @@
 	<Attribute label="Kind" desc="The kind of the type">
 		<SegmentedControl
 			name="signal-type-kind"
-			options={text.kind.options}
+			options={signalTypeKindOptions}
 			bind:selectedValue={sts.entity.kind}
 			readOnly
 		/>
@@ -93,7 +93,7 @@
 	<Divider />
 
 	<div class="grid grid-cols-2 gap-5">
-		<Attribute {...text.size}>
+		<Attribute label="Size" desc="The size in bits">
 			<Readonly>
 				<span class="font-medium">
 					{signalType.size}
@@ -101,7 +101,7 @@
 			</Readonly>
 		</Attribute>
 
-		<Attribute {...text.signed}>
+		<Attribute label="Signed" desc="Whether the value is signed">
 			<Switch checked={signalType.signed} readOnly />
 		</Attribute>
 	</div>
@@ -109,7 +109,7 @@
 	<Divider />
 
 	<div class="grid grid-cols-2 gap-5">
-		<Attribute {...text.min}>
+		<Attribute label="Min" desc="The minimum value">
 			<NumberEditable
 				bind:value={signalType.min}
 				name="signal-type-min"
@@ -118,7 +118,7 @@
 			/>
 		</Attribute>
 
-		<Attribute {...text.max}>
+		<Attribute label="Max" desc="The maximum value">
 			<NumberEditable
 				bind:value={signalType.max}
 				name="signal-type-max"
@@ -131,7 +131,7 @@
 	<Divider />
 
 	<div class="grid grid-cols-2 gap-5">
-		<Attribute {...text.scale}>
+		<Attribute label="Scale" desc="The scale factor">
 			<NumberEditable
 				bind:value={signalType.scale}
 				name="signal-type-scale"
@@ -140,7 +140,7 @@
 			/>
 		</Attribute>
 
-		<Attribute {...text.offset}>
+		<Attribute label="Offset" desc="The offset value">
 			<NumberEditable
 				bind:value={signalType.offset}
 				name="signal-type-offset"
@@ -152,7 +152,7 @@
 {/snippet}
 
 <section>
-	<h3 class="pb-5">{text.headings.attributes}</h3>
+	<h3 class="pb-5">Attributes</h3>
 
 	{@render section(sts.entity)}
 </section>

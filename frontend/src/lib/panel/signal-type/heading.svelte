@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { SignalTypeIcon } from '$lib/components/icon';
 	import type { PanelSectionProps } from '../types';
-	import { getSignalTypeState } from '../../state/signal-type-state.svelte';
+	import { getSignalTypeState } from './state.svelte';
 	import { type SignalType } from '$lib/api/canturin';
 	import { TextEditable } from '$lib/components/editable';
 	import { z } from 'zod';
 	import TextareaEditable from '$lib/components/editable/textarea-editable.svelte';
-	import { text } from './signal-type-text';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -65,7 +64,7 @@
 		<TextareaEditable
 			initialValue={signalType.desc}
 			name="signal-type-desc"
-			triggerLabel={text.buttons.heading.descTriggerLabel}
+			triggerLabel="Add Description"
 			onsubmit={handleDesc}
 		/>
 	</div>

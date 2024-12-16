@@ -12,10 +12,14 @@
 	<h3 class="pb-5">Interfaces</h3>
 
 	{#if ns.entity.interfaces && ns.entity.interfaces.length > 0}
-		{#await ns.getBuses() then buses}
-			{#each ns.entity.interfaces as int}
-				<Interface {buses} {int} {entityId} />
-			{/each}
-		{/await}
+		<ul class="flex flex-col gap-5">
+			{#await ns.getBuses() then buses}
+				{#each ns.entity.interfaces as int}
+					<li>
+						<Interface {buses} {int} {entityId} />
+					</li>
+				{/each}
+			{/await}
+		</ul>
 	{/if}
 </section>

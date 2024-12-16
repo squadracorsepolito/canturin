@@ -15,7 +15,7 @@
 	let invalidNames = $state<string[]>([]);
 
 	onMount(async () => {
-		const res = await SignalEnumService.GetNames();
+		const res = await SignalEnumService.GetInvalidNames('');
 		if (res) {
 			invalidNames = res;
 		}
@@ -38,7 +38,7 @@
 			if (form.valid) {
 				const { name, desc, minSize } = form.data;
 
-				const tmpSignalEnum = await SignalEnumService.Create(name, desc, minSize);
+				const tmpSignalEnum = await SignalEnumService.Create({ name, desc, minSize });
 
 				layout.openPanel('signal_enum', tmpSignalEnum.entityId);
 			}

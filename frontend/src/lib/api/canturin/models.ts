@@ -55,6 +55,31 @@ export interface CreateBusReq {
     "baudrate": number;
 }
 
+export interface CreateNodeReq {
+    "name": string;
+    "desc": string;
+    "nodeId": number;
+    "interfaceCount": number;
+}
+
+export interface CreateSignalEnumReq {
+    "name": string;
+    "desc": string;
+    "minSize": number;
+}
+
+export interface CreateSignalTypeReq {
+    "name": string;
+    "desc": string;
+    "kind": SignalTypeKind;
+    "size": number;
+    "signed": boolean;
+    "min": number;
+    "max": number;
+    "scale": number;
+    "offset": number;
+}
+
 export interface History {
     "operationCount": number;
     "currentIndex": number;
@@ -94,15 +119,28 @@ export interface Node0 {
 export interface NodeInterface {
     "number": number;
     "attachedBus": BaseEntity;
-    "sentMessages": NodeMessage[] | null;
-    "receivedMessages": NodeMessage[] | null;
+    "sentMessages": BaseEntity[] | null;
+    "receivedMessages": BaseEntity[] | null;
 }
 
-export interface NodeMessage {
-    "entityId": string;
-    "name": string;
-    "desc": string;
-    "createTime": time$0.Time;
+export interface RemoveReceivedMessagesReq {
+    "interfaceNumber": number;
+    "messageEntityIds": string[] | null;
+}
+
+export interface RemoveSentMessagesReq {
+    "interfaceNumber": number;
+    "messageEntityIds": string[] | null;
+}
+
+export interface RemoveValuesReq {
+    "valueEntityIds": string[] | null;
+}
+
+export interface ReorderValueReq {
+    "valueEntityId": string;
+    "from": number;
+    "to": number;
 }
 
 export interface Sidebar {
@@ -208,6 +246,11 @@ export interface SignalUnit {
     "references": SignalReference[] | null;
 }
 
+export interface UpdateAttachedBusReq {
+    "busEntityId": string;
+    "interfaceNumber": number;
+}
+
 export interface UpdateBaudrateReq {
     "baudrate": number;
 }
@@ -218,4 +261,43 @@ export interface UpdateBusTypeReq {
 
 export interface UpdateDescReq {
     "desc": string;
+}
+
+export interface UpdateMaxReq {
+    "max": number;
+}
+
+export interface UpdateMinReq {
+    "min": number;
+}
+
+export interface UpdateNameReq {
+    "name": string;
+}
+
+export interface UpdateNodeIDReq {
+    "nodeId": number;
+}
+
+export interface UpdateOffsetReq {
+    "offset": number;
+}
+
+export interface UpdateScaleReq {
+    "scale": number;
+}
+
+export interface UpdateValueDescReq {
+    "valueEntityId": string;
+    "desc": string;
+}
+
+export interface UpdateValueIndexReq {
+    "valueEntityId": string;
+    "index": number;
+}
+
+export interface UpdateValueNameReq {
+    "valueEntityId": string;
+    "name": string;
 }

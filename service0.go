@@ -41,10 +41,20 @@ type serviceHandler[E entity, R any] interface {
 	toResponse(entity E) R
 }
 
+type commonServiceHandler struct {
+	sidebar *sidebarController
+}
+
+func newCommonServiceHandler(sidebar *sidebarController) *commonServiceHandler {
+	return &commonServiceHandler{
+		sidebar: sidebar,
+	}
+}
+
 type service0[E entity, R any, H serviceHandler[E, R]] struct {
 	kind serviceKind
 
-	hanlders H
+	handler H
 
 	mux      sync.RWMutex
 	entities map[acmelib.EntityID]E
@@ -59,7 +69,7 @@ func newService0[E entity, R any, H serviceHandler[E, R]](kind serviceKind, hand
 	return &service0[E, R, H]{
 		kind: kind,
 
-		hanlders: handlers,
+		handler: handlers,
 
 		entities: make(map[acmelib.EntityID]E),
 
@@ -172,7 +182,7 @@ func (s *service0[E, R, H]) sendHistoryOp(undo, redo func() (E, error)) {
 				return nil, err
 			}
 
-			return s.hanlders.toResponse(res), nil
+			return s.handler.toResponse(res), nil
 		},
 		func() (any, error) {
 			s.mux.Lock()
@@ -183,12 +193,12 @@ func (s *service0[E, R, H]) sendHistoryOp(undo, redo func() (E, error)) {
 				return nil, err
 			}
 
-			return s.hanlders.toResponse(res), nil
+			return s.handler.toResponse(res), nil
 		},
 	)
 }
 
-func (s *service0[E, R, H]) handle(entityID string, reqDataPtr any, handler func(E, *request, *response[E]) error) (dummyRes R, _ error) {
+func (s *service0[E, R, H]) handle(entityID string, reqDataPtr any, handlerFn func(E, *request, *response[E]) error) (dummyRes R, _ error) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
@@ -200,7 +210,7 @@ func (s *service0[E, R, H]) handle(entityID string, reqDataPtr any, handler func
 	req := newRequest(reqDataPtr)
 	res := newResponse[E]()
 
-	if err := handler(ent, req, res); err != nil {
+	if err := handlerFn(ent, req, res); err != nil {
 		return dummyRes, err
 	}
 
@@ -208,7 +218,23 @@ func (s *service0[E, R, H]) handle(entityID string, reqDataPtr any, handler func
 		s.sendHistoryOp(res.undo, res.redo)
 	}
 
-	return s.hanlders.toResponse(ent), nil
+	return s.handler.toResponse(ent), nil
+}
+
+func (s *service0[E, R, H]) crossHandle(entityID string, handlerFn func(E) error) (E, error) {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	ent, err := s.getEntity(entityID)
+	if err != nil {
+		return ent, err
+	}
+
+	if err := handlerFn(ent); err != nil {
+		return ent, err
+	}
+
+	return ent, nil
 }
 
 func (s *service0[E, R, H]) addEntity(ent E) {
@@ -237,7 +263,7 @@ func (s *service0[E, R, H]) Get(entityID string) (dummyRes R, _ error) {
 		return dummyRes, err
 	}
 
-	return s.hanlders.toResponse(ent), nil
+	return s.handler.toResponse(ent), nil
 }
 
 func (s *service0[E, R, H]) GetInvalidNames(entityID string) []string {

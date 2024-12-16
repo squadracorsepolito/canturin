@@ -9,13 +9,13 @@ import {Call as $Call} from "@wailsio/runtime";
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
-export function AttachBus(nodeEntID: string, intNumber: number, busEntID: string): Promise<$models.Node> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(2185278590, nodeEntID, intNumber, busEntID) as any;
+export function Create(req: $models.CreateNodeReq): Promise<$models.Node> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3044972449, req) as any;
     return $resultPromise;
 }
 
-export function Create(name: string, desc: string, id: number, interfaceCount: number): Promise<$models.Node> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(3044972449, name, desc, id, interfaceCount) as any;
+export function Delete(entityID: string): Promise<void> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3040942918, entityID) as any;
     return $resultPromise;
 }
 
@@ -24,42 +24,47 @@ export function Get(entityID: string): Promise<$models.Node> & { cancel(): void 
     return $resultPromise;
 }
 
-export function GetInvalidIDs(entityID: string): Promise<number[] | null> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(3779751492, entityID) as any;
-    return $resultPromise;
-}
-
 export function GetInvalidNames(entityID: string): Promise<string[] | null> & { cancel(): void } {
     let $resultPromise = $Call.ByID(3477642942, entityID) as any;
     return $resultPromise;
 }
 
-export function GetNames(): Promise<string[] | null> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(2126753985) as any;
+export function GetInvalidNodeIDs(entityID: string): Promise<number[] | null> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(2336447840, entityID) as any;
     return $resultPromise;
 }
 
-export function RemoveReceivedMessages(nodeEntID: string, intNumber: number, ...messageEntIDs: string[]): Promise<$models.Node> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(507733122, nodeEntID, intNumber, messageEntIDs) as any;
+export function ListBase(): Promise<$models.BaseEntity[] | null> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(720023600) as any;
     return $resultPromise;
 }
 
-export function RemoveSentMessages(nodeEntID: string, intNumber: number, ...messageEntIDs: string[]): Promise<$models.Node> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(377191259, nodeEntID, intNumber, messageEntIDs) as any;
+export function RemoveReceivedMessages(entityID: string, req: $models.RemoveReceivedMessagesReq): Promise<$models.Node> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(507733122, entityID, req) as any;
     return $resultPromise;
 }
 
-export function UpdateDesc(entityID: string, desc: string): Promise<$models.Node> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(663236641, entityID, desc) as any;
+export function RemoveSentMessages(entityID: string, req: $models.RemoveSentMessagesReq): Promise<$models.Node> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(377191259, entityID, req) as any;
     return $resultPromise;
 }
 
-export function UpdateID(entityID: string, id: number): Promise<$models.Node> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(2627669165, entityID, id) as any;
+export function UpdateAttachedBus(entityID: string, req: $models.UpdateAttachedBusReq): Promise<$models.Node> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(2257752090, entityID, req) as any;
     return $resultPromise;
 }
 
-export function UpdateName(entityID: string, name: string): Promise<$models.Node> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(2144136979, entityID, name) as any;
+export function UpdateDesc(entityID: string, req: $models.UpdateDescReq): Promise<$models.Node> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(663236641, entityID, req) as any;
+    return $resultPromise;
+}
+
+export function UpdateName(entityID: string, req: $models.UpdateNameReq): Promise<$models.Node> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(2144136979, entityID, req) as any;
+    return $resultPromise;
+}
+
+export function UpdateNodeID(entityID: string, req: $models.UpdateNodeIDReq): Promise<$models.Node> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1325739537, entityID, req) as any;
     return $resultPromise;
 }
