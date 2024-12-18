@@ -55,22 +55,6 @@ func newSidebarItem(kind SidebarItemKind, entityID acmelib.EntityID, prefix, nam
 	}
 }
 
-// func getSidebarItemMsgBusKey(bus entity) string {
-// 	return fmt.Sprintf("%s:%s", bus.EntityID(), SidebarMessagesPrefix)
-// }
-
-// func getSidebarItemMsgNodeKey(nodeInt *acmelib.NodeInterface) string {
-// 	return fmt.Sprintf("%s:%d:%s", nodeInt.Node().EntityID(), nodeInt.Number(), SidebarMessagesPrefix)
-// }
-
-// func getSidebarItemMsgNodeName(nodeInt *acmelib.NodeInterface) string {
-// 	return fmt.Sprintf("%s:%d", nodeInt.Node().Name(), nodeInt.Number())
-// }
-
-// func getSidebatItemMsgNodePrefix(parBus *acmelib.Bus) string {
-// 	return fmt.Sprintf("%s:%s", SidebarMessagesPrefix, parBus.EntityID())
-// }
-
 type sidebarItemFactory struct{}
 
 func (f *sidebarItemFactory) newItem(kind SidebarItemKind, entityID acmelib.EntityID, prefix, name string) *sidebarItem {
@@ -148,63 +132,6 @@ func (f *sidebarItemFactory) getMessageNodeName(nodeInt *acmelib.NodeInterface) 
 	return fmt.Sprintf("%s:%d", nodeInt.Node().Name(), nodeInt.Number())
 }
 
-// func (f *sidebarItemFactory) getMessageNodePrefix(parBus *acmelib.Bus) string {
-// 	if parBus == nil {
-// 		return ""
-// 	}
-// 	return fmt.Sprintf("%s:%s", SidebarMessagesPrefix, parBus.EntityID())
-// }
-
-//
-//
-//
-
-// func newBusSidebarItem(bus *acmelib.Bus) *sidebarItem {
-// 	return newSidebarItem(SidebarItemKindBus, bus.EntityID(), SidebarBusesPrefix, bus.Name())
-// }
-
-// func newNodeSidebarItem(node *acmelib.Node) *sidebarItem {
-// 	return newSidebarItem(SidebarItemKindNode, node.EntityID(), SidebarNodesPrefix, node.Name())
-// }
-
-// func newMessageSidebarItem(message *acmelib.Message) *sidebarItem {
-// 	return newSidebarItem(SidebarItemKindMessage, message.EntityID(), SidebarMessagesPrefix, message.Name())
-// }
-
-// func newSignalTypeSidebarItem(sigType *acmelib.SignalType) *sidebarItem {
-// 	return newSidebarItem(SidebarItemKindSignalType, sigType.EntityID(), SidebarSignalTypesPrefix, sigType.Name())
-// }
-
-// func newSignalUnitSidebarItem(sigUnit *acmelib.SignalUnit) *sidebarItem {
-// 	return newSidebarItem(SidebarItemKindSignalUnit, sigUnit.EntityID(), SidebarSignalUnitsPrefix, sigUnit.Name())
-// }
-
-// func newSignalEnumSidebarItem(sigEnum *acmelib.SignalEnum) *sidebarItem {
-// 	return newSidebarItem(SidebarItemKindSignalEnum, sigEnum.EntityID(), SidebarSignalEnumsPrefix, sigEnum.Name())
-// }
-
-// func newGroupSidebarItem(id, name string) *sidebarItem {
-// 	return newSidebarItem(SidebarItemKindGroup, acmelib.EntityID(id), "", name)
-// }
-
-// func newMessageBusGroupSidebarItem(bus *acmelib.Bus) *sidebarItem {
-// 	return newSidebarItem(SidebarItemKindGroup, bus.EntityID(), SidebarMessagesPrefix, bus.Name())
-// }
-
-// func newMessageNodeGroupSidebarItem(nodeInt *acmelib.NodeInterface) *sidebarItem {
-// 	busEntID := nodeInt.ParentBus().EntityID()
-// 	nodeEntID := nodeInt.Node().EntityID()
-
-// 	prefix := fmt.Sprintf("%s:%s", SidebarMessagesPrefix, busEntID)
-// 	name := fmt.Sprintf("%s:%d", nodeInt.Node().Name(), nodeInt.Number())
-
-// 	return newSidebarItem(SidebarItemKindGroup, nodeEntID, prefix, name)
-// }
-
-//
-//
-//
-
 func (si *sidebarItem) addChild(child *sidebarItem) {
 	si.children = append(si.children, child)
 	child.parent = si
@@ -273,14 +200,7 @@ type sidebarAddReq struct {
 	parentItemKey string
 }
 
-func newSidebarAddReq(item *sidebarItem, parentItemKey string) *sidebarAddReq {
-	return &sidebarAddReq{
-		item:          item,
-		parentItemKey: parentItemKey,
-	}
-}
-
-func newSidebarAddReq0(item *sidebarItem, itemKey, parentItemKey string) *sidebarAddReq {
+func newSidebarAddReq(item *sidebarItem, itemKey, parentItemKey string) *sidebarAddReq {
 	return &sidebarAddReq{
 		item:          item,
 		itemKey:       itemKey,
@@ -503,6 +423,8 @@ func (s *SidebarService) load(req *sidebarLoadReq) {
 		s.addItem(sigEnumKey, sigEnumItem)
 		sigEnumGroupItem.addChild(sigEnumItem)
 	}
+
+	app.EmitEvent(SidebarLoad)
 }
 
 func (s *SidebarService) sendUpdateName(req *sidebarUpdateNameReq) {
@@ -626,14 +548,14 @@ func (s *sidebarController) sendAdd(ent entity) {
 	switch ent.EntityKind() {
 	case acmelib.EntityKindBus:
 		busKey, busItem := s.f.newBus(ent)
-		s.addCh <- newSidebarAddReq0(busItem, busKey, SidebarBusesPrefix)
+		s.addCh <- newSidebarAddReq(busItem, busKey, SidebarBusesPrefix)
 
 		msgBusKey, msgBusItem := s.f.newMessageBus(ent)
-		s.addCh <- newSidebarAddReq0(msgBusItem, msgBusKey, SidebarMessagesPrefix)
+		s.addCh <- newSidebarAddReq(msgBusItem, msgBusKey, SidebarMessagesPrefix)
 
 	case acmelib.EntityKindNode:
 		nodeKey, nodeItem := s.f.newNode(ent)
-		s.addCh <- newSidebarAddReq0(nodeItem, nodeKey, SidebarNodesPrefix)
+		s.addCh <- newSidebarAddReq(nodeItem, nodeKey, SidebarNodesPrefix)
 
 		node, ok := ent.(*acmelib.Node)
 		if !ok {
@@ -647,24 +569,24 @@ func (s *sidebarController) sendAdd(ent entity) {
 			}
 
 			msgNodeKey, msgGroupItem := s.f.newMessageNode(nodeInt)
-			s.addCh <- newSidebarAddReq0(msgGroupItem, msgNodeKey, s.f.getMessageBusKey(parBus))
+			s.addCh <- newSidebarAddReq(msgGroupItem, msgNodeKey, s.f.getMessageBusKey(parBus))
 		}
 
 	case acmelib.EntityKindMessage:
 		msgKey, msgItem := s.f.newMessage(ent)
-		s.addCh <- newSidebarAddReq0(msgItem, msgKey, SidebarMessagesPrefix)
+		s.addCh <- newSidebarAddReq(msgItem, msgKey, SidebarMessagesPrefix)
 
 	case acmelib.EntityKindSignalType:
 		sigTypeKey, sigTypeItem := s.f.newSignalType(ent)
-		s.addCh <- newSidebarAddReq0(sigTypeItem, sigTypeKey, SidebarSignalTypesPrefix)
+		s.addCh <- newSidebarAddReq(sigTypeItem, sigTypeKey, SidebarSignalTypesPrefix)
 
 	case acmelib.EntityKindSignalUnit:
 		sigUnitKey, sigUnitItem := s.f.newSignalUnit(ent)
-		s.addCh <- newSidebarAddReq0(sigUnitItem, sigUnitKey, SidebarSignalUnitsPrefix)
+		s.addCh <- newSidebarAddReq(sigUnitItem, sigUnitKey, SidebarSignalUnitsPrefix)
 
 	case acmelib.EntityKindSignalEnum:
 		sigEnumKey, sigEnumItem := s.f.newSignalEnum(ent)
-		s.addCh <- newSidebarAddReq0(sigEnumItem, sigEnumKey, SidebarSignalEnumsPrefix)
+		s.addCh <- newSidebarAddReq(sigEnumItem, sigEnumKey, SidebarSignalEnumsPrefix)
 	}
 }
 

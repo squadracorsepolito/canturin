@@ -37,7 +37,8 @@ type HistoryService struct {
 
 	mux sync.RWMutex
 
-	stopCh chan struct{}
+	operationCh chan *operation
+	stopCh      chan struct{}
 }
 
 func newHistoryService() *HistoryService {
@@ -45,7 +46,8 @@ func newHistoryService() *HistoryService {
 		operations: []*operation{},
 		currOpIdx:  -1,
 
-		stopCh: make(chan struct{}),
+		operationCh: make(chan *operation),
+		stopCh:      make(chan struct{}),
 	}
 }
 
@@ -62,7 +64,7 @@ func (s *HistoryService) OnShutdown() error {
 func (s *HistoryService) run() {
 	for {
 		select {
-		case op := <-proxy.historyOperationCh:
+		case op := <-s.operationCh:
 			s.addOperation(op)
 
 		case <-s.stopCh:
@@ -161,4 +163,12 @@ func (s *HistoryService) sendModifyEvent(opDomain operationDomain, res any) {
 	}
 
 	app.EmitEvent(eventName, res)
+}
+
+func (s *HistoryService) pushOperation(domain operationDomain, undo, redo operationFunc) {
+	s.operationCh <- &operation{
+		domain: domain,
+		undo:   undo,
+		redo:   redo,
+	}
 }

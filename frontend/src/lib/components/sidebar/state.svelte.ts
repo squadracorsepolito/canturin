@@ -49,7 +49,7 @@ export class SidebarState {
 		});
 
 		// TODO! Remove this line in production
-		this.load();
+		// this.load();
 	}
 
 	private flattenItems(item: SidebarItem, acc: SidebarItem[]) {

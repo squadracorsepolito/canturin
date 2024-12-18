@@ -14,12 +14,12 @@ type SignalUnit struct {
 }
 
 type SignalUnitService struct {
-	*service0[*acmelib.SignalUnit, SignalUnit, *signalUnitHandler]
+	*service[*acmelib.SignalUnit, SignalUnit, *signalUnitHandler]
 }
 
 func newSignalUnitService(sidebar *sidebarController) *SignalUnitService {
 	return &SignalUnitService{
-		service0: newService0(serviceKindSignalUnit, newSignalUnitHandler(sidebar), sidebar),
+		service: newService(serviceKindSignalUnit, newSignalUnitHandler(sidebar), sidebar),
 	}
 }
 

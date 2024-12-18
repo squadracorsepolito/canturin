@@ -19,7 +19,7 @@ export function GetInvalidNames(entityID: string): Promise<string[] | null> & { 
     return $resultPromise;
 }
 
-export function GetNames(): Promise<string[] | null> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(1368788810) as any;
+export function ListBase(): Promise<$models.BaseEntity[] | null> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(417424819) as any;
     return $resultPromise;
 }

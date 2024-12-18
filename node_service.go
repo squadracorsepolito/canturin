@@ -43,12 +43,12 @@ type Node struct {
 }
 
 type NodeService struct {
-	*service0[*acmelib.Node, Node, *nodeHandler]
+	*service[*acmelib.Node, Node, *nodeHandler]
 }
 
 func newNodeService(sidebar *sidebarController, bus *BusService) *NodeService {
 	return &NodeService{
-		service0: newService0(serviceKindNode, newNodeHandler(sidebar, bus), sidebar),
+		service: newService(serviceKindNode, newNodeHandler(sidebar, bus), sidebar),
 	}
 }
 

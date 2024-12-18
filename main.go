@@ -2,11 +2,7 @@ package main
 
 import (
 	"embed"
-	_ "embed"
-
-	// "fmt"
 	"log"
-	// "os"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
@@ -22,32 +18,17 @@ var assets embed.FS
 
 var app *application.App
 
-var proxy *appProxy
-
 var manager *serviceManager
+
+const testdataPath = "./testdata/SC24.binpb"
 
 // main function serves as the application's entry point.
 // Main initializes the application, creates a window,
 // and starts a goroutine that emits a time-based event every second.
 // It subsequently runs the application and logs any error that might occur.
 func main() {
-	proxy = newAppProxy()
-
 	manager = newServiceManager()
-
-	// Path to the file used for loading network data.
-	infilepath := "./testdata/SC24.binpb"
-
-	// Initialize the services
-	// sidebarService := newSidebarService()
-	// historyService := newHistoryService()
-
-	// busService := newBusService()
-	// nodeService := newNodeService()
-	// messageService := newMessageService()
-	// signalTypeService := newSignalTypeService()
-	// signalUnitService := newSignalUnitService()
-	// signalEnumService := newSignalEnumService()
+	menuHandler := newMenuHandler()
 
 	// Create a new Wails application by providing the necesvar (sary options.
 	// Variables 'Name' and 'Description' are for application metadata.
@@ -59,19 +40,6 @@ func main() {
 		Description: "",
 
 		Services: manager.getServices(),
-
-		// Services: []application.Service{
-
-		// 	application.NewService(sidebarService),
-		// 	application.NewService(historyService),
-
-		// 	application.NewService(busService),
-		// 	application.NewService(nodeService),
-		// 	application.NewService(messageService),
-		// 	application.NewService(signalTypeService),
-		// 	application.NewService(signalUnitService),
-		// 	application.NewService(signalEnumService),
-		// },
 
 		// Key bindings for undo/redo actions, triggering functions on specific key combinations.
 		KeyBindings: map[string]func(window *application.WebviewWindow){
@@ -100,8 +68,6 @@ func main() {
 		},
 	})
 
-	initMenus()
-
 	// Create a new window with the necessary options.
 	// 'Title' is the title of the window.
 	// 'Mac' options tailor the window when running on macOS.
@@ -119,8 +85,10 @@ func main() {
 
 	// Emit an application event to load network data when the application starts.
 	app.OnApplicationEvent(events.Common.ApplicationStarted, func(_ *application.ApplicationEvent) {
-		loadNetwork(infilepath)
+		// loadNetwork(testdataPath)
 	})
+
+	menuHandler.init()
 
 	// Run the application. This blocks until the application has been exited.
 	// If an error occurred while running the application, log it and exit.
@@ -128,16 +96,3 @@ func main() {
 		log.Fatal(err)
 	}
 }
-
-// function to process and read files
-// func processFile(filePath string) {
-// 	// read selected file
-// 	data, err := os.ReadFile(filePath)
-// 	if err != nil {
-// 		fmt.Println("Error reading file:", err)
-// 		return
-// 	}
-
-// 	// Show file content on the terminal
-// 	fmt.Printf("File %s loaded successfully! Content:\n%s\n", filePath, string(data))
-// }

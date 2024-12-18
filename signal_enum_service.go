@@ -64,12 +64,12 @@ func newSignalEnum(sigEnum *acmelib.SignalEnum) SignalEnum {
 }
 
 type SignalEnumService struct {
-	*service0[*acmelib.SignalEnum, SignalEnum, *signalEnumHandler]
+	*service[*acmelib.SignalEnum, SignalEnum, *signalEnumHandler]
 }
 
 func newSignalEnumService(sidebar *sidebarController) *SignalEnumService {
 	return &SignalEnumService{
-		service0: newService0(serviceKindSignalEnum, newSignalEnumHandler(sidebar), sidebar),
+		service: newService(serviceKindSignalEnum, newSignalEnumHandler(sidebar), sidebar),
 	}
 }
 
