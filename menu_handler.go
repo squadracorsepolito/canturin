@@ -25,6 +25,7 @@ func (h *menuHandler) init() {
 
 	h.register(fileMenu, "Open File", h.openFile)
 	h.register(fileMenu, "Import DBC", h.importDBC)
+	h.register(fileMenu, "Close", h.close)
 
 	app.SetMenu(menu)
 }
@@ -49,7 +50,6 @@ func (h *menuHandler) openFile(_ *application.Context) error {
 	}
 
 	if path == "" {
-		application.InfoDialog().SetMessage("No file selected").Show()
 		return nil
 	}
 
@@ -89,7 +89,6 @@ func (h *menuHandler) importDBC(_ *application.Context) error {
 	}
 
 	if path == "" {
-		application.InfoDialog().SetMessage("No file selected").Show()
 		return nil
 	}
 
@@ -112,6 +111,19 @@ func (h *menuHandler) importDBC(_ *application.Context) error {
 	}
 
 	manager.reloadNetwork()
+
+	return nil
+}
+
+func (h *menuHandler) close(_ *application.Context) error {
+	manager.sidebar.clear()
+
+	manager.bus.sendClear()
+	manager.node.sendClear()
+	manager.message.sendClear()
+	manager.signalType.sendClear()
+	manager.signalUnit.sendClear()
+	manager.signalEnum.sendClear()
 
 	return nil
 }

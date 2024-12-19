@@ -228,8 +228,6 @@ type SidebarService struct {
 	updateNameCh chan *sidebarUpdateNameReq
 	addCh        chan *sidebarAddReq
 	deleteCh     chan *sidebarDeleteReq
-
-	stopCh chan struct{}
 }
 
 func newSidebarService() *SidebarService {
@@ -242,12 +240,10 @@ func newSidebarService() *SidebarService {
 		updateNameCh: make(chan *sidebarUpdateNameReq),
 		addCh:        make(chan *sidebarAddReq),
 		deleteCh:     make(chan *sidebarDeleteReq),
-
-		stopCh: make(chan struct{}),
 	}
 }
 
-func (s *SidebarService) run() {
+func (s *SidebarService) run(ctx context.Context) {
 	for {
 		select {
 		case req := <-s.loadCh:
@@ -262,20 +258,26 @@ func (s *SidebarService) run() {
 		case req := <-s.deleteCh:
 			s.delete(req)
 
-		case <-s.stopCh:
+		case <-ctx.Done():
 			return
 		}
 	}
 }
 
-func (s *SidebarService) OnStartup(_ context.Context, _ application.ServiceOptions) error {
-	go s.run()
+func (s *SidebarService) clear() {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	s.root = nil
+	clear(s.items)
+}
+
+func (s *SidebarService) OnStartup(ctx context.Context, _ application.ServiceOptions) error {
+	go s.run(ctx)
 	return nil
 }
 
-func (s *SidebarService) OnShutdown() {
-	s.stopCh <- struct{}{}
-}
+func (s *SidebarService) OnShutdown() {}
 
 func (s *SidebarService) addItem(itemKey string, item *sidebarItem) {
 	s.items[itemKey] = item

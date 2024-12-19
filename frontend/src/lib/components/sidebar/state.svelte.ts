@@ -32,6 +32,7 @@ export class SidebarState {
 
 	constructor() {
 		wails.On(SidebarLoad, () => {
+			this.sidebar = undefined;
 			this.load();
 		});
 
@@ -64,6 +65,7 @@ export class SidebarState {
 
 	async load() {
 		const sidebar = await SidebarService.Get();
+		console.log(sidebar);
 		this.sidebar = sidebar;
 	}
 

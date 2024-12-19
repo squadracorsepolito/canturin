@@ -59,8 +59,8 @@ type service[E entity, R any, H serviceHandler[E, R]] struct {
 	mux      sync.RWMutex
 	entities map[acmelib.EntityID]E
 
-	loadCh chan E
-	stopCh chan struct{}
+	loadCh  chan E
+	clearCh chan struct{}
 
 	sidebar *sidebarController
 }
@@ -73,8 +73,8 @@ func newService[E entity, R any, H serviceHandler[E, R]](kind serviceKind, handl
 
 		entities: make(map[acmelib.EntityID]E),
 
-		loadCh: make(chan E),
-		stopCh: make(chan struct{}),
+		loadCh:  make(chan E),
+		clearCh: make(chan struct{}),
 
 		sidebar: sidebar,
 	}
@@ -84,7 +84,11 @@ func (s *service[E, R, H]) sendLoad(ent E) {
 	s.loadCh <- ent
 }
 
-func (s *service[E, R, H]) run() {
+func (s *service[E, R, H]) sendClear() {
+	s.clearCh <- struct{}{}
+}
+
+func (s *service[E, R, H]) run(ctx context.Context) {
 	for {
 		select {
 		case ent := <-s.loadCh:
@@ -92,21 +96,29 @@ func (s *service[E, R, H]) run() {
 			s.addEntity(ent)
 			s.mux.Unlock()
 
-		case <-s.stopCh:
+		case <-s.clearCh:
+			s.clear()
+
+		case <-ctx.Done():
+			close(s.loadCh)
 			return
 		}
 	}
 }
 
-func (s *service[E, R, H]) OnStartup(_ context.Context, _ application.ServiceOptions) error {
-	go s.run()
+func (s *service[E, R, H]) clear() {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	clear(s.entities)
+}
+
+func (s *service[E, R, H]) OnStartup(ctx context.Context, _ application.ServiceOptions) error {
+	go s.run(ctx)
 	return nil
 }
 
-func (s *service[E, R, H]) OnShutdown() {
-	s.stopCh <- struct{}{}
-	close(s.loadCh)
-}
+func (s *service[E, R, H]) OnShutdown() {}
 
 func (s *service[E, R, H]) sendHistoryOp(undo, redo func() (E, error)) {
 	var opDomain operationDomain
