@@ -10,9 +10,10 @@
 		name: string;
 		options: SegmentedControlOption[];
 		readOnly?: boolean;
+		onchange?: (value: string) => void;
 	};
 
-	let { selectedValue = $bindable(), name, options, readOnly }: Props = $props();
+	let { selectedValue = $bindable(), name, options, readOnly, onchange }: Props = $props();
 
 	const [snapshot, send] = useMachine(
 		radioGroup.machine({
@@ -23,6 +24,7 @@
 			readOnly,
 			onValueChange: (details) => {
 				selectedValue = details.value;
+				onchange?.(details.value);
 			}
 		})
 	);
@@ -63,7 +65,7 @@
 	}
 
 	[data-part='item'] {
-		@apply grid row-span-2 grid-rows-subgrid border-2 py-2 px-3 rounded-btn gap-1 transition-colors;
+		@apply grid row-span-2 grid-rows-subgrid border-2 py-3 rounded-btn gap-1 transition-colors px-3;
 
 		&[data-readonly] {
 			&:not([data-state='checked']) {

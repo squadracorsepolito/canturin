@@ -57,6 +57,7 @@
 			errors={nameErrors}
 			fontWeight="semibold"
 			textSize="lg"
+			border="transparent"
 		/>
 	</div>
 

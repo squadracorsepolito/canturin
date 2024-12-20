@@ -56,7 +56,7 @@ func (m *serviceManager) getServices() []application.Service {
 	}
 }
 
-func (m *serviceManager) loadNetwork(net *acmelib.Network) {
+func (m *serviceManager) initNetwork(net *acmelib.Network) {
 	m.network = net
 
 	m.sidebar.sendLoad(newSidebarLoadReq(net))
@@ -123,6 +123,22 @@ func (m *serviceManager) loadNetwork(net *acmelib.Network) {
 	}
 }
 
+func (m *serviceManager) loadNetwork(net *acmelib.Network) {
+	m.clearServices()
+	m.initNetwork(net)
+}
+
 func (m *serviceManager) reloadNetwork() {
-	m.loadNetwork(m.network)
+	m.initNetwork(m.network)
+}
+
+func (m *serviceManager) clearServices() {
+	m.sidebar.clear()
+
+	m.bus.sendClear()
+	m.node.sendClear()
+	m.message.sendClear()
+	m.signalType.sendClear()
+	m.signalUnit.sendClear()
+	m.signalEnum.sendClear()
 }

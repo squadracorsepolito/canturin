@@ -3,7 +3,7 @@
 	import { getSignalReferenceTree } from '$lib/utils';
 	import type { PanelSectionProps } from '../types';
 	import type { SignalUnit } from '$lib/api/canturin';
-	import { getSignalUnitState } from './signal-unit-state.svelte';
+	import { getSignalUnitState } from './state.svelte';
 
 	let { entityId }: PanelSectionProps = $props();
 

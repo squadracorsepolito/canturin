@@ -2,11 +2,11 @@
 
 ## Status
 
--   Bus (WIP)
--   Node (MVP)
+-   Bus (Done)
+-   Node (Done)
 -   Message (WIP)
 -   Signal Types (Done)
--   Signal Unit (WIP)
+-   Signal Unit (Done)
 -   Signal Enum (Done)
 
 ## Prerequirements

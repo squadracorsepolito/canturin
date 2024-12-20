@@ -5,6 +5,6 @@ export type EditableProps<T> = {
 	errors?: string[];
 	textSize?: 'md' | 'lg';
 	fontWeight?: 'normal' | 'medium' | 'semibold';
-	border?: 'transparent' | 'visible';
+	border?: 'visible' | 'transparent';
 	oncommit?: (value: T) => void;
 };

@@ -56,6 +56,7 @@
 			name="bus-name"
 			fontWeight="semibold"
 			textSize="lg"
+			border="transparent"
 		/>
 	</div>
 

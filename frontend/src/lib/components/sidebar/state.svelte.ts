@@ -45,12 +45,11 @@ export class SidebarState {
 		});
 
 		wails.On(SidebarRemove, (e: wails.WailsEvent) => {
-			console.log(e);
 			this.update(e.data[0] as SidebarItem);
 		});
 
-		// TODO! Remove this line in production
-		// this.load();
+		// TODO!: remove this line in production
+		this.load();
 	}
 
 	private flattenItems(item: SidebarItem, acc: SidebarItem[]) {
@@ -65,7 +64,6 @@ export class SidebarState {
 
 	async load() {
 		const sidebar = await SidebarService.Get();
-		console.log(sidebar);
 		this.sidebar = sidebar;
 	}
 

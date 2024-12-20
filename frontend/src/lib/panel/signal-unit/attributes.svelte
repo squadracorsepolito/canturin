@@ -1,10 +1,13 @@
 <script lang="ts">
-	import type { SignalUnit } from '$lib/api/canturin';
+	import { SignalUnitKind, type SignalUnit } from '$lib/api/canturin';
 	import { Attribute } from '$lib/components/attribute';
+	import Divider from '$lib/components/divider/divider.svelte';
 	import { TextEditable } from '$lib/components/editable';
 	import { Readonly } from '$lib/components/readonly';
+	import { SegmentedControl } from '$lib/components/segmented-control';
 	import type { PanelSectionProps } from '../types';
-	import { getSignalUnitState } from './signal-unit-state.svelte';
+	import { getSignalUnitState } from './state.svelte';
+	import { signalUnitKindOptions } from './utils';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -13,22 +16,27 @@
 	function handleSymbol(sym: string) {
 		sus.updateSymbol(sym);
 	}
+
+	function handleKind(kind: string) {
+		sus.updateKind(kind);
+	}
 </script>
 
 {#snippet section(sigUnit: SignalUnit)}
-	<div class="grid grid-cols-2 gap-5 pt-8">
-		<Attribute label="Symbol" desc="Symbol of the Unit">
-			<TextEditable name="signal-unit-symbol" bind:value={sigUnit.symbol} oncommit={handleSymbol} />
-		</Attribute>
+	<Attribute label="Kind" desc="The kind of the type">
+		<SegmentedControl
+			name="signal-type-kind"
+			options={signalUnitKindOptions}
+			bind:selectedValue={sus.entity.kind}
+			onchange={handleKind}
+		/>
+	</Attribute>
 
-		<Attribute label="Reference Count">
-			<Readonly>
-				<span class="font-medium">
-					{sigUnit.referenceCount}
-				</span>
-			</Readonly>
-		</Attribute>
-	</div>
+	<Divider />
+
+	<Attribute label="Symbol" desc="Symbol of the Unit">
+		<TextEditable name="signal-unit-symbol" bind:value={sigUnit.symbol} oncommit={handleSymbol} />
+	</Attribute>
 {/snippet}
 
 <section>

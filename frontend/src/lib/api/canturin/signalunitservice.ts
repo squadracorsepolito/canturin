@@ -9,6 +9,16 @@ import {Call as $Call} from "@wailsio/runtime";
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+export function Create(req: $models.CreateSignalUnitReq): Promise<$models.SignalUnit> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1724364363, req) as any;
+    return $resultPromise;
+}
+
+export function Delete(entityID: string): Promise<void> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3439884680, entityID) as any;
+    return $resultPromise;
+}
+
 export function Get(entityID: string): Promise<$models.SignalUnit> & { cancel(): void } {
     let $resultPromise = $Call.ByID(3658353397, entityID) as any;
     return $resultPromise;
@@ -31,6 +41,11 @@ export function UpdateDesc(entityID: string, req: $models.UpdateDescReq): Promis
 
 export function UpdateName(entityID: string, req: $models.UpdateNameReq): Promise<$models.SignalUnit> & { cancel(): void } {
     let $resultPromise = $Call.ByID(1637602753, entityID, req) as any;
+    return $resultPromise;
+}
+
+export function UpdateSignalUnitKind(entityID: string, req: $models.UpdateSignalUnitKindReq): Promise<$models.SignalUnit> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(4203284158, entityID, req) as any;
     return $resultPromise;
 }
 

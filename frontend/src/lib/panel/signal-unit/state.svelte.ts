@@ -1,5 +1,7 @@
-import { SignalUnitService, type SignalUnit } from '$lib/api/canturin';
+import { SignalUnitKind, SignalUnitService, type SignalUnit } from '$lib/api/canturin';
 import { HistorySignalUnitModify } from '$lib/api/events';
+import { pushToast } from '$lib/components/toast/toast-provider.svelte';
+import layout from '$lib/state/layout-state.svelte';
 import { EntityState } from '../../state/entity-state.svelte';
 import { StateProvider } from '../../state/state-provider.svelte';
 
@@ -17,17 +19,20 @@ export async function loadSignalUnit(entityId: string) {
 	provider.add(signalUnit);
 }
 
-export function useSignalUnit(entityId: string) {
-	loadSignalUnit(entityId);
+export async function deleteSignalUnit(entityId: string) {
+	try {
+		await SignalUnitService.Delete(entityId);
+		provider.remove(entityId);
+		layout.closeIfOpen(entityId);
+	} catch (error) {
+		pushToast('error', 'Error', 'Operation failed');
+		console.error(error);
+	}
 }
 
 class SignalUnitState extends EntityState<SignalUnit> {
 	constructor(signalUnit: SignalUnit) {
 		super(signalUnit);
-	}
-
-	reload(entityId: string) {
-		loadSignalUnit(entityId);
 	}
 
 	async getInvalidNames() {
@@ -46,6 +51,11 @@ class SignalUnitState extends EntityState<SignalUnit> {
 
 	updateDesc(desc: string) {
 		this.update(SignalUnitService.UpdateDesc(this.entity.entityId, { desc }));
+	}
+
+	updateKind(kindStr: string) {
+		const kind = SignalUnitKind[kindStr as keyof typeof SignalUnitKind];
+		this.update(SignalUnitService.UpdateSignalUnitKind(this.entity.entityId, { kind }));
 	}
 
 	updateSymbol(symbol: string) {

@@ -3,7 +3,9 @@ package main
 import (
 	"embed"
 	"log"
+	"os"
 
+	"github.com/squadracorsepolito/acmelib"
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
 )
@@ -83,9 +85,20 @@ func main() {
 		URL:              "/",
 	})
 
-	// Emit an application event to load network data when the application starts.
+	// TODO! remove this event in production
 	app.OnApplicationEvent(events.Common.ApplicationStarted, func(_ *application.ApplicationEvent) {
-		// loadNetwork(testdataPath)
+		file, err := os.Open(testdataPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file.Close()
+
+		net, err := acmelib.LoadNetwork(file, acmelib.SaveEncodingWire)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		manager.loadNetwork(net)
 	})
 
 	menuHandler.init()

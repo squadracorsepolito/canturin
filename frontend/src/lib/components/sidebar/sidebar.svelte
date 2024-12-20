@@ -17,6 +17,7 @@
 	import { TreeView } from '../tree';
 	import { SidebarState } from './state.svelte';
 	import { deleteNode } from '$lib/panel/node/state.svelte';
+	import { deleteSignalUnit } from '$lib/panel/signal-unit/state.svelte';
 
 	const s = new SidebarState();
 
@@ -83,6 +84,10 @@
 
 			case SidebarItemKind.SidebarItemKindSignalType:
 				deleteSignalType(item.id);
+				break;
+
+			case SidebarItemKind.SidebarItemKindSignalUnit:
+				deleteSignalUnit(item.id);
 				break;
 
 			case SidebarItemKind.SidebarItemKindSignalEnum:

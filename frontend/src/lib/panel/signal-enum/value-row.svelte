@@ -81,6 +81,7 @@
 		name="signal-enum-value-name"
 		fontWeight="medium"
 		errors={nameErrors}
+		border="transparent"
 	/>
 </TableField>
 
@@ -90,6 +91,7 @@
 		oncommit={handleIndex}
 		name="signal-enum-value-index"
 		errors={indexErrors}
+		border="transparent"
 	/>
 </TableField>
 
@@ -99,5 +101,6 @@
 		oncommit={handleDesc}
 		name="signal-enum-value-desc"
 		placeholder="Add Description"
+		border="transparent"
 	/>
 </TableField>

@@ -58,8 +58,6 @@
 	];
 
 	let selected = $state(selectData[0]);
-
-	$inspect(selected);
 </script>
 
 {#if layout.openPanelType === 'bus'}
@@ -75,13 +73,15 @@
 {:else if layout.openPanelType === 'signal_enum'}
 	<SignalEnumPanel entityId={layout.openPanelId} />
 {:else}
-	<Select name="select-test" items={selectData} bind:selected labelKey="label" valueKey="value" />
+	<div>
+		<Select name="select-test" items={selectData} bind:selected labelKey="label" valueKey="value" />
 
-	<Divider></Divider>
+		<Divider></Divider>
 
-	<SortableList {items} instanceId="items" reorder={reorderItems}>
-		{#snippet itemBody({ item: { label } })}
-			<div class="p-3">{label}</div>
-		{/snippet}
-	</SortableList>
+		<SortableList {items} instanceId="items" reorder={reorderItems}>
+			{#snippet itemBody({ item: { label } })}
+				<div class="p-3">{label}</div>
+			{/snippet}
+		</SortableList>
+	</div>
 {/if}

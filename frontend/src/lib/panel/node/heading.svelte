@@ -56,6 +56,7 @@
 			name="node-name"
 			fontWeight="semibold"
 			textSize="lg"
+			border="transparent"
 		/>
 	</div>
 

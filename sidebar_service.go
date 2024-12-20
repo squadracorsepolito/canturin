@@ -81,7 +81,7 @@ func (f *sidebarItemFactory) newBus(bus entity) (string, *sidebarItem) {
 
 func (f *sidebarItemFactory) newMessageBus(bus entity) (string, *sidebarItem) {
 	key := f.getMessageBusKey(bus)
-	item := f.newItem(SidebarItemKindBus, bus.EntityID(), SidebarMessagesPrefix, bus.Name())
+	item := f.newItem(SidebarItemKindGroup, bus.EntityID(), SidebarMessagesPrefix, bus.Name())
 	return key, item
 }
 
@@ -99,7 +99,7 @@ func (f *sidebarItemFactory) newMessageNode(nodeInt *acmelib.NodeInterface) (str
 	name := f.getMessageNodeName(nodeInt)
 
 	key := f.getMessageNodeKey(nodeInt)
-	item := f.newItem(SidebarItemKindNode, nodeInt.Node().EntityID(), prefix, name)
+	item := f.newItem(SidebarItemKindGroup, nodeInt.Node().EntityID(), prefix, name)
 
 	return key, item
 }

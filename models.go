@@ -78,12 +78,6 @@ func getBase(e entity) base {
 	}
 }
 
-type Network struct {
-	base
-
-	Buses []Bus0 `json:"buses"`
-}
-
 type Bus0 struct {
 	base
 

@@ -1,66 +1,80 @@
 <script lang="ts">
+	import './styles.css';
 	import { uniqueId } from '$lib/utils';
 	import * as editable from '@zag-js/editable';
-	import { useMachine, normalizeProps } from '@zag-js/svelte';
-	import { untrack } from 'svelte';
+	import { useMachine, normalizeProps, mergeProps } from '@zag-js/svelte';
+	import type { EditableProps } from './types';
 
-	type Props = {
-		initialValue: string;
-		name: string;
-		placeholder?: string;
-		size?: 'lg' | 'md';
-		validator: (value: string) => string[] | undefined;
-		onsubmit: (value: string) => void;
-	};
+	let {
+		value = $bindable(),
+		name,
+		placeholder,
+		errors,
+		textSize = 'md',
+		fontWeight = 'normal',
+		border = 'visible',
+		oncommit
+	}: EditableProps<string> = $props();
 
-	let { initialValue, name, placeholder, size = 'lg', validator, onsubmit }: Props = $props();
-
-	let errors = $state<string[]>();
+	let fallbackValue = $state(value);
 
 	const [snapshot, send] = useMachine(
 		editable.machine({
 			id: uniqueId(),
-			value: initialValue,
 			name: name,
 			activationMode: 'dblclick',
-			placeholder: placeholder,
+			placeholder: placeholder
+				? {
+						edit: '',
+						preview: placeholder
+					}
+				: undefined,
 			autoResize: true,
 			submitMode: 'both',
 			onValueCommit: (details) => {
 				if (errors) {
-					api.setValue(initialValue);
-					errors = undefined;
+					api.setValue(fallbackValue);
 					return;
 				}
 
-				onsubmit(details.value);
+				fallbackValue = details.value;
+				oncommit?.(details.value);
 			},
 			onValueChange: (details) => {
-				errors = validator(details.value);
+				value = details.value;
 			}
-		})
+		}),
+		{
+			context: {
+				get value() {
+					return value;
+				}
+			}
+		}
 	);
 
 	const api = $derived(editable.connect(snapshot, send, normalizeProps));
 
-	$effect(() => {
-		untrack(() => api.setValue)(initialValue);
-	});
-
-	function getFontSize() {
-		switch (size) {
-			case 'lg':
-				return 'text-h2';
-			case 'md':
-			default:
-				return 'text-h4';
-		}
-	}
+	const rootProps = $derived(
+		mergeProps(api.getRootProps(), {
+			onkeydown: (e: KeyboardEvent) => {
+				if (e.key === 'Escape') {
+					api.cancel();
+				}
+			}
+		})
+	);
 </script>
 
-<div>
-	<div {...api.getRootProps()}>
-		<div {...api.getAreaProps()} data-error={errors ? true : undefined} class={getFontSize()}>
+<div class="editable">
+	<div {...rootProps}>
+		<div
+			{...api.getAreaProps()}
+			data-error={errors ? true : undefined}
+			data-text-size={textSize}
+			data-font-weight={fontWeight}
+			data-border={border}
+		>
 			<input {...api.getInputProps()} />
 
 			<span {...api.getPreviewProps()}>
@@ -69,37 +83,11 @@
 		</div>
 	</div>
 
-	{#if errors}
-		<div class="absolute pt-1 text-error text-xs">
+	{#if errors && api.editing}
+		<div data-part="error">
 			{#each errors as err}
 				<span>{err}</span>
 			{/each}
 		</div>
 	{/if}
 </div>
-
-<style lang="postcss">
-	[data-part='area'] {
-		@apply rounded-btn border-2 border-transparent px-2 py-1 transition-colors;
-
-		&[data-error] {
-			&[data-focus] {
-				@apply focus-ring-error border-error;
-			}
-		}
-
-		&:not([data-error]) {
-			&[data-focus] {
-				@apply focus-ring-primary border-primary;
-			}
-		}
-
-		&[data-placeholder-shown] {
-			@apply text-dimmed;
-		}
-
-		input {
-			@apply outline-none;
-		}
-	}
-</style>

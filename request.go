@@ -233,6 +233,33 @@ func (r *request) toUpdateOffset() *UpdateOffsetReq {
 // SIGNAL UNIT REQUESTS //
 //////////////////////////
 
+type CreateSignalUnitReq struct {
+	commonCreateReq
+
+	Kind   SignalUnitKind `json:"kind"`
+	Symbol string         `json:"symbol"`
+}
+
+func (r *request) toCreateSignalUnit() *CreateSignalUnitReq {
+	req, ok := r.data.(*CreateSignalUnitReq)
+	if !ok {
+		panic("cannot convert to CreateSignalUnitReq")
+	}
+	return req
+}
+
+type UpdateSignalUnitKindReq struct {
+	Kind SignalUnitKind `json:"kind"`
+}
+
+func (r *request) toUpdateSignalUnitKind() *UpdateSignalUnitKindReq {
+	req, ok := r.data.(*UpdateSignalUnitKindReq)
+	if !ok {
+		panic("cannot convert to UpdateSignalUnitKindReq")
+	}
+	return req
+}
+
 type UpdateSymbolReq struct {
 	Symbol string `json:"symbol"`
 }

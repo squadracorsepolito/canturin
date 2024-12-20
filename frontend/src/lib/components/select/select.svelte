@@ -103,10 +103,10 @@
 			}
 
 			[data-part='trigger'] {
-				@apply border-2 border-neutral-content px-2 py-1 rounded-btn transition-colors flex items-center justify-between gap-3;
+				@apply border-2 border-neutral-content px-2 py-1 rounded-btn transition-colors flex items-center justify-between gap-3 outline-none;
 
 				&:focus {
-					@apply ring-2 ring-primary/25;
+					@apply focus-ring-primary;
 				}
 
 				&:hover {
@@ -133,7 +133,7 @@
 			}
 
 			&:focus {
-				@apply ring-2 ring-primary/25;
+				@apply focus-ring-primary;
 			}
 
 			[data-part='item'] {

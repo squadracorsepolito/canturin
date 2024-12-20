@@ -80,6 +80,13 @@ export interface CreateSignalTypeReq {
     "offset": number;
 }
 
+export interface CreateSignalUnitReq {
+    "name": string;
+    "desc": string;
+    "kind": SignalUnitKind;
+    "symbol": string;
+}
+
 export interface History {
     "operationCount": number;
     "currentIndex": number;
@@ -241,10 +248,23 @@ export interface SignalUnit {
     "name": string;
     "desc": string;
     "createTime": time$0.Time;
+    "kind": SignalUnitKind;
     "symbol": string;
     "referenceCount": number;
     "references": SignalReference[] | null;
 }
+
+export enum SignalUnitKind {
+    /**
+     * The Go zero value for the underlying type of the enum.
+     */
+    $zero = "",
+
+    SignalUnitKindCustom = "custom",
+    SignalUnitKindTemperature = "temperature",
+    SignalUnitKindElectrical = "electrical",
+    SignalUnitKindPower = "power",
+};
 
 export interface UpdateAttachedBusReq {
     "busEntityId": string;
@@ -285,6 +305,10 @@ export interface UpdateOffsetReq {
 
 export interface UpdateScaleReq {
     "scale": number;
+}
+
+export interface UpdateSignalUnitKindReq {
+    "kind": SignalUnitKind;
 }
 
 export interface UpdateSymbolReq {

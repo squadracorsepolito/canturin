@@ -1,13 +1,55 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/squadracorsepolito/acmelib"
 )
+
+type SignalUnitKind string
+
+const (
+	SignalUnitKindCustom      SignalUnitKind = "custom"
+	SignalUnitKindTemperature SignalUnitKind = "temperature"
+	SignalUnitKindElectrical  SignalUnitKind = "electrical"
+	SignalUnitKindPower       SignalUnitKind = "power"
+)
+
+func newSignalUnitKind(kind acmelib.SignalUnitKind) SignalUnitKind {
+	switch kind {
+	case acmelib.SignalUnitKindCustom:
+		return SignalUnitKindCustom
+	case acmelib.SignalUnitKindTemperature:
+		return SignalUnitKindTemperature
+	case acmelib.SignalUnitKindElectrical:
+		return SignalUnitKindElectrical
+	case acmelib.SignalUnitKindPower:
+		return SignalUnitKindPower
+	default:
+		return SignalUnitKindCustom
+	}
+}
+
+func (k SignalUnitKind) parse() acmelib.SignalUnitKind {
+	switch k {
+	case SignalUnitKindCustom:
+		return acmelib.SignalUnitKindCustom
+	case SignalUnitKindTemperature:
+		return acmelib.SignalUnitKindTemperature
+	case SignalUnitKindElectrical:
+		return acmelib.SignalUnitKindElectrical
+	case SignalUnitKindPower:
+		return acmelib.SignalUnitKindPower
+	default:
+		return acmelib.SignalUnitKindCustom
+	}
+}
 
 type SignalUnit struct {
 	base
 
-	Symbol string `json:"symbol"`
+	Kind   SignalUnitKind `json:"kind"`
+	Symbol string         `json:"symbol"`
 
 	ReferenceCount int               `json:"referenceCount"`
 	References     []SignalReference `json:"references"`
@@ -23,12 +65,74 @@ func newSignalUnitService(sidebar *sidebarController) *SignalUnitService {
 	}
 }
 
+func (s *SignalUnitService) Create(req CreateSignalUnitReq) (SignalUnit, error) {
+	sigUnit := acmelib.NewSignalUnit(req.Name, req.Kind.parse(), req.Symbol)
+	sigUnit.SetDesc(req.Desc)
+
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	s.addEntity(sigUnit)
+	s.sidebar.sendAdd(sigUnit)
+
+	s.sendHistoryOp(
+		func() (*acmelib.SignalUnit, error) {
+			s.removeEntity(sigUnit.EntityID().String())
+			s.sidebar.sendDelete(sigUnit)
+			return sigUnit, nil
+		},
+		func() (*acmelib.SignalUnit, error) {
+			s.addEntity(sigUnit)
+			s.sidebar.sendAdd(sigUnit)
+			return sigUnit, nil
+		},
+	)
+
+	return s.handler.toResponse(sigUnit), nil
+}
+
+func (s *SignalUnitService) Delete(entityID string) error {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	sigUnit, err := s.getEntity(entityID)
+	if err != nil {
+		return err
+	}
+
+	if sigUnit.ReferenceCount() > 0 {
+		return fmt.Errorf("signal unit %s is referenced %d times", sigUnit.Name(), sigUnit.ReferenceCount())
+	}
+
+	s.removeEntity(entityID)
+	s.sidebar.sendDelete(sigUnit)
+
+	s.sendHistoryOp(
+		func() (*acmelib.SignalUnit, error) {
+			s.addEntity(sigUnit)
+			s.sidebar.sendAdd(sigUnit)
+			return sigUnit, nil
+		},
+		func() (*acmelib.SignalUnit, error) {
+			s.removeEntity(sigUnit.EntityID().String())
+			s.sidebar.sendDelete(sigUnit)
+			return sigUnit, nil
+		},
+	)
+
+	return nil
+}
+
 func (s *SignalUnitService) UpdateName(entityID string, req UpdateNameReq) (SignalUnit, error) {
 	return s.handle(entityID, &req, s.handler.updateName)
 }
 
 func (s *SignalUnitService) UpdateDesc(entityID string, req UpdateDescReq) (SignalUnit, error) {
 	return s.handle(entityID, &req, s.handler.updateDesc)
+}
+
+func (s *SignalUnitService) UpdateSignalUnitKind(entityID string, req UpdateSignalUnitKindReq) (SignalUnit, error) {
+	return s.handle(entityID, &req, s.handler.updateSignalUnitKind)
 }
 
 func (s *SignalUnitService) UpdateSymbol(entityID string, req UpdateSymbolReq) (SignalUnit, error) {
@@ -51,6 +155,7 @@ func (h *signalUnitHandler) toResponse(sigUnit *acmelib.SignalUnit) SignalUnit {
 	return SignalUnit{
 		base: getBase(sigUnit),
 
+		Kind:   newSignalUnitKind(sigUnit.Kind()),
 		Symbol: sigUnit.Symbol(),
 
 		ReferenceCount: sigUnit.ReferenceCount(),
@@ -119,6 +224,35 @@ func (h *signalUnitHandler) updateDesc(sigUnit *acmelib.SignalUnit, req *request
 	return nil
 }
 
+func (h *signalUnitHandler) updateSignalUnitKind(sigUnit *acmelib.SignalUnit, req *request, res *signalUnitRes) error {
+	parsedReq := req.toUpdateSignalUnitKind()
+
+	kind := parsedReq.Kind.parse()
+
+	oldKind := sigUnit.Kind()
+	if oldKind == kind {
+		return nil
+	}
+
+	sigUnit.SetKind(kind)
+
+	res.setUndo(
+		func() (*acmelib.SignalUnit, error) {
+			sigUnit.SetKind(oldKind)
+			return sigUnit, nil
+		},
+	)
+
+	res.setRedo(
+		func() (*acmelib.SignalUnit, error) {
+			sigUnit.SetKind(kind)
+			return sigUnit, nil
+		},
+	)
+
+	return nil
+}
+
 func (h *signalUnitHandler) updateSymbol(sigUnit *acmelib.SignalUnit, req *request, res *signalUnitRes) error {
 	parsedReq := req.toUpdateSymbol()
 
@@ -147,173 +281,3 @@ func (h *signalUnitHandler) updateSymbol(sigUnit *acmelib.SignalUnit, req *reque
 
 	return nil
 }
-
-//
-//
-// //
-
-// type SignalUnitService0 struct {
-// 	*service[*acmelib.SignalUnit, SignalUnit]
-// }
-
-// func signalUnitConverter(sigType *acmelib.SignalUnit) SignalUnit {
-// 	return SignalUnit{
-// 		base: getBase(sigType),
-
-// 		Symbol: sigType.Symbol(),
-
-// 		ReferenceCount: sigType.ReferenceCount(),
-// 		References:     getSignalReferences(sigType),
-// 	}
-// }
-
-// func newSignalUnitService() *SignalUnitService0 {
-// 	return &SignalUnitService0{
-// 		service: newService(proxy.sigUnitCh, signalUnitConverter),
-// 	}
-// }
-
-// func (s *SignalUnitService0) GetInvalidNames(entityID string) []string {
-// 	s.mux.RLock()
-// 	defer s.mux.RUnlock()
-
-// 	names := []string{}
-// 	for _, tmpSigUnit := range s.pool {
-// 		if tmpSigUnit.EntityID() == acmelib.EntityID(entityID) {
-// 			continue
-// 		}
-
-// 		names = append(names, tmpSigUnit.Name())
-// 	}
-
-// 	return names
-// }
-
-// func (s *SignalUnitService0) UpdateName(entityID string, name string) (SignalUnit, error) {
-// 	// retrieve the signal unit
-// 	sigUnit, err := s.getEntity(entityID)
-// 	if err != nil {
-// 		return SignalUnit{}, err
-// 	}
-
-// 	// Lock to guarantee unique access
-// 	s.mux.Lock()
-// 	defer s.mux.Unlock()
-
-// 	// Actual signal unit name
-// 	oldName := sigUnit.Name()
-
-// 	if name == oldName {
-// 		return s.converterFn(sigUnit), nil
-// 	}
-
-// 	// Update name
-// 	sigUnit.SetName(name)
-
-// 	// Push the new name to the sideBar
-// 	proxy.pushSidebarUpdate(sigUnit.EntityID(), name)
-
-// 	// Add history operation
-// 	proxy.pushHistoryOperation(
-// 		operationDomainSignalUnit,
-// 		func() (any, error) {
-// 			s.mux.Lock()
-// 			defer s.mux.Unlock()
-
-// 			// Rollback of the name
-// 			sigUnit.SetName(oldName)
-// 			proxy.pushSidebarUpdate(sigUnit.EntityID(), oldName)
-
-// 			return s.converterFn(sigUnit), nil
-// 		},
-// 		func() (any, error) {
-// 			s.mux.Lock()
-// 			defer s.mux.Unlock()
-
-// 			// Final update
-// 			sigUnit.SetName(name)
-// 			proxy.pushSidebarUpdate(sigUnit.EntityID(), name)
-
-// 			return s.converterFn(sigUnit), nil
-// 		},
-// 	)
-
-// 	// return the updated entity
-// 	return s.converterFn(sigUnit), nil
-// }
-
-// func (s *SignalUnitService0) UpdateDesc(entityID string, desc string) (SignalUnit, error) {
-// 	sigUnit, err := s.getEntity(entityID)
-// 	if err != nil {
-// 		return SignalUnit{}, err
-// 	}
-
-// 	s.mux.Lock()
-// 	defer s.mux.Unlock()
-
-// 	oldDesc := sigUnit.Desc()
-// 	if desc == oldDesc {
-// 		return s.converterFn(sigUnit), nil
-// 	}
-
-// 	sigUnit.SetDesc(desc)
-
-// 	proxy.pushHistoryOperation(
-// 		operationDomainSignalUnit,
-// 		func() (any, error) {
-// 			s.mux.Lock()
-// 			defer s.mux.Unlock()
-
-// 			sigUnit.SetDesc(oldDesc)
-
-// 			return s.converterFn(sigUnit), nil
-// 		},
-// 		func() (any, error) {
-// 			s.mux.Lock()
-// 			defer s.mux.Unlock()
-
-// 			sigUnit.SetDesc(desc)
-
-// 			return s.converterFn(sigUnit), nil
-// 		},
-// 	)
-
-// 	return s.converterFn(sigUnit), nil
-// }
-
-// func (s *SignalUnitService0) UpdateSymbol(entityID string, symbol string) (SignalUnit, error) {
-// 	sigUnit, err := s.getEntity(entityID)
-// 	if err != nil {
-// 		return SignalUnit{}, err
-// 	}
-
-// 	s.mux.Lock()
-// 	defer s.mux.Unlock()
-
-// 	oldSymbol := sigUnit.Symbol()
-// 	if symbol == oldSymbol {
-// 		return s.converterFn(sigUnit), nil
-// 	}
-
-// 	sigUnit.SetSymbol(symbol)
-
-// 	proxy.pushHistoryOperation(
-// 		operationDomainSignalUnit,
-// 		func() (any, error) {
-// 			s.mux.Lock()
-// 			defer s.mux.Unlock()
-
-// 			sigUnit.SetSymbol(oldSymbol)
-// 			return s.converterFn(sigUnit), nil
-// 		},
-// 		func() (any, error) {
-// 			s.mux.Lock()
-// 			defer s.mux.Unlock()
-
-// 			sigUnit.SetSymbol(symbol)
-// 			return s.converterFn(sigUnit), nil
-// 		},
-// 	)
-
-// 	return s.converterFn(sigUnit), nil
-// }

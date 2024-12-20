@@ -4,7 +4,7 @@
 	import { SignalUnitIcon } from '$lib/components/icon';
 	import { z } from 'zod';
 	import type { PanelSectionProps } from '../types';
-	import { getSignalUnitState } from './signal-unit-state.svelte';
+	import { getSignalUnitState } from './state.svelte';
 	import { onMount } from 'svelte';
 
 	let { entityId }: PanelSectionProps = $props();
@@ -53,6 +53,7 @@
 			errors={nameErrors}
 			fontWeight="semibold"
 			textSize="lg"
+			border="transparent"
 		/>
 	</div>
 
