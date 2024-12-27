@@ -54,8 +54,8 @@ class SignalUnitState extends EntityState<SignalUnit> {
 	}
 
 	updateKind(kindStr: string) {
-		const kind = SignalUnitKind[kindStr as keyof typeof SignalUnitKind];
-		this.update(SignalUnitService.UpdateSignalUnitKind(this.entity.entityId, { kind }));
+		const kind = kindStr as SignalUnitKind;
+		this.update(SignalUnitService.UpdateKind(this.entity.entityId, { kind }));
 	}
 
 	updateSymbol(symbol: string) {

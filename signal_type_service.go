@@ -30,8 +30,8 @@ type SignalType struct {
 	Scale  float64        `json:"scale"`
 	Offset float64        `json:"offset"`
 
-	ReferenceCount int               `json:"referenceCount"`
-	References     []SignalReference `json:"references"`
+	ReferenceCount int         `json:"referenceCount"`
+	References     []Reference `json:"references"`
 }
 
 type SignalTypeService struct {
@@ -182,7 +182,9 @@ func newSignalTypeHandler(sidebar *sidebarController) *signalTypeHandler {
 }
 
 func (h *signalTypeHandler) toResponse(sigType *acmelib.SignalType) SignalType {
-	return SignalType{
+	refCount := sigType.ReferenceCount()
+
+	res := SignalType{
 		base: getBase(sigType),
 
 		Kind:   newSignalTypeKind(sigType.Kind()),
@@ -193,9 +195,54 @@ func (h *signalTypeHandler) toResponse(sigType *acmelib.SignalType) SignalType {
 		Scale:  sigType.Scale(),
 		Offset: sigType.Offset(),
 
-		ReferenceCount: sigType.ReferenceCount(),
-		References:     getSignalReferences(sigType),
+		ReferenceCount: refCount,
 	}
+
+	if refCount == 0 {
+		return res
+	}
+
+	rootRefs := []*reference{}
+	refs := make(map[acmelib.EntityID]*reference)
+	for _, sig := range sigType.References() {
+		sigRef := newReference(sig)
+		refs[sig.EntityID()] = sigRef
+
+		var msgRef *reference
+		msg := sig.ParentMessage()
+		sigRef.entityID = msg.EntityID()
+		msgRef, ok := refs[msg.EntityID()]
+		if !ok {
+			msgRef = newReference(msg)
+			refs[msg.EntityID()] = msgRef
+		}
+		msgRef.addChild(sigRef)
+
+		var nodeRef *reference
+		node := msg.SenderNodeInterface().Node()
+		nodeRef, ok = refs[node.EntityID()]
+		if !ok {
+			nodeRef = newReference(node)
+			refs[node.EntityID()] = nodeRef
+		}
+		nodeRef.addChild(msgRef)
+
+		var busRef *reference
+		bus := msg.SenderNodeInterface().ParentBus()
+		busRef, ok = refs[bus.EntityID()]
+		if !ok {
+			busRef = newReference(bus)
+			refs[bus.EntityID()] = busRef
+			rootRefs = append(rootRefs, busRef)
+		}
+		busRef.addChild(nodeRef)
+	}
+
+	for _, tmpRef := range rootRefs {
+		res.References = append(res.References, tmpRef.toResponse())
+	}
+
+	return res
 }
 
 func (h *signalTypeHandler) updateName(sigType *acmelib.SignalType, req *request, res *signalTypeRes) error {

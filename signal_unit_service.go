@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/squadracorsepolito/acmelib"
 )
@@ -51,8 +52,67 @@ type SignalUnit struct {
 	Kind   SignalUnitKind `json:"kind"`
 	Symbol string         `json:"symbol"`
 
-	ReferenceCount int               `json:"referenceCount"`
-	References     []SignalReference `json:"references"`
+	ReferenceCount int         `json:"referenceCount"`
+	References     []Reference `json:"references"`
+}
+
+func newSignalUnit(sigUnit *acmelib.SignalUnit) SignalUnit {
+	refCount := sigUnit.ReferenceCount()
+
+	res := SignalUnit{
+		base: getBase(sigUnit),
+
+		Kind:   newSignalUnitKind(sigUnit.Kind()),
+		Symbol: sigUnit.Symbol(),
+
+		ReferenceCount: refCount,
+	}
+
+	if refCount == 0 {
+		return res
+	}
+
+	rootRefs := []*reference{}
+	refs := make(map[acmelib.EntityID]*reference)
+	for _, stdSig := range sigUnit.References() {
+		sigRef := newReference(stdSig)
+		refs[stdSig.EntityID()] = sigRef
+
+		var msgRef *reference
+		msg := stdSig.ParentMessage()
+		sigRef.entityID = msg.EntityID()
+		msgRef, ok := refs[msg.EntityID()]
+		if !ok {
+			msgRef = newReference(msg)
+			refs[msg.EntityID()] = msgRef
+		}
+		msgRef.addChild(sigRef)
+
+		var nodeRef *reference
+		node := msg.SenderNodeInterface().Node()
+		nodeRef, ok = refs[node.EntityID()]
+		if !ok {
+			nodeRef = newReference(node)
+			refs[node.EntityID()] = nodeRef
+		}
+		nodeRef.addChild(msgRef)
+
+		var busRef *reference
+		bus := msg.SenderNodeInterface().ParentBus()
+		busRef, ok = refs[bus.EntityID()]
+		if !ok {
+			busRef = newReference(bus)
+			refs[bus.EntityID()] = busRef
+			rootRefs = append(rootRefs, busRef)
+		}
+		busRef.addChild(nodeRef)
+	}
+
+	for _, tmpRef := range rootRefs {
+		res.References = append(res.References, tmpRef.toResponse())
+	}
+
+	return res
 }
 
 type SignalUnitService struct {
@@ -131,8 +191,8 @@ func (s *SignalUnitService) UpdateDesc(entityID string, req UpdateDescReq) (Sign
 	return s.handle(entityID, &req, s.handler.updateDesc)
 }
 
-func (s *SignalUnitService) UpdateSignalUnitKind(entityID string, req UpdateSignalUnitKindReq) (SignalUnit, error) {
-	return s.handle(entityID, &req, s.handler.updateSignalUnitKind)
+func (s *SignalUnitService) UpdateKind(entityID string, req UpdateSignalUnitKindReq) (SignalUnit, error) {
+	return s.handle(entityID, &req, s.handler.updateKind)
 }
 
 func (s *SignalUnitService) UpdateSymbol(entityID string, req UpdateSymbolReq) (SignalUnit, error) {
@@ -152,15 +212,7 @@ func newSignalUnitHandler(sidebar *sidebarController) *signalUnitHandler {
 }
 
 func (h *signalUnitHandler) toResponse(sigUnit *acmelib.SignalUnit) SignalUnit {
-	return SignalUnit{
-		base: getBase(sigUnit),
-
-		Kind:   newSignalUnitKind(sigUnit.Kind()),
-		Symbol: sigUnit.Symbol(),
-
-		ReferenceCount: sigUnit.ReferenceCount(),
-		References:     getSignalReferences(sigUnit),
-	}
+	return newSignalUnit(sigUnit)
 }
 
 func (h *signalUnitHandler) updateName(sigUnit *acmelib.SignalUnit, req *request, res *signalUnitRes) error {
@@ -224,10 +276,12 @@ func (h *signalUnitHandler) updateDesc(sigUnit *acmelib.SignalUnit, req *request
 	return nil
 }
 
-func (h *signalUnitHandler) updateSignalUnitKind(sigUnit *acmelib.SignalUnit, req *request, res *signalUnitRes) error {
+func (h *signalUnitHandler) updateKind(sigUnit *acmelib.SignalUnit, req *request, res *signalUnitRes) error {
 	parsedReq := req.toUpdateSignalUnitKind()
 
 	kind := parsedReq.Kind.parse()
+
+	log.Print(kind.String())
 
 	oldKind := sigUnit.Kind()
 	if oldKind == kind {

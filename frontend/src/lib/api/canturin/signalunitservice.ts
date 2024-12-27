@@ -39,13 +39,13 @@ export function UpdateDesc(entityID: string, req: $models.UpdateDescReq): Promis
     return $resultPromise;
 }
 
-export function UpdateName(entityID: string, req: $models.UpdateNameReq): Promise<$models.SignalUnit> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(1637602753, entityID, req) as any;
+export function UpdateKind(entityID: string, req: $models.UpdateSignalUnitKindReq): Promise<$models.SignalUnit> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3852535836, entityID, req) as any;
     return $resultPromise;
 }
 
-export function UpdateSignalUnitKind(entityID: string, req: $models.UpdateSignalUnitKindReq): Promise<$models.SignalUnit> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(4203284158, entityID, req) as any;
+export function UpdateName(entityID: string, req: $models.UpdateNameReq): Promise<$models.SignalUnit> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1637602753, entityID, req) as any;
     return $resultPromise;
 }
 

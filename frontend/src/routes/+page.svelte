@@ -8,9 +8,10 @@
 		SignalTypePanel,
 		BusPanel,
 		NodePanel,
-		SignalUnitPanel
+		SignalUnitPanel,
+		MessagePanel
 	} from '$lib/panel';
-	import MessagePanel from '$lib/panel/message-panel.svelte';
+	// import MessagePanel from '$lib/panel/message-panel.svelte';
 	import layout from '$lib/state/layout-state.svelte';
 
 	let items = $state([
@@ -57,7 +58,7 @@
 		{ label: 'Uganda', value: 'UG' }
 	];
 
-	let selected = $state(selectData[0]);
+	let selected = $state('NG');
 </script>
 
 {#if layout.openPanelType === 'bus'}

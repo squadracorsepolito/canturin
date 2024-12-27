@@ -4,13 +4,14 @@
 	type Props = {
 		label: string;
 		desc?: string;
+		fullSpan?: boolean;
 		children: Snippet;
 	};
 
-	let { label, desc, children }: Props = $props();
+	let { label, desc, fullSpan, children }: Props = $props();
 </script>
 
-<div class="grid grid-cols-2 gap-3">
+<div class="{fullSpan && 'col-span-2'} grid grid-cols-2 gap-3">
 	<div>
 		<h4>{label}</h4>
 

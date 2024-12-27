@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { ReferenceTree } from '$lib/components/tree';
-	import { getSignalReferenceTree } from '$lib/utils';
 	import type { PanelSectionProps } from '../types';
 	import { getSignalTypeState } from './state.svelte';
 	import { type SignalType } from '$lib/api/canturin';
+	import ReferenceTree0 from '$lib/components/tree/reference-tree0.svelte';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -14,7 +13,8 @@
 	{#if signalType.references && signalType.references.length > 0}
 		<h3 class="pb-5">References</h3>
 
-		<ReferenceTree siblingNodes={getSignalReferenceTree(signalType.references)} depth={4} />
+		<ReferenceTree0 nodes={signalType.references} depth={4} />
+		<!-- <ReferenceTree siblingNodes={getSignalReferenceTree(signalType.references)} depth={4} /> -->
 	{/if}
 {/snippet}
 

@@ -28,7 +28,7 @@ type SignalEnum struct {
 	MaxIndex int               `json:"maxIndex"`
 	Values   []SignalEnumValue `json:"values"`
 
-	References []SignalReference `json:"references"`
+	References []Reference `json:"references"`
 }
 
 func newSignalEnum(sigEnum *acmelib.SignalEnum) SignalEnum {
@@ -37,30 +37,60 @@ func newSignalEnum(sigEnum *acmelib.SignalEnum) SignalEnum {
 		values = append(values, signalEnumValueConverter(val))
 	}
 
-	references := []SignalReference{}
-	for _, ref := range sigEnum.References() {
-		parMsg := ref.ParentMessage()
-		parNode := parMsg.SenderNodeInterface().Node()
-		parBus := parMsg.SenderNodeInterface().ParentBus()
-
-		references = append(references, SignalReference{
-			Bus:     getEntityStub(parBus),
-			Node:    getEntityStub(parNode),
-			Message: getEntityStub(parMsg),
-			Signal:  getEntityStub(ref),
-		})
-	}
-
-	return SignalEnum{
+	res := SignalEnum{
 		base: getBase(sigEnum),
 
 		Size:     sigEnum.GetSize(),
 		MinSize:  sigEnum.MinSize(),
 		MaxIndex: sigEnum.MaxIndex(),
 		Values:   values,
-
-		References: references,
 	}
+
+	if len(sigEnum.References()) == 0 {
+		return res
+	}
+
+	rootRefs := []*reference{}
+	refs := make(map[acmelib.EntityID]*reference)
+	for _, sig := range sigEnum.References() {
+		sigRef := newReference(sig)
+		refs[sig.EntityID()] = sigRef
+
+		var msgRef *reference
+		msg := sig.ParentMessage()
+		sigRef.entityID = msg.EntityID()
+		msgRef, ok := refs[msg.EntityID()]
+		if !ok {
+			msgRef = newReference(msg)
+			refs[msg.EntityID()] = msgRef
+		}
+		msgRef.addChild(sigRef)
+
+		var nodeRef *reference
+		node := msg.SenderNodeInterface().Node()
+		nodeRef, ok = refs[node.EntityID()]
+		if !ok {
+			nodeRef = newReference(node)
+			refs[node.EntityID()] = nodeRef
+		}
+		nodeRef.addChild(msgRef)
+
+		var busRef *reference
+		bus := msg.SenderNodeInterface().ParentBus()
+		busRef, ok = refs[bus.EntityID()]
+		if !ok {
+			busRef = newReference(bus)
+			refs[bus.EntityID()] = busRef
+			rootRefs = append(rootRefs, busRef)
+		}
+		busRef.addChild(nodeRef)
+	}
+
+	for _, tmpRef := range rootRefs {
+		res.References = append(res.References, tmpRef.toResponse())
+	}
+
+	return res
 }
 
 type SignalEnumService struct {

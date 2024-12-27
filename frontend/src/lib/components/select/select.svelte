@@ -1,16 +1,17 @@
-<script lang="ts" generics="T extends { [K in keyof T]: any }">
-	import { uniqueId, type KeyOfString } from '$lib/utils';
+<script lang="ts" generics="T extends { [K in keyof T]: any }, V extends string">
+	import { uniqueId, type FieldNameOf } from '$lib/utils';
 	import * as select from '@zag-js/select';
 	import { normalizeProps, portal, useMachine } from '@zag-js/svelte';
 	import { AltArrowIcon, CheckIcon } from '../icon';
 
 	type Props = {
 		items: T[];
-		selected: T;
+		selected: V;
 		name: string;
-		valueKey: KeyOfString<T>;
-		labelKey: KeyOfString<T>;
-		onselect?: (item: T) => void;
+		valueKey: FieldNameOf<T, V>;
+		labelKey: FieldNameOf<T, string>;
+		onselect?: (value: V) => void;
+		onitemselect?: (item: T) => void;
 		filter?: (item: T) => boolean;
 	};
 
@@ -21,6 +22,7 @@
 		valueKey,
 		labelKey,
 		onselect,
+		onitemselect,
 		filter
 	}: Props = $props();
 
@@ -41,14 +43,17 @@
 					return;
 				}
 
-				selected = details.items[0] as T;
-				onselect?.(details.items[0] as T);
+				const item = details.items[0] as T;
+				const value = item[valueKey];
+				selected = value;
+				onselect?.(value);
+				onitemselect?.(item);
 			}
 		}),
 		{
 			context: {
 				get value() {
-					return [selected[valueKey]];
+					return [selected];
 				}
 			}
 		}

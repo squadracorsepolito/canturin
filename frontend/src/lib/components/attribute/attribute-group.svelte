@@ -2,12 +2,12 @@
 	import type { Snippet } from 'svelte';
 
 	type Props = {
-		attributes: Snippet;
+		children: Snippet;
 	};
 
-	let { attributes }: Props = $props();
+	let { children }: Props = $props();
 </script>
 
-<div class="grid grid-cols-4 gap-5">
-	{@render attributes()}
+<div class="grid grid-cols-2 gap-5">
+	{@render children()}
 </div>

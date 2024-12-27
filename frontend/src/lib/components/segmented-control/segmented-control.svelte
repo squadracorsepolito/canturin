@@ -35,13 +35,8 @@
 <div {...api.getRootProps()} style:grid-template-columns="repeat({options.length}, minmax(0, 1fr))">
 	{#each options as opt}
 		<label {...api.getItemProps({ value: opt.value })}>
-			<div
-				{...api.getItemTextProps({ value: opt.value })}
-				class="font-medium flex items-center gap-1 justify-between"
-			>
-				<span>
-					{opt.label}
-				</span>
+			<div {...api.getItemTextProps({ value: opt.value })}>
+				<span>{opt.label}</span>
 
 				{#if opt.value === api.value}
 					<span>
@@ -89,6 +84,14 @@
 
 		&[data-focus] {
 			@apply focus-ring-primary;
+		}
+	}
+
+	[data-part='item-text'] {
+		@apply font-medium flex items-center gap-1 justify-between overflow-x-hidden;
+
+		span:first-child {
+			@apply truncate;
 		}
 	}
 </style>

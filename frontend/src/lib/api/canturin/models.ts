@@ -9,10 +9,6 @@ import * as acmelib$0 from "../github.com/squadracorsepolito/acmelib/models.js";
 // @ts-ignore: Unused imports
 import * as time$0 from "../time/models.js";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore: Unused imports
-import * as $internal from "./internal.js";
-
 export interface AttachedNode {
     "entityId": string;
     "name": string;
@@ -97,14 +93,32 @@ export interface Message {
     "name": string;
     "desc": string;
     "createTime": time$0.Time;
-    "id": acmelib$0.MessageID;
     "hasStaticCANID": boolean;
-    "canId": acmelib$0.CANID;
+    "id": number;
+    "canId": number;
+    "cycleTime": number;
+    "sendType": MessageSendType;
+    "delayTime": number;
+    "startDelayTime": number;
     "sizeByte": number;
-    "byteOrder": acmelib$0.MessageByteOrder;
     "signals": Signal[] | null;
     "receivers": Node0[] | null;
+    "senderNode": BaseEntity;
+    "parentBus": BaseEntity;
 }
+
+export enum MessageSendType {
+    /**
+     * The Go zero value for the underlying type of the enum.
+     */
+    $zero = "",
+
+    MessageSendTypeUnset = "unset",
+    MessageSendTypeCyclic = "cyclic",
+    MessageSendTypeCyclicIfActive = "cyclic_if_active",
+    MessageSendTypeCyclicAndTriggered = "cyclic_and_triggered",
+    MessageSendTypeCyclicIfActiveAndTriggered = "cyclic_if_active_and_triggered",
+};
 
 export interface Node {
     "entityId": string;
@@ -129,6 +143,25 @@ export interface NodeInterface {
     "sentMessages": BaseEntity[] | null;
     "receivedMessages": BaseEntity[] | null;
 }
+
+export interface Reference {
+    "kind": ReferenceKind;
+    "entityId": string;
+    "name": string;
+    "children": Reference[] | null;
+}
+
+export enum ReferenceKind {
+    /**
+     * The Go zero value for the underlying type of the enum.
+     */
+    $zero = "",
+
+    ReferenceKindBus = "bus",
+    ReferenceKindNode = "node",
+    ReferenceKindMessage = "message",
+    ReferenceKindSignal = "signal",
+};
 
 export interface RemoveReceivedMessagesReq {
     "interfaceNumber": number;
@@ -197,7 +230,7 @@ export interface SignalEnum {
     "minSize": number;
     "maxIndex": number;
     "values": SignalEnumValue[] | null;
-    "references": SignalReference[] | null;
+    "references": Reference[] | null;
 }
 
 export interface SignalEnumValue {
@@ -206,13 +239,6 @@ export interface SignalEnumValue {
     "desc": string;
     "createTime": time$0.Time;
     "index": number;
-}
-
-export interface SignalReference {
-    "bus": $internal.entityStub;
-    "node": $internal.entityStub;
-    "message": $internal.entityStub;
-    "signal": $internal.entityStub;
 }
 
 export interface SignalType {
@@ -228,7 +254,7 @@ export interface SignalType {
     "scale": number;
     "offset": number;
     "referenceCount": number;
-    "references": SignalReference[] | null;
+    "references": Reference[] | null;
 }
 
 export enum SignalTypeKind {
@@ -251,7 +277,7 @@ export interface SignalUnit {
     "kind": SignalUnitKind;
     "symbol": string;
     "referenceCount": number;
-    "references": SignalReference[] | null;
+    "references": Reference[] | null;
 }
 
 export enum SignalUnitKind {
@@ -279,12 +305,24 @@ export interface UpdateBusTypeReq {
     "busType": BusType;
 }
 
+export interface UpdateCycleTimeReq {
+    "cycleTime": number;
+}
+
+export interface UpdateDelayTimeReq {
+    "delayTime": number;
+}
+
 export interface UpdateDescReq {
     "desc": string;
 }
 
 export interface UpdateMaxReq {
     "max": number;
+}
+
+export interface UpdateMessageIDReq {
+    "messageId": number;
 }
 
 export interface UpdateMinReq {
@@ -307,8 +345,20 @@ export interface UpdateScaleReq {
     "scale": number;
 }
 
+export interface UpdateSendTypeReq {
+    "sendType": MessageSendType;
+}
+
 export interface UpdateSignalUnitKindReq {
     "kind": SignalUnitKind;
+}
+
+export interface UpdateStartDelayTimeReq {
+    "startDelayTime": number;
+}
+
+export interface UpdateStaticCANIDReq {
+    "staticCanId": number;
 }
 
 export interface UpdateSymbolReq {

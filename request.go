@@ -157,6 +157,82 @@ func (r *request) toRemoveReceivedMessages() *RemoveReceivedMessagesReq {
 	return req
 }
 
+//////////////////////
+// MESSAGE REQUESTS //
+//////////////////////
+
+type UpdateMessageIDReq struct {
+	MessageID uint `json:"messageId"`
+}
+
+func (r *request) toUpdateMessageID() *UpdateMessageIDReq {
+	req, ok := r.data.(*UpdateMessageIDReq)
+	if !ok {
+		panic("cannot convert to UpdateMessageIDReq")
+	}
+	return req
+}
+
+type UpdateStaticCANIDReq struct {
+	StaticCANID uint `json:"staticCanId"`
+}
+
+func (r *request) toUpdateStaticCANID() *UpdateStaticCANIDReq {
+	req, ok := r.data.(*UpdateStaticCANIDReq)
+	if !ok {
+		panic("cannot convert to UpdateStaticCANIDReq")
+	}
+	return req
+}
+
+type UpdateSendTypeReq struct {
+	SendType MessageSendType `json:"sendType"`
+}
+
+func (r *request) toUpdateSendType() *UpdateSendTypeReq {
+	req, ok := r.data.(*UpdateSendTypeReq)
+	if !ok {
+		panic("cannot convert to UpdateSendTypeReq")
+	}
+	return req
+}
+
+type UpdateCycleTimeReq struct {
+	CycleTime int `json:"cycleTime"`
+}
+
+func (r *request) toUpdateCycleTime() *UpdateCycleTimeReq {
+	req, ok := r.data.(*UpdateCycleTimeReq)
+	if !ok {
+		panic("cannot convert to UpdateCycleTimeReq")
+	}
+	return req
+}
+
+type UpdateDelayTimeReq struct {
+	DelayTime int `json:"delayTime"`
+}
+
+func (r *request) toUpdateDelayTime() *UpdateDelayTimeReq {
+	req, ok := r.data.(*UpdateDelayTimeReq)
+	if !ok {
+		panic("cannot convert to UpdateDelayTimeReq")
+	}
+	return req
+}
+
+type UpdateStartDelayTimeReq struct {
+	StartDelayTime int `json:"startDelayTime"`
+}
+
+func (r *request) toUpdateStartDelayTime() *UpdateStartDelayTimeReq {
+	req, ok := r.data.(*UpdateStartDelayTimeReq)
+	if !ok {
+		panic("cannot convert to UpdateStartDelayTimeReq")
+	}
+	return req
+}
+
 //////////////////////////
 // SIGNAL TYPE REQUESTS //
 //////////////////////////

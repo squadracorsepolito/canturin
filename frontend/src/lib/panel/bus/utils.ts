@@ -7,18 +7,25 @@ export type BaudrateSelectItem = {
 	valueAsNumber: number;
 };
 
-export function getSelectItemFromBaudrate(baudrate: number): BaudrateSelectItem {
-	let bits = 1_000_000;
-	if (baudrate <= 125_000) {
-		bits = 125_000;
-	} else if (baudrate <= 250_000) {
-		bits = 250_000;
-	} else if (baudrate <= 500_000) {
-		bits = 500_000;
+const baudrateValues = {
+	'1_000_000': 1_000_000,
+	'500_000': 500_000,
+	'250_000': 250_000,
+	'125_000': 125_000
+};
+
+function getSelectItemFromBaudrate(baudrate: number): BaudrateSelectItem {
+	let bits = baudrateValues['1_000_000'];
+	if (baudrate <= baudrateValues['125_000']) {
+		bits = baudrateValues['125_000'];
+	} else if (baudrate <= baudrateValues['250_000']) {
+		bits = baudrateValues['250_000'];
+	} else if (baudrate <= baudrateValues['500_000']) {
+		bits = baudrateValues['500_000'];
 	}
 
-	const scale = bits < 1_000_000 ? 1_000 : 1_000_000;
-	const unit = scale === 1_000_000 ? 'M' : 'k';
+	const scale = bits < baudrateValues['1_000_000'] ? 1_000 : 1_000_000;
+	const unit = scale === baudrateValues['1_000_000'] ? 'M' : 'k';
 
 	return {
 		label: `${bits / scale} ${unit}bit/s`,

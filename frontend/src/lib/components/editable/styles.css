@@ -45,6 +45,10 @@
 		&[data-font-weight='semibold'] {
 			@apply font-semibold;
 		}
+
+		&[data-readonly] {
+			@apply bg-base-300 border-base-300;
+		}
 	}
 
 	[data-part='input'] {
@@ -56,6 +60,10 @@
 	}
 
 	[data-part='error'] {
-		@apply absolute pt-1 text-error text-xs truncate cursor-pointer;
+		@apply absolute flex gap-1 pt-1;
+
+		span {
+			@apply truncate text-error text-xs;
+		}
 	}
 }

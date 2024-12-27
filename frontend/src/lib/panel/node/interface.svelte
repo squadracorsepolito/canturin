@@ -22,8 +22,8 @@
 
 	const ns = getNodeState(entityId);
 
-	function handleAttachBus(bus: BaseEntity) {
-		ns.updateAttachedBus(int.number, bus.entityId);
+	function handleAttachBus(busEntityID: string) {
+		ns.updateAttachedBus(int.number, busEntityID);
 	}
 
 	let invalidBusIds = $derived.by(() => {
@@ -83,7 +83,7 @@
 					valueKey="entityId"
 					name={`node-${int.number}-bus`}
 					labelKey="name"
-					bind:selected={int.attachedBus}
+					bind:selected={int.attachedBus.entityId}
 					filter={(item) => {
 						return invalidBusIds.includes(item.entityId);
 					}}

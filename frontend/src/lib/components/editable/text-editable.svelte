@@ -13,6 +13,7 @@
 		textSize = 'md',
 		fontWeight = 'normal',
 		border = 'visible',
+		readonly = false,
 		oncommit
 	}: EditableProps<string> = $props();
 
@@ -48,6 +49,9 @@
 			context: {
 				get value() {
 					return value;
+				},
+				get readOnly() {
+					return readonly;
 				}
 			}
 		}
@@ -74,6 +78,7 @@
 			data-text-size={textSize}
 			data-font-weight={fontWeight}
 			data-border={border}
+			data-readonly={readonly ? true : undefined}
 		>
 			<input {...api.getInputProps()} />
 

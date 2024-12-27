@@ -90,20 +90,6 @@ type Node0 struct {
 	SendedMessages []Message `json:"sendedMessages"`
 }
 
-type Message struct {
-	base
-
-	ID             acmelib.MessageID `json:"id"`
-	HasStaticCANID bool              `json:"hasStaticCANID"`
-	CANID          acmelib.CANID     `json:"canId"`
-
-	SizeByte  int                      `json:"sizeByte"`
-	ByteOrder acmelib.MessageByteOrder `json:"byteOrder"`
-	Signals   []Signal                 `json:"signals"`
-
-	Receivers []Node0 `json:"receivers"`
-}
-
 type Signal struct {
 	base
 

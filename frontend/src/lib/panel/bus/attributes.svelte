@@ -1,24 +1,18 @@
 <script lang="ts">
-	import { BusType, type Bus } from '$lib/api/canturin';
+	import { type Bus } from '$lib/api/canturin';
 	import { Attribute } from '$lib/components/attribute';
 	import Divider from '$lib/components/divider/divider.svelte';
 	import { SegmentedControl } from '$lib/components/segmented-control';
-	import type { SegmentedControlOption } from '$lib/components/segmented-control/types';
 	import { Select } from '$lib/components/select';
 	import type { PanelSectionProps } from '../types';
 	import { getBusState } from './state.svelte';
-	import {
-		baudrateItems,
-		busTypeOptions,
-		getSelectItemFromBaudrate,
-		type BaudrateSelectItem
-	} from './utils';
+	import { baudrateItems, busTypeOptions, type BaudrateSelectItem } from './utils';
 
 	let { entityId }: PanelSectionProps = $props();
 
 	const bs = getBusState(entityId);
 
-	let selectedBaudrate = $state(getSelectItemFromBaudrate(bs.entity.baudrate));
+	let selectedBaudrate = $state(`${bs.entity.baudrate}`);
 
 	function handleBaudrate(item: BaudrateSelectItem) {
 		bs.updateBaudrate(item.valueAsNumber);
@@ -27,12 +21,7 @@
 
 {#snippet section(bus: Bus)}
 	<Attribute label="Bus Type" desc="The type of the bus">
-		<SegmentedControl
-			name="bus-type"
-			options={busTypeOptions}
-			bind:selectedValue={bus.type}
-			readOnly
-		/>
+		<SegmentedControl name="bus-type" options={busTypeOptions} selectedValue={bus.type} readOnly />
 	</Attribute>
 
 	<Divider />
@@ -44,7 +33,7 @@
 			labelKey="label"
 			valueKey="value"
 			bind:selected={selectedBaudrate}
-			onselect={handleBaudrate}
+			onitemselect={handleBaudrate}
 		/>
 	</Attribute>
 {/snippet}

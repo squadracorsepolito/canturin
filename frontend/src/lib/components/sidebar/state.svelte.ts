@@ -37,6 +37,7 @@ export class SidebarState {
 		});
 
 		wails.On(SidebarUpdateName, (e: wails.WailsEvent) => {
+			console.log(e.data[0]);
 			this.updateName(e.data[0] as SidebarItem);
 		});
 

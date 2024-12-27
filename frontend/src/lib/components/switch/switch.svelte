@@ -47,6 +47,10 @@
 </label>
 
 <style lang="postcss">
+	[data-part='root'] {
+		@apply inline-block;
+	}
+
 	[data-part='control'] {
 		@apply flex border-2 w-12 p-1 rounded-badge transition-colors;
 
@@ -59,10 +63,10 @@
 		}
 
 		&[data-state='unchecked'] {
-			@apply border-base-300 justify-start;
+			@apply border-neutral-content justify-start;
 
 			&[data-readonly] {
-				@apply bg-base-300 opacity-80;
+				@apply bg-neutral-content opacity-80;
 			}
 		}
 

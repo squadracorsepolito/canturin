@@ -9,7 +9,7 @@
 	import { defaults, superForm } from 'sveltekit-superforms';
 	import { zod } from 'sveltekit-superforms/adapters';
 	import { z } from 'zod';
-	import { baudrateItems, busTypeOptions, getSelectItemFromBaudrate } from './utils';
+	import { baudrateItems, busTypeOptions } from './utils';
 	import Divider from '$lib/components/divider/divider.svelte';
 	import { Select } from '$lib/components/select';
 	import { SubmitButton } from '$lib/components/button';
@@ -34,7 +34,9 @@
 		busType: z.nativeEnum(BusType).default(BusType.BusTypeCAN2A)
 	});
 
-	let selectedBaudrate = $state(getSelectItemFromBaudrate(1_000_000));
+	const defaultBaudrate = 1_000_000;
+	let baudrate = $state(defaultBaudrate);
+	let selectedBaudrate = $state(`${defaultBaudrate}`);
 
 	const { enhance, errors, form } = superForm(defaults(zod(schema)), {
 		SPA: true,
@@ -47,7 +49,7 @@
 					name,
 					desc,
 					busType,
-					baudrate: selectedBaudrate.valueAsNumber
+					baudrate
 				});
 
 				layout.openPanel('bus', tmpBus.entityId);
@@ -88,6 +90,7 @@
 			labelKey="label"
 			valueKey="value"
 			bind:selected={selectedBaudrate}
+			onitemselect={(item) => (baudrate = item.valueAsNumber)}
 		/>
 	</FormField>
 
