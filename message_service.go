@@ -44,6 +44,35 @@ func (st MessageSendType) parse() acmelib.MessageSendType {
 	}
 }
 
+type MessageByteOrder string
+
+const (
+	MessageByteOrderLittleEndian MessageByteOrder = "little-endian"
+	MessageByteOrderBigEndian    MessageByteOrder = "big-endian"
+)
+
+func newMessageByteOrder(bo acmelib.MessageByteOrder) MessageByteOrder {
+	switch bo {
+	case acmelib.MessageByteOrderLittleEndian:
+		return MessageByteOrderLittleEndian
+	case acmelib.MessageByteOrderBigEndian:
+		return MessageByteOrderBigEndian
+	default:
+		return MessageByteOrderLittleEndian
+	}
+}
+
+func (bo MessageByteOrder) parse() acmelib.MessageByteOrder {
+	switch bo {
+	case MessageByteOrderLittleEndian:
+		return acmelib.MessageByteOrderLittleEndian
+	case MessageByteOrderBigEndian:
+		return acmelib.MessageByteOrderBigEndian
+	default:
+		return acmelib.MessageByteOrderLittleEndian
+	}
+}
+
 type Message struct {
 	base
 
@@ -51,13 +80,13 @@ type Message struct {
 	ID             uint `json:"id"`
 	CANID          uint `json:"canId"`
 
+	SizeByte  int              `json:"sizeByte"`
+	ByteOrder MessageByteOrder `json:"byteOrder"`
+
 	CycleTime      int             `json:"cycleTime"`
 	SendType       MessageSendType `json:"sendType"`
 	DelayTime      int             `json:"delayTime"`
 	StartDelayTime int             `json:"startDelayTime"`
-
-	SizeByte int `json:"sizeByte"`
-	// ByteOrder acmelib.MessageByteOrder `json:"byteOrder"`
 
 	Signals []Signal `json:"signals"`
 
@@ -75,13 +104,15 @@ func newMessage(msg *acmelib.Message) Message {
 		ID:             uint(msg.ID()),
 		CANID:          uint(msg.GetCANID()),
 
+		SizeByte:  msg.SizeByte(),
+		ByteOrder: newMessageByteOrder(msg.ByteOrder()),
+
 		CycleTime:      msg.CycleTime(),
 		SendType:       newMessageSendType(msg.SendType()),
 		DelayTime:      msg.DelayTime(),
 		StartDelayTime: msg.StartDelayTime(),
 
-		SizeByte: msg.SizeByte(),
-		Signals:  []Signal{},
+		Signals: []Signal{},
 
 		Receivers: []Node0{},
 	}
@@ -186,6 +217,11 @@ func (s *MessageService) UpdateMessageID(entityID string, req UpdateMessageIDReq
 
 func (s *MessageService) UpdateStaticCANID(entityID string, req UpdateStaticCANIDReq) (Message, error) {
 	return s.handle(entityID, &req, s.handler.updateStaticCANID)
+
+}
+
+func (s *MessageService) UpdateByteOrder(entityID string, req UpdateByteOrderReq) (Message, error) {
+	return s.handle(entityID, &req, s.handler.updateByteOrder)
 }
 
 func (s *MessageService) UpdateCycleTime(entityID string, req UpdateCycleTimeReq) (Message, error) {
@@ -363,6 +399,35 @@ func (h *messageHandler) updateStaticCANID(msg *acmelib.Message, req *request, r
 			if err := msg.SetStaticCANID(staticCANID); err != nil {
 				return nil, err
 			}
+			return msg, nil
+		},
+	)
+
+	return nil
+}
+
+func (h *messageHandler) updateByteOrder(msg *acmelib.Message, req *request, res *messageRes) error {
+	parsedReq := req.toUpdateByteOrder()
+
+	byteOrder := parsedReq.ByteOrder.parse()
+
+	oldByteOrder := msg.ByteOrder()
+	if byteOrder == oldByteOrder {
+		return nil
+	}
+
+	msg.SetByteOrder(byteOrder)
+
+	res.setUndo(
+		func() (*acmelib.Message, error) {
+			msg.SetByteOrder(oldByteOrder)
+			return msg, nil
+		},
+	)
+
+	res.setRedo(
+		func() (*acmelib.Message, error) {
+			msg.SetByteOrder(byteOrder)
 			return msg, nil
 		},
 	)

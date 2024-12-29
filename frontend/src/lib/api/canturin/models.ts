@@ -96,16 +96,27 @@ export interface Message {
     "hasStaticCANID": boolean;
     "id": number;
     "canId": number;
+    "sizeByte": number;
+    "byteOrder": MessageByteOrder;
     "cycleTime": number;
     "sendType": MessageSendType;
     "delayTime": number;
     "startDelayTime": number;
-    "sizeByte": number;
     "signals": Signal[] | null;
     "receivers": Node0[] | null;
     "senderNode": BaseEntity;
     "parentBus": BaseEntity;
 }
+
+export enum MessageByteOrder {
+    /**
+     * The Go zero value for the underlying type of the enum.
+     */
+    $zero = "",
+
+    MessageByteOrderLittleEndian = "little-endian",
+    MessageByteOrderBigEndian = "big-endian",
+};
 
 export enum MessageSendType {
     /**
@@ -303,6 +314,10 @@ export interface UpdateBaudrateReq {
 
 export interface UpdateBusTypeReq {
     "busType": BusType;
+}
+
+export interface UpdateByteOrderReq {
+    "byteOrder": MessageByteOrder;
 }
 
 export interface UpdateCycleTimeReq {

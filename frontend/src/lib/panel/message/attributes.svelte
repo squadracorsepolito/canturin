@@ -1,5 +1,10 @@
 <script lang="ts">
-	import { MessageService, type Message, type MessageSendType } from '$lib/api/canturin';
+	import {
+		MessageByteOrder,
+		MessageService,
+		type Message,
+		type MessageSendType
+	} from '$lib/api/canturin';
 	import { Attribute, AttributeGroup } from '$lib/components/attribute';
 	import { NumberEditable } from '$lib/components/editable';
 	import { Select } from '$lib/components/select';
@@ -7,12 +12,13 @@
 	import type { PanelSectionProps } from '../types';
 	import { getMessageState } from './state.svelte';
 	import * as v from 'valibot';
-	import { sendTypeSelectItems } from './utils';
+	import { byteOrderOptions, sendTypeSelectItems } from './utils';
 	import Divider from '$lib/components/divider/divider.svelte';
 	import Readonly from '$lib/components/readonly/readonly.svelte';
 	import { getHexNumber } from '$lib/utils';
 	import { Switch } from '$lib/components/switch';
 	import { onMount } from 'svelte';
+	import { SegmentedControl } from '$lib/components/segmented-control';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -70,6 +76,10 @@
 
 	function handleCanId(canId: number) {
 		ms.updateStaticCanId(canId);
+	}
+
+	function handleByteOrder(byteOrder: string) {
+		ms.updateByteOrder(byteOrder as MessageByteOrder);
 	}
 
 	function handleCycleTime(cycleTime: number) {
@@ -130,6 +140,25 @@
 	<Divider />
 
 	<AttributeGroup>
+		<Attribute label="Size" desc="The size of the message in bytes" fullSpan>
+			<Readonly>
+				{msg.sizeByte}
+			</Readonly>
+		</Attribute>
+
+		<Attribute label="Byte Order" desc="The byte order of the message payload" fullSpan>
+			<SegmentedControl
+				name="message-byte-order"
+				options={byteOrderOptions}
+				bind:selectedValue={msg.byteOrder}
+				onchange={handleByteOrder}
+			/>
+		</Attribute>
+	</AttributeGroup>
+
+	<Divider />
+
+	<AttributeGroup>
 		<Attribute label="Cycle Time" desc="The cycle time of the message in ms">
 			<NumberEditable
 				bind:value={msg.cycleTime}
@@ -168,8 +197,6 @@
 			/>
 		</Attribute>
 	</AttributeGroup>
-
-	<pre>{JSON.stringify(msg, null, 2)}</pre>
 {/snippet}
 
 <section>

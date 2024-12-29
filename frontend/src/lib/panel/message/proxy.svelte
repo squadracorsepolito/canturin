@@ -3,6 +3,7 @@
 	import type { PanelSectionProps } from '../types';
 	import Attributes from './attributes.svelte';
 	import Heading from './heading.svelte';
+	import Payload from './payload.svelte';
 	import { loadMessage } from './state.svelte';
 
 	let { entityId }: PanelSectionProps = $props();
@@ -18,6 +19,8 @@
 			<Heading {entityId} />
 
 			<Attributes {entityId} />
+
+			<Payload {entityId} />
 		{/await}
 	{/if}
 </Panel>

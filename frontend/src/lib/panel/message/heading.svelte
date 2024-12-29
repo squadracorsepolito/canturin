@@ -2,10 +2,11 @@
 	import { onMount } from 'svelte';
 	import type { PanelSectionProps } from '../types';
 	import { getMessageState } from './state.svelte';
-	import { z } from 'zod';
+	import * as v from 'valibot';
 	import type { Message } from '$lib/api/canturin';
 	import { MessageIcon } from '$lib/components/icon';
 	import { TextareaEditable, TextEditable } from '$lib/components/editable';
+	import { checkUnused, Validator } from '$lib/utils/validator.svelte';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -18,20 +19,14 @@
 		invalidNames = res;
 	});
 
-	const nameSchema = z.object({
-		name: z
-			.string()
-			.min(1)
-			.refine((n) => !invalidNames.includes(n), { message: 'Duplicated' })
-	});
-
-	let nameErrors = $derived.by(() => {
-		const res = nameSchema.safeParse({ name: ms.entity.name });
-		if (res.success) {
-			return undefined;
-		}
-		return res.error.flatten().fieldErrors.name;
-	});
+	const nameValidator = new Validator(
+		v.pipe(
+			v.string(),
+			v.minLength(1),
+			checkUnused(() => invalidNames)
+		),
+		() => ms.entity.name
+	);
 
 	function handleName(name: string) {
 		ms.updateName(name);
@@ -50,7 +45,7 @@
 			bind:value={msg.name}
 			name="message-name"
 			oncommit={handleName}
-			errors={nameErrors}
+			errors={nameValidator.errors}
 			fontWeight="semibold"
 			textSize="lg"
 			border="transparent"

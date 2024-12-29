@@ -34,6 +34,11 @@ export function ListBase(): Promise<$models.BaseEntity[] | null> & { cancel(): v
     return $resultPromise;
 }
 
+export function UpdateByteOrder(entityID: string, req: $models.UpdateByteOrderReq): Promise<$models.Message> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(2955379659, entityID, req) as any;
+    return $resultPromise;
+}
+
 export function UpdateCycleTime(entityID: string, req: $models.UpdateCycleTimeReq): Promise<$models.Message> & { cancel(): void } {
     let $resultPromise = $Call.ByID(2224820826, entityID, req) as any;
     return $resultPromise;

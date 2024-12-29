@@ -185,6 +185,18 @@ func (r *request) toUpdateStaticCANID() *UpdateStaticCANIDReq {
 	return req
 }
 
+type UpdateByteOrderReq struct {
+	ByteOrder MessageByteOrder `json:"byteOrder"`
+}
+
+func (r *request) toUpdateByteOrder() *UpdateByteOrderReq {
+	req, ok := r.data.(*UpdateByteOrderReq)
+	if !ok {
+		panic("cannot convert to UpdateByteOrderReq")
+	}
+	return req
+}
+
 type UpdateSendTypeReq struct {
 	SendType MessageSendType `json:"sendType"`
 }
