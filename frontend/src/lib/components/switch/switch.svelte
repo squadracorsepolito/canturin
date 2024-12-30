@@ -83,7 +83,7 @@
 		}
 
 		&[data-state='unchecked'] {
-			@apply bg-base-content;
+			@apply bg-neutral;
 		}
 	}
 </style>

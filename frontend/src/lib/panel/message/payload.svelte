@@ -4,7 +4,6 @@
 	import { ForwardIcon } from '$lib/components/icon';
 	import BackwardIcon from '$lib/components/icon/backward-icon.svelte';
 	import { Table, TableField, TableTitle } from '$lib/components/table';
-	import { getColorByName } from '$lib/utils';
 	import type { PanelSectionProps } from '../types';
 	import { getMessageState, type GridItem, gridWidth } from './state.svelte';
 

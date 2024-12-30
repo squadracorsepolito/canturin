@@ -44,7 +44,8 @@
 				}
 
 				const item = details.items[0] as T;
-				const value = item[valueKey];
+				const value = details.value[0] as V;
+
 				selected = value;
 				onselect?.(value);
 				onitemselect?.(item);

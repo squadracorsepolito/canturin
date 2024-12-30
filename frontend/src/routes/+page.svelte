@@ -13,6 +13,7 @@
 	} from '$lib/panel';
 	// import MessagePanel from '$lib/panel/message-panel.svelte';
 	import layout from '$lib/state/layout-state.svelte';
+	import Combobox from '$lib/components/combobox/combobox.svelte';
 
 	let items = $state([
 		{
@@ -58,7 +59,19 @@
 		{ label: 'Uganda', value: 'UG' }
 	];
 
-	let selected = $state('NG');
+	let selected = $state('');
+
+	let comboboxData = [
+		{ label: 'Nigeria', value: 'NG' },
+		{ label: 'Japan', value: 'JP' },
+		{ label: 'Korea', value: 'KO' },
+		{ label: 'Kenya', value: 'KE' },
+		{ label: 'United Kingdom', value: 'UK' },
+		{ label: 'Ghana', value: 'GH' },
+		{ label: 'Uganda', value: 'UG' }
+	];
+
+	let comboboxSelected = $state('GH');
 </script>
 
 {#if layout.openPanelType === 'bus'}
@@ -84,5 +97,15 @@
 				<div class="p-3">{label}</div>
 			{/snippet}
 		</SortableList>
+
+		<Divider></Divider>
+
+		<Combobox
+			items={comboboxData}
+			bind:selected={comboboxSelected}
+			name="combobox-test"
+			labelKey="label"
+			valueKey="value"
+		/>
 	</div>
 {/if}
