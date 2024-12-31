@@ -240,6 +240,14 @@ func (s *MessageService) UpdateStartDelayTime(entityID string, req UpdateStartDe
 	return s.handle(entityID, &req, s.handler.updateStartDelayTime)
 }
 
+func (s *MessageService) RemoveSignals(entityID string, req RemoveSignalsReq) (Message, error) {
+	return s.handle(entityID, &req, s.handler.removeSignals)
+}
+
+func (s *MessageService) CompactSignals(entityID string) (Message, error) {
+	return s.handle(entityID, nil, s.handler.compactSignals)
+}
+
 type messageRes = response[*acmelib.Message]
 
 type messageHandler struct {
@@ -544,6 +552,106 @@ func (h *messageHandler) updateStartDelayTime(msg *acmelib.Message, req *request
 	res.setRedo(
 		func() (*acmelib.Message, error) {
 			msg.SetStartDelayTime(startDelatTime)
+			return msg, nil
+		},
+	)
+
+	return nil
+}
+
+func (h *messageHandler) removeSignals(msg *acmelib.Message, req *request, res *messageRes) error {
+	parsedReq := req.toRemoveSignals()
+
+	if len(parsedReq.SignalEntityIDs) == 0 {
+		return nil
+	}
+
+	remSigIDs := make(map[string]struct{})
+	for _, sigID := range parsedReq.SignalEntityIDs {
+		remSigIDs[sigID] = struct{}{}
+	}
+
+	remSignals := []acmelib.Signal{}
+	remStartPos := make(map[string]int)
+	for _, sig := range msg.Signals() {
+		tmpID := sig.EntityID().String()
+
+		if _, ok := remSigIDs[tmpID]; ok {
+			remSignals = append(remSignals, sig)
+			remStartPos[tmpID] = sig.GetStartBit()
+		}
+	}
+
+	for _, sig := range remSignals {
+		if err := msg.RemoveSignal(sig.EntityID()); err != nil {
+			return err
+		}
+	}
+
+	res.setUndo(
+		func() (*acmelib.Message, error) {
+			for _, sig := range remSignals {
+				startPos, ok := remStartPos[sig.EntityID().String()]
+				if !ok {
+					continue
+				}
+
+				if err := msg.InsertSignal(sig, startPos); err != nil {
+					return nil, err
+				}
+			}
+
+			return msg, nil
+		},
+	)
+
+	res.setRedo(
+		func() (*acmelib.Message, error) {
+			for _, sig := range remSignals {
+				if err := msg.RemoveSignal(sig.EntityID()); err != nil {
+					return nil, err
+				}
+			}
+			return msg, nil
+		},
+	)
+
+	return nil
+}
+
+func (h *messageHandler) compactSignals(msg *acmelib.Message, _ *request, res *messageRes) error {
+	signals := []acmelib.Signal{}
+	startPos := make(map[acmelib.EntityID]int)
+
+	for _, sig := range msg.Signals() {
+		signals = append(signals, sig)
+		startPos[sig.EntityID()] = sig.GetStartBit()
+	}
+
+	msg.CompactSignals()
+
+	res.setUndo(
+		func() (*acmelib.Message, error) {
+			msg.RemoveAllSignals()
+
+			for _, sig := range signals {
+				startPos, ok := startPos[sig.EntityID()]
+				if !ok {
+					continue
+				}
+
+				if err := msg.InsertSignal(sig, startPos); err != nil {
+					return nil, err
+				}
+			}
+
+			return msg, nil
+		},
+	)
+
+	res.setRedo(
+		func() (*acmelib.Message, error) {
+			msg.CompactSignals()
 			return msg, nil
 		},
 	)

@@ -184,6 +184,10 @@ export interface RemoveSentMessagesReq {
     "messageEntityIds": string[] | null;
 }
 
+export interface RemoveSignalsReq {
+    "signalEntityIds": string[] | null;
+}
+
 export interface RemoveValuesReq {
     "valueEntityIds": string[] | null;
 }

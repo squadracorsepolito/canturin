@@ -22,3 +22,4 @@ export { default as CheckIcon } from './check-icon.svelte';
 export { default as EditIcon } from './edit-icon.svelte';
 export { default as CollapseIcon } from './collapse-icon.svelte';
 export { default as SignalIcon } from './signal-icon.svelte';
+export { default as CompactIcon } from './compact-icon.svelte';

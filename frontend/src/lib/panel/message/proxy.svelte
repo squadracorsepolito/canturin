@@ -3,7 +3,7 @@
 	import type { PanelSectionProps } from '../types';
 	import Attributes from './attributes.svelte';
 	import Heading from './heading.svelte';
-	import Payload from './payload.svelte';
+	import Signals from './signals.svelte';
 	import { loadMessage } from './state.svelte';
 
 	let { entityId }: PanelSectionProps = $props();
@@ -20,7 +20,7 @@
 
 			<Attributes {entityId} />
 
-			<Payload {entityId} />
+			<Signals {entityId} />
 		{/await}
 	{/if}
 </Panel>

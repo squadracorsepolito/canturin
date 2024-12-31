@@ -86,7 +86,11 @@
 
 <div {...api.getRootProps()}>
 	<div {...api.getControlProps()}>
-		<div>
+		<div
+			data-scope="combobox"
+			data-part="control-group"
+			data-selected={api.hasSelectedItems ? true : undefined}
+		>
 			<input {...api.getInputProps()} />
 
 			<button {...api.getTriggerProps()}>
@@ -123,17 +127,21 @@
 		[data-part='control'] {
 			@apply flex items-center relative;
 
-			&[data-focus] {
-				div {
-					@apply focus-ring-primary;
-				}
-			}
-
-			div {
-				@apply border-2 border-primary bg-primary-ghost text-primary rounded-btn px-2 py-1 flex items-center gap-3;
+			[data-part='control-group'] {
+				@apply border-2 border-neutral-content rounded-btn px-2 py-1 flex items-center gap-3;
 
 				[data-part='input'] {
 					@apply outline-none font-medium bg-transparent;
+				}
+
+				&[data-selected] {
+					@apply border-primary bg-primary-ghost text-primary;
+				}
+			}
+
+			&[data-focus] {
+				[data-part='control-group'] {
+					@apply focus-ring-primary border-primary bg-primary-ghost text-primary;
 				}
 			}
 

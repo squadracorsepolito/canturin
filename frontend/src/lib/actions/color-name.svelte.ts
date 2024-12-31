@@ -1,4 +1,5 @@
-import { getColorByName } from '$lib/utils';
+import { darken, getLuminance, lighten } from 'color2k';
+import randomColor from 'randomcolor';
 
 type Options = {
 	name: string;
@@ -6,9 +7,21 @@ type Options = {
 
 export function colorByName(el: HTMLElement, opts: Options) {
 	$effect(() => {
-		const colors = getColorByName(opts.name);
+		const bgColor = randomColor({
+			seed: opts.name
+		});
 
-		el.style.backgroundColor = colors.bgColor;
-		el.style.color = colors.textColor;
+		let textColor = '';
+		if (getLuminance(bgColor) > 0.4) {
+			textColor = darken(bgColor, 0.7);
+		} else {
+			textColor = lighten(bgColor, 0.7);
+		}
+
+		const borderColor = darken(bgColor, 0.15);
+
+		el.style.backgroundColor = bgColor;
+		el.style.color = textColor;
+		el.style.borderColor = borderColor;
 	});
 }

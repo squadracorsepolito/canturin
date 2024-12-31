@@ -9,6 +9,11 @@ import {Call as $Call} from "@wailsio/runtime";
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+export function CompactSignals(entityID: string): Promise<$models.Message> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1903844292, entityID) as any;
+    return $resultPromise;
+}
+
 export function Get(entityID: string): Promise<$models.Message> & { cancel(): void } {
     let $resultPromise = $Call.ByID(383147390, entityID) as any;
     return $resultPromise;
@@ -31,6 +36,11 @@ export function GetInvalidNames(entityID: string): Promise<string[] | null> & { 
 
 export function ListBase(): Promise<$models.BaseEntity[] | null> & { cancel(): void } {
     let $resultPromise = $Call.ByID(417424819) as any;
+    return $resultPromise;
+}
+
+export function RemoveSignals(entityID: string, req: $models.RemoveSignalsReq): Promise<$models.Message> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1417096119, entityID, req) as any;
     return $resultPromise;
 }
 

@@ -245,6 +245,18 @@ func (r *request) toUpdateStartDelayTime() *UpdateStartDelayTimeReq {
 	return req
 }
 
+type RemoveSignalsReq struct {
+	SignalEntityIDs []string `json:"signalEntityIds"`
+}
+
+func (r *request) toRemoveSignals() *RemoveSignalsReq {
+	req, ok := r.data.(*RemoveSignalsReq)
+	if !ok {
+		panic("cannot convert to RemoveSignalsReq")
+	}
+	return req
+}
+
 //////////////////////////
 // SIGNAL TYPE REQUESTS //
 //////////////////////////

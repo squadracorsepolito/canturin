@@ -11,7 +11,6 @@
 		SignalUnitPanel,
 		MessagePanel
 	} from '$lib/panel';
-	// import MessagePanel from '$lib/panel/message-panel.svelte';
 	import layout from '$lib/state/layout-state.svelte';
 	import Combobox from '$lib/components/combobox/combobox.svelte';
 
@@ -59,7 +58,7 @@
 		{ label: 'Uganda', value: 'UG' }
 	];
 
-	let selected = $state('');
+	let selected = $state('NG');
 
 	let comboboxData = [
 		{ label: 'Nigeria', value: 'NG' },

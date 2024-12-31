@@ -1,7 +1,7 @@
 <script lang="ts">
+	import { colorByName } from '$lib/actions/color-name.svelte';
 	import { ReferenceKind, type Reference } from '$lib/api/canturin';
 	import layoutStateSvelte, { type PanelType } from '$lib/state/layout-state.svelte';
-	import { getColorByName } from '$lib/utils';
 
 	type Props = {
 		nodes: Reference[];
@@ -39,13 +39,10 @@
 </script>
 
 {#snippet treeNodeItem(node: Reference)}
-	{@const color = getColorByName(node.name)}
-
 	<div>
 		<button
+			use:colorByName={{ name: node.name }}
 			onclick={() => handleClick(node)}
-			style:background-color={color.bgColor}
-			style:color={color.textColor}
 			class="text-sm py-3 truncate overflow-x-hidden w-full h-full rounded-box hover:ring-2 ring-primary"
 		>
 			{node.name}
