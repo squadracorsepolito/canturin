@@ -161,6 +161,10 @@ func (r *request) toRemoveReceivedMessages() *RemoveReceivedMessagesReq {
 // MESSAGE REQUESTS //
 //////////////////////
 
+type commondMessageSignalReq struct {
+	SignalEntityID string `json:"signalEntityId"`
+}
+
 type UpdateMessageIDReq struct {
 	MessageID uint `json:"messageId"`
 }
@@ -253,6 +257,21 @@ func (r *request) toRemoveSignals() *RemoveSignalsReq {
 	req, ok := r.data.(*RemoveSignalsReq)
 	if !ok {
 		panic("cannot convert to RemoveSignalsReq")
+	}
+	return req
+}
+
+type ReorderSignalReq struct {
+	commondMessageSignalReq
+
+	From int `json:"from"`
+	To   int `json:"to"`
+}
+
+func (r *request) toReorderSignal() *ReorderSignalReq {
+	req, ok := r.data.(*ReorderSignalReq)
+	if !ok {
+		panic("cannot convert to ReorderSignalReq")
 	}
 	return req
 }

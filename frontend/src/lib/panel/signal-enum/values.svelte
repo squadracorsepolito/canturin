@@ -32,14 +32,17 @@
 {#snippet section(signalEnum: SignalEnum)}
 	{#if signalEnum.values && signalEnum.values.length > 0}
 		<Table items={signalEnum.values} idKey="entityId" reorder={handleReorderValue}>
-			{#snippet bulkActions({ selectedCount, selectedItems })}
+			{#snippet bulkActions({ selectedCount, selectedItems, deselectAll })}
 				<div class="flex justify-end gap-5">
 					<IconButton onclick={() => handleAdd()} label="Add Value" color="primary">
 						<AddIcon />
 					</IconButton>
 
 					<IconButton
-						onclick={() => handleBulkDelete(selectedItems)}
+						onclick={() => {
+							handleBulkDelete(selectedItems);
+							deselectAll();
+						}}
 						label={`Delete Values ${selectedCount > 0 ? ` (${selectedCount})` : ''}`}
 						disabled={selectedCount === 0}
 						color="error"

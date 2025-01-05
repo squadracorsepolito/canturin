@@ -44,6 +44,11 @@ export function RemoveSignals(entityID: string, req: $models.RemoveSignalsReq): 
     return $resultPromise;
 }
 
+export function ReorderSignal(entityID: string, req: $models.ReorderSignalReq): Promise<$models.Message> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(872043789, entityID, req) as any;
+    return $resultPromise;
+}
+
 export function UpdateByteOrder(entityID: string, req: $models.UpdateByteOrderReq): Promise<$models.Message> & { cancel(): void } {
     let $resultPromise = $Call.ByID(2955379659, entityID, req) as any;
     return $resultPromise;

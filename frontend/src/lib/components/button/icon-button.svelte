@@ -4,7 +4,7 @@
 
 	type Props = {
 		onclick: () => void;
-		color?: 'primary' | 'error';
+		color?: 'primary' | 'secondary' | 'error';
 		label?: string;
 		disabled?: boolean;
 		children: Snippet;
@@ -41,6 +41,15 @@
 			&:hover,
 			&:disabled {
 				@apply bg-primary-ghost;
+			}
+		}
+
+		&[data-color='secondary'] {
+			@apply text-secondary;
+
+			&:hover,
+			&:disabled {
+				@apply bg-secondary-ghost;
 			}
 		}
 

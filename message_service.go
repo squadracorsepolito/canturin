@@ -248,6 +248,10 @@ func (s *MessageService) CompactSignals(entityID string) (Message, error) {
 	return s.handle(entityID, nil, s.handler.compactSignals)
 }
 
+func (s *MessageService) ReorderSignal(entityID string, req ReorderSignalReq) (Message, error) {
+	return s.handle(entityID, &req, s.handler.reorderSignal)
+}
+
 type messageRes = response[*acmelib.Message]
 
 type messageHandler struct {
@@ -652,6 +656,90 @@ func (h *messageHandler) compactSignals(msg *acmelib.Message, _ *request, res *m
 	res.setRedo(
 		func() (*acmelib.Message, error) {
 			msg.CompactSignals()
+			return msg, nil
+		},
+	)
+
+	return nil
+}
+
+func (h *messageHandler) reorderSignal(msg *acmelib.Message, req *request, res *messageRes) error {
+	parsedReq := req.toReorderSignal()
+
+	from := parsedReq.From
+	to := parsedReq.To
+
+	if from == to {
+		return nil
+	}
+
+	oldOrderSignals := msg.Signals()
+	newOrderSignals := []acmelib.Signal{}
+
+	if from < to {
+		// move down
+		for i := 0; i < to; i++ {
+			if i == from {
+				continue
+			}
+
+			newOrderSignals = append(newOrderSignals, oldOrderSignals[i])
+		}
+
+		newOrderSignals = append(newOrderSignals, oldOrderSignals[from])
+
+		for i := to + 1; i < len(oldOrderSignals); i++ {
+			newOrderSignals = append(newOrderSignals, oldOrderSignals[i])
+		}
+	} else {
+		// move up
+		for i := 0; i < to; i++ {
+			newOrderSignals = append(newOrderSignals, oldOrderSignals[i])
+		}
+
+		newOrderSignals = append(newOrderSignals, oldOrderSignals[from])
+
+		for i := to; i < len(oldOrderSignals); i++ {
+			if i == from {
+				continue
+			}
+
+			newOrderSignals = append(newOrderSignals, oldOrderSignals[i])
+		}
+	}
+
+	msg.RemoveAllSignals()
+
+	for _, sig := range newOrderSignals {
+		if err := msg.AppendSignal(sig); err != nil {
+			return err
+		}
+	}
+
+	res.setUndo(
+		func() (*acmelib.Message, error) {
+			msg.RemoveAllSignals()
+
+			for _, sig := range oldOrderSignals {
+				if err := msg.AppendSignal(sig); err != nil {
+					return nil, err
+				}
+			}
+
+			return msg, nil
+		},
+	)
+
+	res.setRedo(
+		func() (*acmelib.Message, error) {
+			msg.RemoveAllSignals()
+
+			for _, sig := range newOrderSignals {
+				if err := msg.AppendSignal(sig); err != nil {
+					return nil, err
+				}
+			}
+
 			return msg, nil
 		},
 	)

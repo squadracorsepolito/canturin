@@ -187,25 +187,27 @@
 {/snippet}
 
 <div class="flex gap-2">
-	<div class="flex flex-col py-2 gap-2 justify-around">
+	<div class="flex flex-col gap-2 justify-around">
 		{#each { length: height } as _, idx}
-			<div class="font-semibold pr-5">
+			<div class="font-medium pr-5">
 				{idx + 1}
 			</div>
 		{/each}
 	</div>
 
 	<div class="flex-1 relative">
-		<div class="absolute h-full w-full block rounded-box bg-base-200"></div>
+		<div class="absolute h-full w-full block rounded-box"></div>
 
 		<div
-			class="absolute w-full h-full grid gap-2 p-2"
+			class="absolute w-full h-full grid gap-2"
 			style:grid-template-columns="repeat({width}, minmax(0, 1fr))"
 			style:grid-template-rows="repeat({height}, minmax(0, 1fr))"
 		>
 			{#each { length: width * height } as _, idx}
-				<div class="flex items-center rounded-box justify-center bg-base-100">
-					<span class="text-base-content font-semibold">
+				<div
+					class="flex items-center rounded-btn justify-center bg-base-200 border-2 border-base-300"
+				>
+					<span class="text-base-content font-medium">
 						{getPlaceholder(idx)}
 					</span>
 				</div>
@@ -213,7 +215,7 @@
 		</div>
 
 		<div
-			class="relative grid gap-2 p-2"
+			class="relative grid gap-2"
 			style:grid-template-columns="repeat({width}, minmax(0, 1fr))"
 			style:grid-template-rows="repeat({height}, minmax(0, 1fr))"
 			style:aspect-ratio={width / height}

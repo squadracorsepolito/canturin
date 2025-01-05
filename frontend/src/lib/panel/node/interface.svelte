@@ -102,10 +102,13 @@
 			{#snippet content()}
 				{#if int.sentMessages}
 					<Table items={int.sentMessages} idKey="entityId">
-						{#snippet bulkActions({ selectedCount, selectedItems })}
+						{#snippet bulkActions({ selectedCount, selectedItems, deselectAll })}
 							<div class="flex gap-5">
 								<IconButton
-									onclick={() => layout.openMessageDraftPanel()}
+									onclick={() => {
+										layout.openMessageDraftPanel();
+										deselectAll();
+									}}
 									label="Add Sent Message"
 									color="primary"
 								>

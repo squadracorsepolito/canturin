@@ -29,14 +29,17 @@
 		<div class="flex flex-col gap-5 @5xl:gap-2 @5xl:flex-row">
 			<div class="flex-1">
 				<Table items={msg.signals} idKey="entityId">
-					{#snippet bulkActions({ selectedCount, selectedItems })}
+					{#snippet bulkActions({ selectedCount, selectedItems, deselectAll })}
 						<div class="flex justify-end gap-5">
-							<IconButton onclick={handlCompact}>
+							<IconButton onclick={handlCompact} color="secondary">
 								<CompactIcon />
 							</IconButton>
 
 							<IconButton
-								onclick={() => handleBulkDelete(selectedItems)}
+								onclick={() => {
+									handleBulkDelete(selectedItems);
+									deselectAll();
+								}}
 								label={`Delete Signals ${selectedCount > 0 ? ` (${selectedCount})` : ''}`}
 								disabled={selectedCount === 0}
 								color="error"

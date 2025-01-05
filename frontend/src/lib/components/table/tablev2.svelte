@@ -14,7 +14,7 @@
 		items: T[];
 		idKey: KeyOfString<T>;
 		reorder?: (id: string, from: number, to: number) => void;
-		bulkActions?: Snippet<[{ selectedCount: number; selectedItems: T[] }]>;
+		bulkActions?: Snippet<[{ selectedCount: number; selectedItems: T[]; deselectAll: () => void }]>;
 		header: Snippet;
 		row: Snippet<[T]>;
 		rowActions?: Snippet<[T]>;
@@ -105,7 +105,11 @@
 
 	{#if bulkActions}
 		<div>
-			{@render bulkActions({ selectedCount, selectedItems })}
+			{@render bulkActions({
+				selectedCount,
+				selectedItems,
+				deselectAll: () => handleSelectAll(false)
+			})}
 		</div>
 	{/if}
 </div>

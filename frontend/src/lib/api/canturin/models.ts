@@ -192,6 +192,12 @@ export interface RemoveValuesReq {
     "valueEntityIds": string[] | null;
 }
 
+export interface ReorderSignalReq {
+    "signalEntityId": string;
+    "from": number;
+    "to": number;
+}
+
 export interface ReorderValueReq {
     "valueEntityId": string;
     "from": number;
