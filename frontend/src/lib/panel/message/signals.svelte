@@ -11,8 +11,12 @@
 
 	const ms = getMessageState(entityId);
 
-	function handlCompact() {
+	function handleCompact() {
 		ms.compactSignals();
+	}
+
+	function handleReorder(sigEntId: string, from: number, to: number) {
+		ms.reorderSignal(sigEntId, from, to);
 	}
 
 	function handleBulkDelete(signals: Signal[]) {
@@ -28,10 +32,10 @@
 	{#if msg.signals}
 		<div class="flex flex-col gap-5 @5xl:gap-2 @5xl:flex-row">
 			<div class="flex-1">
-				<Table items={msg.signals} idKey="entityId">
+				<Table items={msg.signals} idKey="entityId" reorder={handleReorder}>
 					{#snippet bulkActions({ selectedCount, selectedItems, deselectAll })}
 						<div class="flex justify-end gap-5">
-							<IconButton onclick={handlCompact} color="secondary">
+							<IconButton onclick={handleCompact} color="secondary">
 								<CompactIcon />
 							</IconButton>
 

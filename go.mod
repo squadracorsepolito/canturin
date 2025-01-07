@@ -3,7 +3,7 @@ module canturin
 go 1.22.4
 
 require (
-	github.com/squadracorsepolito/acmelib v1.5.4
+	github.com/squadracorsepolito/acmelib v1.5.5
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.8.3
 )
 

@@ -107,4 +107,8 @@ class MessageState extends EntityState<Message> {
 	compactSignals() {
 		this.update(MessageService.CompactSignals(this.entity.entityId));
 	}
+
+	reorderSignal(signalEntityId: string, from: number, to: number) {
+		this.update(MessageService.ReorderSignal(this.entity.entityId, { signalEntityId, from, to }));
+	}
 }
