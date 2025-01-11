@@ -44,8 +44,8 @@
 
 		&[data-closest-edge] {
 			background-image: linear-gradient(
-				var(--fallback-a, oklch(var(--a) / var(--tw-border-opacity))),
-				var(--fallback-a, oklch(var(--a) / var(--tw-border-opacity)))
+				var(--fallback-a, oklch(var(--a))),
+				var(--fallback-a, oklch(var(--a)))
 			);
 			background-size: 100% 5%;
 			background-repeat: no-repeat;
