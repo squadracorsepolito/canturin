@@ -380,10 +380,6 @@ func (h *signalEnumHandler) removeValues(sigEnum *acmelib.SignalEnum, req *reque
 }
 
 func (h *signalEnumHandler) reorderValue(sigEnum *acmelib.SignalEnum, sigEnumVal *acmelib.SignalEnumValue, from, to int) error {
-	if from == to {
-		return nil
-	}
-
 	if err := sigEnum.RemoveValue(sigEnumVal.EntityID()); err != nil {
 		return err
 	}

@@ -249,7 +249,7 @@ func (s *MessageService) CompactSignals(entityID string) (Message, error) {
 }
 
 func (s *MessageService) ReorderSignal(entityID string, req ReorderSignalReq) (Message, error) {
-	return s.handle(entityID, &req, s.handler.reorderSignal)
+	return s.handle(entityID, &req, s.handler.reorderSignalHandler)
 }
 
 type messageRes = response[*acmelib.Message]
@@ -663,7 +663,46 @@ func (h *messageHandler) compactSignals(msg *acmelib.Message, _ *request, res *m
 	return nil
 }
 
-func (h *messageHandler) reorderSignal(msg *acmelib.Message, req *request, res *messageRes) error {
+func (h *messageHandler) reorderSignal(msg *acmelib.Message, sig acmelib.Signal, from, to int) error {
+	if err := msg.RemoveSignal(sig.EntityID()); err != nil {
+		return err
+	}
+
+	otherSignals := msg.Signals()
+
+	newStartPos := 0
+	if to < from {
+		// move up
+		nearestSig := otherSignals[from-1]
+		targetSig := otherSignals[to]
+
+		newStartPos = targetSig.GetStartBit()
+		offset := sig.GetSize() + sig.GetStartBit() - nearestSig.GetSize() - nearestSig.GetStartBit()
+
+		for i := to; i < from; i++ {
+			msg.ShiftSignalRight(otherSignals[i].EntityID(), offset)
+		}
+	} else {
+		// move down
+		nearestSig := otherSignals[from]
+		targetSig := otherSignals[to-1]
+
+		newStartPos = targetSig.GetStartBit() + targetSig.GetSize() - sig.GetSize()
+		offset := nearestSig.GetStartBit() - sig.GetStartBit()
+
+		for i := from; i < to; i++ {
+			msg.ShiftSignalLeft(otherSignals[i].EntityID(), offset)
+		}
+	}
+
+	if err := msg.InsertSignal(sig, newStartPos); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (h *messageHandler) reorderSignalHandler(msg *acmelib.Message, req *request, res *messageRes) error {
 	parsedReq := req.toReorderSignal()
 
 	from := parsedReq.From
@@ -673,157 +712,32 @@ func (h *messageHandler) reorderSignal(msg *acmelib.Message, req *request, res *
 		return nil
 	}
 
-	targetSig, err := msg.GetSignal(acmelib.EntityID(parsedReq.SignalEntityID))
+	currSig, err := msg.GetSignal(acmelib.EntityID(parsedReq.SignalEntityID))
 	if err != nil {
 		return err
 	}
 
-	if err := msg.RemoveSignal(targetSig.EntityID()); err != nil {
+	if err := h.reorderSignal(msg, currSig, from, to); err != nil {
 		return err
 	}
 
-	otherSignals := msg.Signals()
-
-	newTargetStartPos := 0
-	if to < from {
-		// move up
-		for idx, tmpSig := range otherSignals {
-			if idx < to {
-				continue
+	res.setUndo(
+		func() (*acmelib.Message, error) {
+			if err := h.reorderSignal(msg, currSig, to, from); err != nil {
+				return nil, err
 			}
+			return msg, nil
+		},
+	)
 
-			if idx == to {
-				newTargetStartPos = tmpSig.GetStartBit()
+	res.setRedo(
+		func() (*acmelib.Message, error) {
+			if err := h.reorderSignal(msg, currSig, from, to); err != nil {
+				return nil, err
 			}
-
-			if idx == from {
-				break
-			}
-
-			msg.ShiftSignalRight(tmpSig.EntityID(), targetSig.GetSize())
-		}
-	} else {
-		// move down
-		lastSig := otherSignals[len(otherSignals)-1]
-		newTargetStartPos = lastSig.GetStartBit() + lastSig.GetSize() - targetSig.GetSize()
-
-		for idx, tmpSig := range otherSignals {
-			if idx < from {
-				continue
-			}
-
-			if idx == to {
-				newTargetStartPos = tmpSig.GetStartBit() - targetSig.GetSize()
-				break
-			}
-
-			msg.ShiftSignalLeft(tmpSig.EntityID(), targetSig.GetSize())
-		}
-	}
-
-	if err := msg.InsertSignal(targetSig, newTargetStartPos); err != nil {
-		return err
-	}
-
-	// res.setUndo(
-	// 	func() (*acmelib.Message, error) {
-	// 		if err := msg.RemoveSignal(targetSig.EntityID()); err != nil {
-	// 			return nil, err
-	// 		}
-
-	// 		if to < from {
-
-	// 			for idx, tmpSig := range msg.Signals() {
-	// 				if idx < from {
-	// 					continue
-	// 				}
-
-	// 				if idx == from {
-	// 					newTargetStartPos = tmpSig.GetStartBit()
-	// 				}
-
-	// 				msg.ShiftSignalLeft(tmpSig.EntityID(), targetSig.GetSize())
-
-	// 				if idx == to {
-	// 					break
-	// 				}
-	// 			}
-	// 		} else {
-	// 			for idx, tmpSig := range msg.Signals() {
-	// 				if idx < to {
-	// 					continue
-	// 				}
-
-	// 				if idx == to {
-	// 					newTargetStartPos = tmpSig.GetStartBit()
-	// 				}
-
-	// 				msg.ShiftSignalRight(tmpSig.EntityID(), targetSig.GetSize())
-
-	// 				if idx == from {
-	// 					break
-	// 				}
-	// 			}
-	// 		}
-
-	// 		if err := msg.InsertSignal(targetSig, newTargetStartPos); err != nil {
-	// 			return nil, err
-	// 		}
-
-	// 		return msg, nil
-	// 	},
-	// )
-
-	// res.setRedo(
-	// 	func() (*acmelib.Message, error) {
-	// 		if err := msg.RemoveSignal(targetSig.EntityID()); err != nil {
-	// 			return nil, err
-	// 		}
-
-	// 		newTargetStartPos := 0
-	// 		if to < from {
-	// 			// move up
-	// 			for idx, tmpSig := range msg.Signals() {
-	// 				if idx < to {
-	// 					continue
-	// 				}
-
-	// 				if idx == to {
-	// 					newTargetStartPos = tmpSig.GetStartBit()
-	// 				}
-
-	// 				msg.ShiftSignalRight(tmpSig.EntityID(), targetSig.GetSize())
-
-	// 				if idx == from {
-	// 					break
-	// 				}
-	// 			}
-	// 		} else {
-	// 			// move down
-	// 			for idx, tmpSig := range msg.Signals() {
-	// 				if idx < from {
-	// 					continue
-	// 				}
-
-	// 				if idx == from {
-	// 					newTargetStartPos = tmpSig.GetStartBit()
-	// 				}
-
-	// 				msg.ShiftSignalLeft(tmpSig.EntityID(), targetSig.GetSize())
-
-	// 				if idx == to {
-	// 					break
-	// 				}
-	// 			}
-	// 		}
-
-	// 		if err := msg.InsertSignal(targetSig, newTargetStartPos); err != nil {
-	// 			return nil, err
-	// 		}
-
-	// 		return msg, nil
-	// 	},
-	// )
+			return msg, nil
+		},
+	)
 
 	return nil
 }
