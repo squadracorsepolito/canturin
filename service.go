@@ -32,6 +32,7 @@ const (
 	serviceKindBus serviceKind = iota
 	serviceKindNode
 	serviceKindMessage
+	serviceKindSignal
 	serviceKindSignalType
 	serviceKindSignalUnit
 	serviceKindSignalEnum
@@ -132,6 +133,9 @@ func (s *service[E, R, H]) sendHistoryOp(undo, redo func() (E, error)) {
 
 	case serviceKindMessage:
 		opDomain = operationDomainMessage
+
+	case serviceKindSignal:
+		opDomain = operationDomainSignal
 
 	case serviceKindSignalType:
 		opDomain = operationDomainSignalType

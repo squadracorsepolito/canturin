@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strings"
+
 	"github.com/squadracorsepolito/acmelib"
 )
 
@@ -179,7 +181,7 @@ func (h *busHandler) toResponse(bus *acmelib.Bus) Bus {
 func (h *busHandler) updateName(bus *acmelib.Bus, req *request, res *busRes) error {
 	parsedReq := req.toUpdateName()
 
-	name := parsedReq.Name
+	name := strings.TrimSpace(parsedReq.Name)
 
 	oldName := bus.Name()
 	if name == oldName {

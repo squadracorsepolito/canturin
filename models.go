@@ -90,14 +90,6 @@ type Node0 struct {
 	SendedMessages []Message `json:"sendedMessages"`
 }
 
-type Signal struct {
-	base
-
-	Kind     acmelib.SignalKind `json:"kind"`
-	StartPos int                `json:"startPos"`
-	Size     int                `json:"size"`
-}
-
 type SignalReference struct {
 	Bus     entityStub `json:"bus"`
 	Node    entityStub `json:"node"`

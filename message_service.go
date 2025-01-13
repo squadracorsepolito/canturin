@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strings"
+
 	"github.com/squadracorsepolito/acmelib"
 )
 
@@ -129,7 +131,7 @@ func newMessage(msg *acmelib.Message) Message {
 		res.Signals = append(res.Signals, Signal{
 			base: getBase(sig),
 
-			Kind:     sig.Kind(),
+			Kind:     newSignalKind(sig.Kind()),
 			StartPos: sig.GetStartBit(),
 			Size:     sig.GetSize(),
 		})
@@ -271,7 +273,7 @@ func (h *messageHandler) toResponse(msg *acmelib.Message) Message {
 func (h *messageHandler) updateName(msg *acmelib.Message, req *request, res *messageRes) error {
 	parsedReq := req.toUpdateName()
 
-	name := parsedReq.Name
+	name := strings.TrimSpace(parsedReq.Name)
 
 	oldName := msg.Name()
 	if name == oldName {

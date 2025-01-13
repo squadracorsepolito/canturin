@@ -6,6 +6,7 @@ export const HistoryChange = "history-change";
 export const HistoryBusModify = "history-bus-modify";
 export const HistoryNodeModify = "history-node-modify";
 export const HistoryMessageModify = "history-message-modify";
+export const HistorySignalModify = "history-signal-modify";
 export const HistorySignalTypeModify = "history-signal-type-modify";
 export const HistorySignalUnitModify = "history-signal-unit-modify";
 export const HistorySignalEnumModify = "history-signal-enum-modify";

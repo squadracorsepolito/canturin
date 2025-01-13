@@ -18,6 +18,7 @@ const (
 	operationDomainBus operationDomain = iota
 	operationDomainNode
 	operationDomainMessage
+	operationDomainSignal
 	operationDomainSignalType
 	operationDomainSignalUnit
 	operationDomainSignalEnum
@@ -154,6 +155,8 @@ func (s *HistoryService) sendModifyEvent(opDomain operationDomain, res any) {
 		eventName = HistoryNodeModify
 	case operationDomainMessage:
 		eventName = HistoryMessageModify
+	case operationDomainSignal:
+		eventName = HistorySignalModify
 	case operationDomainSignalType:
 		eventName = HistorySignalTypeModify
 	case operationDomainSignalUnit:

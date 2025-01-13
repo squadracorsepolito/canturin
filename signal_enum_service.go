@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/squadracorsepolito/acmelib"
 )
@@ -219,7 +220,7 @@ func (h *signalEnumHandler) toResponse(sigEnum *acmelib.SignalEnum) SignalEnum {
 func (h *signalEnumHandler) updateName(sigEnum *acmelib.SignalEnum, req *request, res *signalEnumRes) error {
 	parsedReq := req.toUpdateName()
 
-	name := parsedReq.Name
+	name := strings.TrimSpace(parsedReq.Name)
 
 	oldName := sigEnum.Name()
 	if oldName == name {

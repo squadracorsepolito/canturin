@@ -38,8 +38,9 @@
 					return;
 				}
 
-				fallbackValue = details.value;
-				oncommit?.(details.value);
+				const tmpValue = details.value;
+				fallbackValue = tmpValue;
+				oncommit?.(tmpValue);
 			},
 			onValueChange: (details) => {
 				value = details.value;

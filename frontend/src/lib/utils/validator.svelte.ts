@@ -22,3 +22,12 @@ export function checkUnused<T>(getter: () => T[]) {
 		(issue) => `Invalid value: Received ${issue.received} but already used`
 	);
 }
+
+export function nameSchema(getInvalidNames: () => string[]) {
+	return v.pipe(
+		v.string(),
+		v.minLength(1),
+		v.regex(/^[a-zA-Z_].*/, 'Invalid string: Must start with a letter or underscore'),
+		checkUnused(getInvalidNames)
+	);
+}

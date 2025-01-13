@@ -4,9 +4,6 @@
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
-import * as acmelib$0 from "../github.com/squadracorsepolito/acmelib/models.js";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore: Unused imports
 import * as time$0 from "../time/models.js";
 
 export interface AttachedNode {
@@ -237,7 +234,7 @@ export interface Signal {
     "name": string;
     "desc": string;
     "createTime": time$0.Time;
-    "kind": acmelib$0.SignalKind;
+    "kind": SignalKind;
     "startPos": number;
     "size": number;
 }
@@ -261,6 +258,17 @@ export interface SignalEnumValue {
     "createTime": time$0.Time;
     "index": number;
 }
+
+export enum SignalKind {
+    /**
+     * The Go zero value for the underlying type of the enum.
+     */
+    $zero = "",
+
+    SignalKindStandard = "standard",
+    SignalKindEnum = "enum",
+    SignalKindMultiplexed = "multiplexed",
+};
 
 export interface SignalType {
     "entityId": string;

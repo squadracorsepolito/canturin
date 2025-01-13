@@ -9,7 +9,8 @@
 		BusPanel,
 		NodePanel,
 		SignalUnitPanel,
-		MessagePanel
+		MessagePanel,
+		SignalPanel
 	} from '$lib/panel';
 	import layout from '$lib/state/layout-state.svelte';
 	import Combobox from '$lib/components/combobox/combobox.svelte';
@@ -79,6 +80,8 @@
 	<NodePanel entityId={layout.openPanelId} />
 {:else if layout.openPanelType === 'message'}
 	<MessagePanel entityId={layout.openPanelId} />
+{:else if layout.openPanelType === 'signal'}
+	<SignalPanel entityId={layout.openPanelId} />
 {:else if layout.openPanelType === 'signal_type'}
 	<SignalTypePanel entityId={layout.openPanelId} />
 {:else if layout.openPanelType === 'signal_unit'}

@@ -3,6 +3,7 @@ export type PanelType =
 	| 'bus'
 	| 'node'
 	| 'message'
+	| 'signal'
 	| 'signal_type'
 	| 'signal_unit'
 	| 'signal_enum';

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/squadracorsepolito/acmelib"
 )
@@ -218,7 +219,7 @@ func (h *signalUnitHandler) toResponse(sigUnit *acmelib.SignalUnit) SignalUnit {
 func (h *signalUnitHandler) updateName(sigUnit *acmelib.SignalUnit, req *request, res *signalUnitRes) error {
 	parsedReq := req.toUpdateName()
 
-	name := parsedReq.Name
+	name := strings.TrimSpace(parsedReq.Name)
 
 	oldName := sigUnit.Name()
 	if oldName == name {

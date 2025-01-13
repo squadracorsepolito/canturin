@@ -15,6 +15,7 @@ type serviceManager struct {
 	bus        *BusService
 	node       *NodeService
 	message    *MessageService
+	signal     *SignalService
 	signalType *SignalTypeService
 	signalUnit *SignalUnitService
 	signalEnum *SignalEnumService
@@ -36,6 +37,7 @@ func newServiceManager() *serviceManager {
 		bus:        bus,
 		node:       newNodeService(sidebarController, bus),
 		message:    newMessageService(sidebarController),
+		signal:     newSignalService(sidebarController),
 		signalType: newSignalTypeService(sidebarController),
 		signalUnit: newSignalUnitService(sidebarController),
 		signalEnum: newSignalEnumService(sidebarController),
@@ -50,6 +52,7 @@ func (m *serviceManager) getServices() []application.Service {
 		application.NewService(manager.bus),
 		application.NewService(manager.node),
 		application.NewService(manager.message),
+		application.NewService(manager.signal),
 		application.NewService(manager.signalType),
 		application.NewService(manager.signalUnit),
 		application.NewService(manager.signalEnum),
@@ -80,6 +83,8 @@ func (m *serviceManager) initNetwork(net *acmelib.Network) {
 
 				// Iterate over the signals
 				for _, sig := range msg.Signals() {
+					manager.signal.sendLoad(sig)
+
 					switch sig.Kind() {
 					// Standard Signal
 					case acmelib.SignalKindStandard:
@@ -138,6 +143,7 @@ func (m *serviceManager) clearServices() {
 	m.bus.sendClear()
 	m.node.sendClear()
 	m.message.sendClear()
+	m.signal.sendClear()
 	m.signalType.sendClear()
 	m.signalUnit.sendClear()
 	m.signalEnum.sendClear()

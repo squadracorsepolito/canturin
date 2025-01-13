@@ -1,4 +1,4 @@
-import { MessageByteOrder, MessageSendType } from '$lib/api/canturin';
+import { MessageByteOrder, MessageSendType, SignalKind } from '$lib/api/canturin';
 import type { SegmentedControlOption } from '$lib/components/segmented-control/types';
 
 export const sendTypeSelectItems = [
@@ -36,3 +36,16 @@ export const byteOrderOptions: SegmentedControlOption[] = [
 		desc: 'Most significant byte first'
 	}
 ];
+
+export function getSignalKindString(kind: SignalKind) {
+	switch (kind) {
+		case SignalKind.SignalKindStandard:
+			return 'Standard';
+		case SignalKind.SignalKindEnum:
+			return 'Enum';
+		case SignalKind.SignalKindMultiplexed:
+			return 'Multiplexed';
+		default:
+			return '';
+	}
+}

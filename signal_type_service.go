@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/squadracorsepolito/acmelib"
 )
@@ -248,7 +249,7 @@ func (h *signalTypeHandler) toResponse(sigType *acmelib.SignalType) SignalType {
 func (h *signalTypeHandler) updateName(sigType *acmelib.SignalType, req *request, res *signalTypeRes) error {
 	parsedReq := req.toUpdateName()
 
-	name := parsedReq.Name
+	name := strings.TrimSpace(parsedReq.Name)
 
 	oldName := sigType.Name()
 	if name == oldName {

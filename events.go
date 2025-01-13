@@ -10,6 +10,7 @@ const (
 	HistoryBusModify        = "history-bus-modify"
 	HistoryNodeModify       = "history-node-modify"
 	HistoryMessageModify    = "history-message-modify"
+	HistorySignalModify     = "history-signal-modify"
 	HistorySignalTypeModify = "history-signal-type-modify"
 	HistorySignalUnitModify = "history-signal-unit-modify"
 	HistorySignalEnumModify = "history-signal-enum-modify"

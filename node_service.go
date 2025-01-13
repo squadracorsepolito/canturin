@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strings"
+
 	"github.com/squadracorsepolito/acmelib"
 )
 
@@ -216,7 +218,7 @@ func (h *nodeHandler) toResponse(node *acmelib.Node) Node {
 func (h *nodeHandler) updateName(node *acmelib.Node, req *request, res *nodeRes) error {
 	parsedReq := req.toUpdateName()
 
-	name := parsedReq.Name
+	name := strings.TrimSpace(parsedReq.Name)
 
 	oldName := node.Name()
 	if name == oldName {

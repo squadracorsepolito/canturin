@@ -1,11 +1,13 @@
 <script lang="ts">
-	import type { Message, Signal } from '$lib/api/canturin';
-	import { IconButton } from '$lib/components/button';
+	import { type Message, type Signal, SignalKind } from '$lib/api/canturin';
+	import { IconButton, UnderlinedButton } from '$lib/components/button';
 	import { SignalGrid } from '$lib/components/grid';
 	import { CompactIcon, DeleteIcon } from '$lib/components/icon';
 	import { Table, TableField, TableTitle } from '$lib/components/table';
+	import layout from '$lib/state/layout-state.svelte';
 	import type { PanelSectionProps } from '../types';
 	import { getMessageState } from './state.svelte';
+	import { getSignalKindString } from './utils';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -56,13 +58,31 @@
 					{#snippet header()}
 						<TableTitle>Name</TableTitle>
 
+						<TableTitle>Kind</TableTitle>
+
 						<TableTitle>Size</TableTitle>
 
 						<TableTitle>Start Position</TableTitle>
 					{/snippet}
 
 					{#snippet row(sig)}
-						<TableField>{sig.name}</TableField>
+						<TableField>
+							<UnderlinedButton
+								label={sig.name}
+								onclick={() => layout.openPanel('signal', sig.entityId)}
+							/>
+						</TableField>
+
+						<TableField>
+							<span
+								class={[
+									'badge badge-sm',
+									sig.kind === SignalKind.SignalKindStandard && 'badge-primary',
+									sig.kind === SignalKind.SignalKindEnum && 'badge-secondary',
+									sig.kind === SignalKind.SignalKindMultiplexed && 'badge-accent'
+								]}>{getSignalKindString(sig.kind)}</span
+							>
+						</TableField>
 
 						<TableField>{sig.size}</TableField>
 
@@ -82,8 +102,6 @@
 			</div>
 		</div>
 	{/if}
-
-	<pre>{JSON.stringify(msg, null, 2)}</pre>
 {/snippet}
 
 <section>
