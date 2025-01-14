@@ -14,6 +14,7 @@
 	} from '$lib/panel';
 	import layout from '$lib/state/layout-state.svelte';
 	import Combobox from '$lib/components/combobox/combobox.svelte';
+	import { HoverPreview } from '$lib/components/hover-preview';
 
 	let items = $state([
 		{
@@ -109,5 +110,17 @@
 			labelKey="label"
 			valueKey="value"
 		/>
+
+		<Divider></Divider>
+
+		<HoverPreview>
+			{#snippet trigger()}
+				trigger
+			{/snippet}
+
+			{#snippet content()}
+				content
+			{/snippet}
+		</HoverPreview>
 	</div>
 {/if}
