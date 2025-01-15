@@ -2,9 +2,10 @@
 	import { colorByName } from '$lib/actions/color-name.svelte';
 	import type { BaseEntity, NodeInterface } from '$lib/api/canturin';
 	import { Attribute } from '$lib/components/attribute';
-	import { IconButton, UnderlinedButton } from '$lib/components/button';
+	import { IconButton, LinkButton } from '$lib/components/button';
 	import { Collapsible } from '$lib/components/collapsible';
 	import Divider from '$lib/components/divider/divider.svelte';
+	import { HoverPreview } from '$lib/components/hover-preview';
 	import { AddIcon, DeleteIcon } from '$lib/components/icon';
 	import { Readonly } from '$lib/components/readonly';
 	import { Select } from '$lib/components/select';
@@ -65,6 +66,14 @@
 		ns.removeReceivedMessage(int.number, msg.entityId);
 	}
 </script>
+
+{#snippet messagePreview(msg: BaseEntity)}
+	<div class="font-medium text-sm pr-1">{msg.name}</div>
+
+	{#if msg.desc}
+		<div class="text-xs text-dimmed pt-1">{msg.desc}</div>
+	{/if}
+{/snippet}
 
 <div class="flex gap-4">
 	<div use:colorByName={{ name: int.attachedBus.name }} class="block w-2 rounded-btn"></div>
@@ -132,10 +141,18 @@
 
 						{#snippet row(msg)}
 							<TableField>
-								<UnderlinedButton
-									label={msg.name}
-									onclick={() => layout.openMessagePanel(msg.entityId)}
-								/>
+								<HoverPreview placement="right">
+									{#snippet trigger()}
+										<LinkButton
+											label={msg.name}
+											onclick={() => layout.openMessagePanel(msg.entityId)}
+										/>
+									{/snippet}
+
+									{#snippet content()}
+										{@render messagePreview(msg)}
+									{/snippet}
+								</HoverPreview>
 							</TableField>
 						{/snippet}
 
@@ -176,10 +193,18 @@
 
 						{#snippet row(msg)}
 							<TableField>
-								<UnderlinedButton
-									label={msg.name}
-									onclick={() => layout.openMessagePanel(msg.entityId)}
-								/>
+								<HoverPreview placement="right">
+									{#snippet trigger()}
+										<LinkButton
+											label={msg.name}
+											onclick={() => layout.openMessagePanel(msg.entityId)}
+										/>
+									{/snippet}
+
+									{#snippet content()}
+										{@render messagePreview(msg)}
+									{/snippet}
+								</HoverPreview>
 							</TableField>
 						{/snippet}
 

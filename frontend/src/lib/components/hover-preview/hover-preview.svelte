@@ -5,15 +5,24 @@
 	import type { Snippet } from 'svelte';
 
 	type Props = {
+		placement?: hoverCard.Placement;
 		trigger: Snippet;
 		content: Snippet;
 	};
 
-	let { trigger, content }: Props = $props();
+	let { trigger, content, placement }: Props = $props();
 
 	const [snapshot, send] = useMachine(
 		hoverCard.machine({
-			id: uniqueId()
+			id: uniqueId(),
+			openDelay: 1300,
+			closeDelay: 200,
+			positioning: {
+				offset: {
+					mainAxis: 2
+				},
+				placement: placement
+			}
 		})
 	);
 
@@ -27,11 +36,19 @@
 {#if api.open}
 	<div use:portal {...api.getPositionerProps()}>
 		<div {...api.getContentProps()}>
-			<div {...api.getArrowProps()}>
-				<div {...api.getArrowTipProps()}></div>
-			</div>
-
 			{@render content()}
 		</div>
 	</div>
 {/if}
+
+<style lang="postcss">
+	[data-scope='hover-card'] {
+		&[data-part='trigger'] {
+			@apply inline-block;
+		}
+
+		&[data-part='content'] {
+			@apply rounded-btn bg-base-100 px-3 py-2 border-2 border-secondary max-w-80;
+		}
+	}
+</style>

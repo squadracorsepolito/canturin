@@ -161,8 +161,8 @@
 		onclick={() => onclick?.(id)}
 		onpointerenter={() => (hoveredId = id)}
 		onpointerleave={() => (hoveredId = '')}
-		class="rounded-btn text-xs cursor-pointer hover:opacity-50 transition-all border-2"
-		class:opacity-50={hoveredId === id}
+		class="rounded-btn text-xs cursor-pointer hover:opacity-40 transition-all border-2"
+		class:opacity-40={hoveredId === id}
 		style:grid-column-start={colStart}
 		style:grid-column-end={colEnd}
 		style:grid-row-start={rowStart}

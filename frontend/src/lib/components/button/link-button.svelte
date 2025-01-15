@@ -9,6 +9,10 @@
 	let { label, onclick, ...rest }: Props = $props();
 </script>
 
-<button {onclick} {...rest} class="px-2 underline underline-offset-4 font-medium">
+<button
+	{onclick}
+	{...rest}
+	class="px-2 underline underline-offset-4 font-medium hover:text-secondary transition-colors"
+>
 	{label}
 </button>

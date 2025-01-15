@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { type Message, type Signal, SignalKind } from '$lib/api/canturin';
-	import { IconButton, UnderlinedButton } from '$lib/components/button';
+	import { IconButton, LinkButton } from '$lib/components/button';
 	import { SignalGrid } from '$lib/components/grid';
+	import { HoverPreview } from '$lib/components/hover-preview';
 	import { CompactIcon, DeleteIcon } from '$lib/components/icon';
 	import { Table, TableField, TableTitle } from '$lib/components/table';
 	import layout from '$lib/state/layout-state.svelte';
@@ -29,6 +30,31 @@
 		ms.deleteSignal(signal.entityId);
 	}
 </script>
+
+{#snippet preview(sig: Signal)}
+	<div>
+		<span class="font-medium text-sm pr-1">{sig.name}</span>
+
+		<span>
+			{@render kindBadge(sig.kind)}
+		</span>
+	</div>
+
+	{#if sig.desc}
+		<div class="text-xs text-dimmed pt-1">{sig.desc}</div>
+	{/if}
+{/snippet}
+
+{#snippet kindBadge(kind: SignalKind)}
+	<span
+		class={[
+			'badge badge-sm',
+			kind === SignalKind.SignalKindStandard && 'badge-primary',
+			kind === SignalKind.SignalKindEnum && 'badge-secondary',
+			kind === SignalKind.SignalKindMultiplexed && 'badge-accent'
+		]}>{getSignalKindString(kind)}</span
+	>
+{/snippet}
 
 {#snippet section(msg: Message)}
 	{#if msg.signals}
@@ -67,21 +93,22 @@
 
 					{#snippet row(sig)}
 						<TableField>
-							<UnderlinedButton
-								label={sig.name}
-								onclick={() => layout.openPanel('signal', sig.entityId)}
-							/>
+							<HoverPreview placement="right">
+								{#snippet trigger()}
+									<LinkButton
+										label={sig.name}
+										onclick={() => layout.openPanel('signal', sig.entityId)}
+									/>
+								{/snippet}
+
+								{#snippet content()}
+									{@render preview(sig)}
+								{/snippet}
+							</HoverPreview>
 						</TableField>
 
 						<TableField>
-							<span
-								class={[
-									'badge badge-sm',
-									sig.kind === SignalKind.SignalKindStandard && 'badge-primary',
-									sig.kind === SignalKind.SignalKindEnum && 'badge-secondary',
-									sig.kind === SignalKind.SignalKindMultiplexed && 'badge-accent'
-								]}>{getSignalKindString(sig.kind)}</span
-							>
+							{@render kindBadge(sig.kind)}
 						</TableField>
 
 						<TableField>{sig.size}</TableField>

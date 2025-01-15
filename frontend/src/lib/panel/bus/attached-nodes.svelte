@@ -1,6 +1,7 @@
 <script lang="ts">
-	import type { Bus } from '$lib/api/canturin';
-	import { UnderlinedButton } from '$lib/components/button';
+	import type { BaseEntity, Bus } from '$lib/api/canturin';
+	import { LinkButton } from '$lib/components/button';
+	import { HoverPreview } from '$lib/components/hover-preview';
 	import { Table, TableTitle } from '$lib/components/table';
 	import TableField from '$lib/components/table/table-field.svelte';
 	import layoutStateSvelte from '$lib/state/layout-state.svelte';
@@ -12,6 +13,14 @@
 
 	const bs = getBusState(entityId);
 </script>
+
+{#snippet nodePreview(node: BaseEntity)}
+	<div class="font-medium text-sm pr-1">{node.name}</div>
+
+	{#if node.desc}
+		<div class="text-xs text-dimmed pt-1">{node.desc}</div>
+	{/if}
+{/snippet}
 
 {#snippet section(bus: Bus)}
 	{#if bus.attachedNodes}
@@ -28,10 +37,18 @@
 
 			{#snippet row(node)}
 				<TableField>
-					<UnderlinedButton
-						label={node.name}
-						onclick={() => layoutStateSvelte.openPanel('node', node.entityId)}
-					/>
+					<HoverPreview placement="right">
+						{#snippet trigger()}
+							<LinkButton
+								label={node.name}
+								onclick={() => layoutStateSvelte.openPanel('node', node.entityId)}
+							/>
+						{/snippet}
+
+						{#snippet content()}
+							{@render nodePreview(node)}
+						{/snippet}
+					</HoverPreview>
 				</TableField>
 
 				<TableField>{node.id}</TableField>
