@@ -1,3 +1,5 @@
+import { EntityKind } from '$lib/api/canturin';
+
 export type PanelType =
 	| 'none'
 	| 'bus'
@@ -29,6 +31,40 @@ class LayoutState {
 		if (this.openPanelId === panelId) {
 			this.openPanel('none', '');
 		}
+	}
+
+	openPanel0(entKind: EntityKind, entId: string) {
+		let panelType: PanelType;
+		switch (entKind) {
+			case EntityKind.EntityKindNetwork:
+				panelType = 'bus';
+				break;
+			case EntityKind.EntityKindBus:
+				panelType = 'bus';
+				break;
+			case EntityKind.EntityKindNode:
+				panelType = 'node';
+				break;
+			case EntityKind.EntityKindMessage:
+				panelType = 'message';
+				break;
+			case EntityKind.EntityKindSignal:
+				panelType = 'signal';
+				break;
+			case EntityKind.EntityKindSignalType:
+				panelType = 'signal_type';
+				break;
+			case EntityKind.EntityKindSignalUnit:
+				panelType = 'signal_unit';
+				break;
+			case EntityKind.EntityKindSignalEnum:
+				panelType = 'signal_enum';
+				break;
+			default:
+				panelType = 'bus';
+		}
+
+		this.openPanel(panelType, entId);
 	}
 }
 

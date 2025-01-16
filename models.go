@@ -138,3 +138,53 @@ func getSignalReferences(refs entityWithRefs[*acmelib.StandardSignal]) []SignalR
 
 	return res
 }
+
+type EntityKind string
+
+const (
+	EntityKindNetwork    EntityKind = "network"
+	EntityKindBus        EntityKind = "bus"
+	EntityKindNode       EntityKind = "node"
+	EntityKindMessage    EntityKind = "message"
+	EntityKindSignal     EntityKind = "signal"
+	EntityKindSignalType EntityKind = "signal-type"
+	EntityKindSignalUnit EntityKind = "signal-unit"
+	EntityKindSignalEnum EntityKind = "signal-enum"
+)
+
+func newEntityKind(kind acmelib.EntityKind) EntityKind {
+	switch kind {
+	case acmelib.EntityKindNetwork:
+		return EntityKindNetwork
+	case acmelib.EntityKindBus:
+		return EntityKindBus
+	case acmelib.EntityKindNode:
+		return EntityKindNode
+	case acmelib.EntityKindMessage:
+		return EntityKindMessage
+	case acmelib.EntityKindSignal:
+		return EntityKindSignal
+	case acmelib.EntityKindSignalType:
+		return EntityKindSignalType
+	case acmelib.EntityKindSignalUnit:
+		return EntityKindSignalUnit
+	case acmelib.EntityKindSignalEnum:
+		return EntityKindSignalEnum
+	default:
+		return EntityKindNetwork
+	}
+}
+
+type EntityPath struct {
+	Kind     EntityKind `json:"kind"`
+	EntityID string     `json:"entityId"`
+	Name     string     `json:"name"`
+}
+
+func newEntityPath(ent entity) EntityPath {
+	return EntityPath{
+		Kind:     newEntityKind(ent.EntityKind()),
+		EntityID: ent.EntityID().String(),
+		Name:     ent.Name(),
+	}
+}

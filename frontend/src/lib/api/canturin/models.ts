@@ -80,6 +80,28 @@ export interface CreateSignalUnitReq {
     "symbol": string;
 }
 
+export enum EntityKind {
+    /**
+     * The Go zero value for the underlying type of the enum.
+     */
+    $zero = "",
+
+    EntityKindNetwork = "network",
+    EntityKindBus = "bus",
+    EntityKindNode = "node",
+    EntityKindMessage = "message",
+    EntityKindSignal = "signal",
+    EntityKindSignalType = "signal-type",
+    EntityKindSignalUnit = "signal-unit",
+    EntityKindSignalEnum = "signal-enum",
+};
+
+export interface EntityPath {
+    "kind": EntityKind;
+    "entityId": string;
+    "name": string;
+}
+
 export interface History {
     "operationCount": number;
     "currentIndex": number;
@@ -234,6 +256,7 @@ export interface Signal {
     "name": string;
     "desc": string;
     "createTime": time$0.Time;
+    "paths": EntityPath[] | null;
     "kind": SignalKind;
     "startPos": number;
     "size": number;

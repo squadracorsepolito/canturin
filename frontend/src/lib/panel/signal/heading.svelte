@@ -6,6 +6,7 @@
 	import type { PanelSectionProps } from '../types';
 	import { getSignalState } from './state.svelte';
 	import { nameSchema, Validator } from '$lib/utils/validator.svelte';
+	import { Breadcrumbs } from '$lib/components/breadcrumbs';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -33,7 +34,11 @@
 </script>
 
 {#snippet section(sig: Signal)}
-	<div class="flex gap-2 items-center">
+	{#if sig.paths}
+		<Breadcrumbs paths={sig.paths} />
+	{/if}
+
+	<div class="pt-5 flex gap-2 items-center">
 		<SignalIcon width="48" height="48" />
 
 		<TextEditable

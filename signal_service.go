@@ -1,6 +1,7 @@
 package main
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/squadracorsepolito/acmelib"
@@ -43,14 +44,44 @@ func (sk SignalKind) parse() acmelib.SignalKind {
 type Signal struct {
 	base
 
+	Paths []EntityPath `json:"paths"`
+
 	Kind     SignalKind `json:"kind"`
 	StartPos int        `json:"startPos"`
 	Size     int        `json:"size"`
 }
 
 func newSignal(sig acmelib.Signal) Signal {
+	paths := []EntityPath{
+		newEntityPath(sig),
+	}
+
+	parMsg := sig.ParentMessage()
+	if parMsg != nil {
+		paths = append(paths, newEntityPath(parMsg))
+
+		parNodeInt := parMsg.SenderNodeInterface()
+		if parNodeInt != nil {
+			paths = append(paths, newEntityPath(parNodeInt.Node()))
+
+			parBus := parNodeInt.ParentBus()
+			if parBus != nil {
+				paths = append(paths, newEntityPath(parBus))
+
+				parNet := parBus.ParentNetwork()
+				if parNet != nil {
+					paths = append(paths, newEntityPath(parNet))
+				}
+			}
+		}
+	}
+
+	slices.Reverse(paths)
+
 	return Signal{
 		base: getBase(sig),
+
+		Paths: paths,
 
 		Kind:     newSignalKind(sig.Kind()),
 		StartPos: sig.GetStartBit(),
