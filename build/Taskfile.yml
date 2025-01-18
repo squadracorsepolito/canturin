@@ -4,10 +4,6 @@ tasks:
   go:mod:tidy:
     summary: Runs `go mod tidy`
     internal: true
-    generates:
-      - go.sum
-    sources:
-      - go.mod
     cmds:
       - go mod tidy
 
@@ -41,6 +37,8 @@ tasks:
 
   generate:bindings:
     summary: Generates bindings for the frontend
+    deps:
+      - task: go:mod:tidy
     sources:
       - "**/*.go"
       - go.mod
@@ -71,7 +69,7 @@ tasks:
       - "icons.icns"
       - "icons.ico"
     cmds:
-      - wails3 generate icons -input appicon.png
+      - wails3 generate icons -input appicon.png -macfilename darwin/icons.icns -windowsfilename windows/icons.ico
 
   dev:frontend:
     summary: Runs the frontend in development mode
