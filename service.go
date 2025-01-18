@@ -17,7 +17,7 @@ type BaseEntity struct {
 	CreateTime time.Time `json:"createTime"`
 }
 
-func getBaseEntity(e entity) BaseEntity {
+func newBaseEntity(e entity) BaseEntity {
 	return BaseEntity{
 		EntityID:   e.EntityID().String(),
 		Name:       e.Name(),
@@ -263,7 +263,7 @@ func (s *service[E, R, H]) ListBase() []BaseEntity {
 
 	var res []BaseEntity
 	for _, ent := range s.entities {
-		res = append(res, getBaseEntity(ent))
+		res = append(res, newBaseEntity(ent))
 	}
 
 	return res

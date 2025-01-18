@@ -27,6 +27,9 @@ func newServiceManager() *serviceManager {
 
 	bus := newBusService(sidebarController)
 
+	signalType := newSignalTypeService(sidebarController)
+	signalUnit := newSignalUnitService(sidebarController)
+
 	return &serviceManager{
 		network: acmelib.NewNetwork("Unnamed Network"),
 
@@ -34,12 +37,13 @@ func newServiceManager() *serviceManager {
 		sidebarController: sidebarController,
 		history:           newHistoryService(),
 
-		bus:        bus,
-		node:       newNodeService(sidebarController, bus),
-		message:    newMessageService(sidebarController),
-		signal:     newSignalService(sidebarController),
-		signalType: newSignalTypeService(sidebarController),
-		signalUnit: newSignalUnitService(sidebarController),
+		bus:     bus,
+		node:    newNodeService(sidebarController, bus),
+		message: newMessageService(sidebarController),
+
+		signal:     newSignalService(sidebarController, signalType, signalUnit),
+		signalType: signalType,
+		signalUnit: signalUnit,
 		signalEnum: newSignalEnumService(sidebarController),
 	}
 }

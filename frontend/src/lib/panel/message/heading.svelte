@@ -7,6 +7,7 @@
 	import { MessageIcon } from '$lib/components/icon';
 	import { TextareaEditable, TextEditable } from '$lib/components/editable';
 	import { checkUnused, Validator } from '$lib/utils/validator.svelte';
+	import { Breadcrumbs } from '$lib/components/breadcrumbs';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -38,7 +39,11 @@
 </script>
 
 {#snippet section(msg: Message)}
-	<div class="flex gap-2 items-center">
+	{#if msg.paths}
+		<Breadcrumbs paths={msg.paths} />
+	{/if}
+
+	<div class="flex gap-2 items-center pt-5">
 		<MessageIcon width="48" height="48" />
 
 		<TextEditable

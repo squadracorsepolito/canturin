@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/squadracorsepolito/acmelib"
@@ -18,6 +19,47 @@ const (
 
 func newSignalTypeKind(kind acmelib.SignalTypeKind) SignalTypeKind {
 	return SignalTypeKind(kind.String())
+}
+
+func compareSignalTypeKind(a, b SignalTypeKind) int {
+	if a == b {
+		return 0
+	}
+
+	switch a {
+	case SignalTypeKindFlag:
+		return -1
+
+	case SignalTypeKindInteger:
+		if b == SignalTypeKindFlag {
+			return 1
+		}
+		return -1
+
+	case SignalTypeKindDecimal:
+		if b == SignalTypeKindCustom {
+			return -1
+		}
+		return 1
+	}
+
+	return 1
+}
+
+type SignalTypeBrief struct {
+	BaseEntity
+
+	Kind SignalTypeKind `json:"kind"`
+	Size int            `json:"size"`
+}
+
+func newSignalTypeBrief(sigType *acmelib.SignalType) SignalTypeBrief {
+	return SignalTypeBrief{
+		BaseEntity: newBaseEntity(sigType),
+
+		Kind: newSignalTypeKind(sigType.Kind()),
+		Size: sigType.Size(),
+	}
 }
 
 type SignalType struct {
@@ -144,6 +186,30 @@ func (s *SignalTypeService) Delete(entityID string) error {
 	)
 
 	return nil
+}
+
+func (s *SignalTypeService) ListBrief() []SignalTypeBrief {
+	s.mux.RLock()
+	defer s.mux.RUnlock()
+
+	res := []SignalTypeBrief{}
+	for _, sigType := range s.entities {
+		res = append(res, newSignalTypeBrief(sigType))
+	}
+
+	slices.SortFunc(res, func(a, b SignalTypeBrief) int {
+		if a.Kind == b.Kind {
+			if a.Size == b.Size {
+				return strings.Compare(a.Name, b.Name)
+			}
+
+			return a.Size - b.Size
+		}
+
+		return compareSignalTypeKind(a.Kind, b.Kind)
+	})
+
+	return res
 }
 
 func (s *SignalTypeService) UpdateName(entityID string, req UpdateNameReq) (SignalType, error) {

@@ -1,10 +1,11 @@
 <script lang="ts">
-	import type { Signal } from '$lib/api/canturin';
+	import { type Signal, SignalKind } from '$lib/api/canturin';
 	import { Attribute, AttributeGroup } from '$lib/components/attribute';
 	import Divider from '$lib/components/divider/divider.svelte';
 	import { Readonly } from '$lib/components/readonly';
 	import { SegmentedControl } from '$lib/components/segmented-control';
 	import type { PanelSectionProps } from '../types';
+	import StandardAttributes from './standard-attributes.svelte';
 	import { getSignalState } from './state.svelte';
 	import { signalKindOptions } from './utils';
 
@@ -37,6 +38,12 @@
 			<Readonly>{sig.startPos}</Readonly>
 		</Attribute>
 	</AttributeGroup>
+
+	<Divider />
+
+	{#if sig.kind === SignalKind.SignalKindStandard}
+		<StandardAttributes {entityId} signal={sig.standard} />
+	{/if}
 {/snippet}
 
 <section>

@@ -16,12 +16,12 @@ type NodeInterface struct {
 func getNodeInterface(nodeInt *acmelib.NodeInterface) NodeInterface {
 	sentMessages := []BaseEntity{}
 	for _, tmpMsg := range nodeInt.SentMessages() {
-		sentMessages = append(sentMessages, getBaseEntity(tmpMsg))
+		sentMessages = append(sentMessages, newBaseEntity(tmpMsg))
 	}
 
 	receivedMessages := []BaseEntity{}
 	for _, tmpMsg := range nodeInt.ReceivedMessages() {
-		receivedMessages = append(receivedMessages, getBaseEntity(tmpMsg))
+		receivedMessages = append(receivedMessages, newBaseEntity(tmpMsg))
 	}
 
 	res := NodeInterface{
@@ -31,7 +31,7 @@ func getNodeInterface(nodeInt *acmelib.NodeInterface) NodeInterface {
 	}
 
 	if nodeInt.ParentBus() != nil {
-		res.AttachedBus = getBaseEntity(nodeInt.ParentBus())
+		res.AttachedBus = newBaseEntity(nodeInt.ParentBus())
 	}
 
 	return res

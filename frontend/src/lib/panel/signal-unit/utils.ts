@@ -1,6 +1,14 @@
 import { SignalUnitKind } from '$lib/api/canturin';
 import type { SegmentedControlOption } from '$lib/components/segmented-control/types';
 
+export const signalUnitKindLabels = {
+	[SignalUnitKind.$zero]: '',
+	[SignalUnitKind.SignalUnitKindCustom]: 'Custom',
+	[SignalUnitKind.SignalUnitKindTemperature]: 'Temperature',
+	[SignalUnitKind.SignalUnitKindElectrical]: 'Electrical',
+	[SignalUnitKind.SignalUnitKindPower]: 'Power'
+};
+
 export const signalUnitKindOptions: SegmentedControlOption[] = [
 	{
 		label: 'Custom',

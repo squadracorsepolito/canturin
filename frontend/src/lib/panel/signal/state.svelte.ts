@@ -44,4 +44,12 @@ class SignalState extends EntityState<Signal> {
 	updateDesc(desc: string) {
 		this.update(SignalService.UpdateDesc(this.entity.entityId, { desc }));
 	}
+
+	updateSignalType(signalTypeEntityId: string) {
+		this.update(SignalService.UpdateSignalType(this.entity.entityId, { signalTypeEntityId }));
+	}
+
+	updateSignalUnit(signalUnitEntityId: string) {
+		this.update(SignalService.UpdateSignalUnit(this.entity.entityId, { signalUnitEntityId }));
+	}
 }

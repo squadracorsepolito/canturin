@@ -1,1 +1,1 @@
-export { default as Breadcrumbs } from '$lib/components/breadcrumbs/breadcrumbs.svelte';
+export { default as Breadcrumbs } from './breadcrumbs.svelte';

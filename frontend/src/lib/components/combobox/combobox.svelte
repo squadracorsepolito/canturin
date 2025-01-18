@@ -1,7 +1,7 @@
 <script lang="ts" generics="T extends { [K in keyof T]: any }, V extends string">
 	import { uniqueId, type FieldNameOf } from '$lib/utils';
 	import * as combobox from '@zag-js/combobox';
-	import { normalizeProps, useMachine } from '@zag-js/svelte';
+	import { mergeProps, normalizeProps, useMachine } from '@zag-js/svelte';
 	import { AltArrowIcon, CheckIcon, CloseIcon } from '../icon';
 
 	type Props = {
@@ -10,8 +10,11 @@
 		name: string;
 		valueKey: FieldNameOf<T, V>;
 		labelKey: FieldNameOf<T, string>;
+		descKey?: FieldNameOf<T, string>;
 		onselect?: (value: V) => void;
 		onitemselect?: (item: T) => void;
+		onclear?: () => void;
+		filter?: (item: T) => boolean;
 	};
 
 	let {
@@ -20,8 +23,11 @@
 		name,
 		valueKey,
 		labelKey,
+		descKey,
 		onselect,
-		onitemselect
+		onitemselect,
+		onclear,
+		filter
 	}: Props = $props();
 
 	let options = $state.raw(items);
@@ -29,7 +35,8 @@
 	const collection = combobox.collection({
 		items,
 		itemToString: (item) => item[labelKey],
-		itemToValue: (item) => item[valueKey]
+		itemToValue: (item) => item[valueKey],
+		isItemDisabled: filter
 	});
 
 	const [snapshot, send] = useMachine(
@@ -62,8 +69,6 @@
 					return;
 				}
 
-				console.log(details);
-
 				const item = details.items[0] as T;
 				const value = details.value[0] as V;
 
@@ -75,6 +80,12 @@
 		{
 			context: {
 				get value() {
+					collection.setItems(items);
+
+					if (!selected) {
+						return [];
+					}
+
 					return [selected];
 				}
 			}
@@ -82,6 +93,14 @@
 	);
 
 	const api = $derived(combobox.connect(snapshot, send, normalizeProps));
+
+	const clearTriggerProps = $derived(
+		mergeProps(api.getClearTriggerProps(), {
+			onclick: () => {
+				onclear?.();
+			}
+		})
+	);
 </script>
 
 <div {...api.getRootProps()}>
@@ -98,9 +117,11 @@
 			</button>
 		</div>
 
-		<button {...api.getClearTriggerProps()}>
-			<CloseIcon />
-		</button>
+		{#if onclear}
+			<button {...clearTriggerProps}>
+				<CloseIcon />
+			</button>
+		{/if}
 	</div>
 
 	<div {...api.getPositionerProps()}>
@@ -108,7 +129,13 @@
 			<ul {...api.getContentProps()}>
 				{#each options as item}
 					<li {...api.getItemProps({ item })}>
-						<span {...api.getItemTextProps({ item })}>{item[labelKey]}</span>
+						<div>
+							<span {...api.getItemTextProps({ item })}>{item[labelKey]}</span>
+
+							{#if descKey}
+								<div class="text-xs pt-1">{item[descKey]}</div>
+							{/if}
+						</div>
 
 						<span {...api.getItemIndicatorProps({ item })}>
 							<CheckIcon height={18} width={18} />
@@ -152,10 +179,14 @@
 
 		[data-part='positioner'] {
 			[data-part='content'] {
-				@apply bg-base-100 rounded-btn border-2 border-primary;
+				@apply bg-base-100 rounded-btn border-2 border-primary max-h-80 overflow-y-auto z-50;
 
 				[data-part='item'] {
 					@apply p-2 cursor-pointer transition-colors flex items-center gap-3 justify-between;
+
+					&[data-disabled] {
+						@apply opacity-50 cursor-not-allowed;
+					}
 
 					&[data-highlighted] {
 						@apply bg-secondary-ghost text-secondary;

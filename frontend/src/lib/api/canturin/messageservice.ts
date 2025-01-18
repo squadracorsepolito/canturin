@@ -34,6 +34,11 @@ export function GetInvalidNames(entityID: string): Promise<string[] | null> & { 
     return $resultPromise;
 }
 
+export function GetSpaceLeft(entityID: string): Promise<number> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(2622867801, entityID) as any;
+    return $resultPromise;
+}
+
 export function ListBase(): Promise<$models.BaseEntity[] | null> & { cancel(): void } {
     let $resultPromise = $Call.ByID(417424819) as any;
     return $resultPromise;

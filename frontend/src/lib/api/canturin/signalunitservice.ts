@@ -34,6 +34,11 @@ export function ListBase(): Promise<$models.BaseEntity[] | null> & { cancel(): v
     return $resultPromise;
 }
 
+export function ListBrief(): Promise<$models.SignalUnitBrief[] | null> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(2557497877) as any;
+    return $resultPromise;
+}
+
 export function UpdateDesc(entityID: string, req: $models.UpdateDescReq): Promise<$models.SignalUnit> & { cancel(): void } {
     let $resultPromise = $Call.ByID(3797493755, entityID, req) as any;
     return $resultPromise;

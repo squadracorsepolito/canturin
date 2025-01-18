@@ -78,6 +78,8 @@ func (bo MessageByteOrder) parse() acmelib.MessageByteOrder {
 type Message struct {
 	base
 
+	Paths []EntityPath `json:"paths"`
+
 	HasStaticCANID bool `json:"hasStaticCANID"`
 	ID             uint `json:"id"`
 	CANID          uint `json:"canId"`
@@ -102,6 +104,8 @@ func newMessage(msg *acmelib.Message) Message {
 	res := Message{
 		base: getBase(msg),
 
+		Paths: newMessageEntityPaths(msg),
+
 		HasStaticCANID: msg.HasStaticCANID(),
 		ID:             uint(msg.ID()),
 		CANID:          uint(msg.GetCANID()),
@@ -120,10 +124,10 @@ func newMessage(msg *acmelib.Message) Message {
 	}
 
 	if nodeInt := msg.SenderNodeInterface(); nodeInt != nil {
-		res.SenderNode = getBaseEntity(nodeInt.Node())
+		res.SenderNode = newBaseEntity(nodeInt.Node())
 
 		if bus := nodeInt.ParentBus(); bus != nil {
-			res.ParentBus = getBaseEntity(bus)
+			res.ParentBus = newBaseEntity(bus)
 		}
 	}
 
@@ -203,6 +207,23 @@ func (s *MessageService) GetInvalidCANIDs(entityID string, busEntityID string) [
 	}
 
 	return canIDs
+}
+
+func (s *MessageService) GetSpaceLeft(entityID string) int {
+	s.mux.RLock()
+	defer s.mux.RUnlock()
+
+	msg, err := s.getEntity(entityID)
+	if err != nil {
+		return 0
+	}
+
+	spaceLeft := msg.SizeByte() * 8
+	for _, sig := range msg.Signals() {
+		spaceLeft -= sig.GetSize()
+	}
+
+	return spaceLeft
 }
 
 func (s *MessageService) UpdateName(entityID string, req UpdateNameReq) (Message, error) {

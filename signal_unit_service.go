@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"slices"
 	"strings"
 
 	"github.com/squadracorsepolito/acmelib"
@@ -44,6 +45,20 @@ func (k SignalUnitKind) parse() acmelib.SignalUnitKind {
 		return acmelib.SignalUnitKindPower
 	default:
 		return acmelib.SignalUnitKindCustom
+	}
+}
+
+type SignalUnitBrief struct {
+	BaseEntity
+
+	Kind SignalUnitKind `json:"kind"`
+}
+
+func newSignalUnitBrief(sigUnit *acmelib.SignalUnit) SignalUnitBrief {
+	return SignalUnitBrief{
+		BaseEntity: newBaseEntity(sigUnit),
+
+		Kind: newSignalUnitKind(sigUnit.Kind()),
 	}
 }
 
@@ -182,6 +197,26 @@ func (s *SignalUnitService) Delete(entityID string) error {
 	)
 
 	return nil
+}
+
+func (s *SignalUnitService) ListBrief() []SignalUnitBrief {
+	s.mux.RLock()
+	defer s.mux.RUnlock()
+
+	res := []SignalUnitBrief{}
+	for _, sigUnit := range s.entities {
+		res = append(res, newSignalUnitBrief(sigUnit))
+	}
+
+	slices.SortFunc(res, func(a, b SignalUnitBrief) int {
+		if a.Kind == b.Kind {
+			return strings.Compare(a.Name, b.Name)
+		}
+
+		return int(a.Kind.parse()) - int(b.Kind.parse())
+	})
+
+	return res
 }
 
 func (s *SignalUnitService) UpdateName(entityID string, req UpdateNameReq) (SignalUnit, error) {

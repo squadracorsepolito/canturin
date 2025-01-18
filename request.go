@@ -276,6 +276,34 @@ func (r *request) toReorderSignal() *ReorderSignalReq {
 	return req
 }
 
+/////////////////////
+// SIGNAL REQUESTS //
+/////////////////////
+
+type UpdateSignalTypeReq struct {
+	SignalTypeEntityID string `json:"signalTypeEntityId"`
+}
+
+func (r *request) toUpdateSignalType() *UpdateSignalTypeReq {
+	req, ok := r.data.(*UpdateSignalTypeReq)
+	if !ok {
+		panic("cannot convert to UpdateSignalTypeReq")
+	}
+	return req
+}
+
+type UpdateSignalUnitReq struct {
+	SignalUnitEntityID string `json:"signalUnitEntityId"`
+}
+
+func (r *request) toUpdateSignalUnit() *UpdateSignalUnitReq {
+	req, ok := r.data.(*UpdateSignalUnitReq)
+	if !ok {
+		panic("cannot convert to UpdateSignalUnitReq")
+	}
+	return req
+}
+
 //////////////////////////
 // SIGNAL TYPE REQUESTS //
 //////////////////////////

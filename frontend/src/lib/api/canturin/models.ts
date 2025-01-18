@@ -112,6 +112,7 @@ export interface Message {
     "name": string;
     "desc": string;
     "createTime": time$0.Time;
+    "paths": EntityPath[] | null;
     "hasStaticCANID": boolean;
     "id": number;
     "canId": number;
@@ -257,9 +258,11 @@ export interface Signal {
     "desc": string;
     "createTime": time$0.Time;
     "paths": EntityPath[] | null;
+    "parentMessage": BaseEntity;
     "kind": SignalKind;
     "startPos": number;
     "size": number;
+    "standard": StandardSignal;
 }
 
 export interface SignalEnum {
@@ -309,6 +312,15 @@ export interface SignalType {
     "references": Reference[] | null;
 }
 
+export interface SignalTypeBrief {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+    "kind": SignalTypeKind;
+    "size": number;
+}
+
 export enum SignalTypeKind {
     /**
      * The Go zero value for the underlying type of the enum.
@@ -332,6 +344,14 @@ export interface SignalUnit {
     "references": Reference[] | null;
 }
 
+export interface SignalUnitBrief {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+    "kind": SignalUnitKind;
+}
+
 export enum SignalUnitKind {
     /**
      * The Go zero value for the underlying type of the enum.
@@ -343,6 +363,11 @@ export enum SignalUnitKind {
     SignalUnitKindElectrical = "electrical",
     SignalUnitKindPower = "power",
 };
+
+export interface StandardSignal {
+    "signalType": SignalTypeBrief;
+    "signalUnit": BaseEntity;
+}
 
 export interface UpdateAttachedBusReq {
     "busEntityId": string;
@@ -405,8 +430,16 @@ export interface UpdateSendTypeReq {
     "sendType": MessageSendType;
 }
 
+export interface UpdateSignalTypeReq {
+    "signalTypeEntityId": string;
+}
+
 export interface UpdateSignalUnitKindReq {
     "kind": SignalUnitKind;
+}
+
+export interface UpdateSignalUnitReq {
+    "signalUnitEntityId": string;
 }
 
 export interface UpdateStartDelayTimeReq {

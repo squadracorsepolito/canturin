@@ -188,3 +188,55 @@ func newEntityPath(ent entity) EntityPath {
 		Name:     ent.Name(),
 	}
 }
+
+func newBusEntityPaths(bus *acmelib.Bus) []EntityPath {
+	res := []EntityPath{}
+
+	parNet := bus.ParentNetwork()
+	if parNet != nil {
+		res = append(res, newEntityPath(parNet))
+	}
+
+	res = append(res, newEntityPath(bus))
+
+	return res
+}
+
+func newNodeInterfaceEntityPaths(nodeInt *acmelib.NodeInterface) []EntityPath {
+	res := []EntityPath{}
+
+	parBus := nodeInt.ParentBus()
+	if parBus != nil {
+		res = newBusEntityPaths(parBus)
+	}
+
+	res = append(res, newEntityPath(nodeInt.Node()))
+
+	return res
+}
+
+func newMessageEntityPaths(msg *acmelib.Message) []EntityPath {
+	res := []EntityPath{}
+
+	parNodeInt := msg.SenderNodeInterface()
+	if parNodeInt != nil {
+		res = newNodeInterfaceEntityPaths(parNodeInt)
+	}
+
+	res = append(res, newEntityPath(msg))
+
+	return res
+}
+
+func newSignalEntityPaths(sig acmelib.Signal) []EntityPath {
+	res := []EntityPath{}
+
+	parMsg := sig.ParentMessage()
+	if parMsg != nil {
+		res = newMessageEntityPaths(parMsg)
+	}
+
+	res = append(res, newEntityPath(sig))
+
+	return res
+}
