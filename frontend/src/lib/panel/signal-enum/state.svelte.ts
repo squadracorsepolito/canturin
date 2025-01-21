@@ -1,5 +1,5 @@
 import { SignalEnumService, type SignalEnum } from '$lib/api/canturin';
-import { HistorySignalEnumModify } from '$lib/api/events';
+import { HistorySignalEnumModify } from '$lib/constants/events';
 import { pushToast } from '$lib/components/toast/toast-provider.svelte';
 import layout from '$lib/state/layout-state.svelte';
 import { EntityState } from '../../state/entity-state.svelte';

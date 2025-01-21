@@ -57,8 +57,8 @@ tasks:
     generates:
       - "frontend/src/lib/api/**/*"
     cmds:
-      - wails3 generate constants -f events.go -o frontend/src/lib/api/events.ts
-      - wails3 generate constants -f constants.go -o frontend/src/lib/api/constants.ts
+      - wails3 generate constants -f events.go -o frontend/src/lib/constants/events.ts
+      - wails3 generate constants -f constants.go -o frontend/src/lib/constants/constants.ts
 
   generate:icons:
     summary: Generates Windows `.ico` and Mac `.icns` files from an image

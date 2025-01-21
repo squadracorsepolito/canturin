@@ -1,5 +1,5 @@
 import { HistoryService, type History } from '$lib/api/canturin';
-import { HistoryChange } from '$lib/api/events';
+import { HistoryChange } from '$lib/constants/events';
 import { Events as wails } from '@wailsio/runtime';
 
 class HistoryState {

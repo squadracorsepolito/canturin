@@ -1,5 +1,5 @@
 import { SignalService, type Signal } from '$lib/api/canturin';
-import { HistorySignalModify } from '$lib/api/events';
+import { HistorySignalModify } from '$lib/constants/events';
 import { EntityState } from '$lib/state/entity-state.svelte';
 import { StateProvider } from '$lib/state/state-provider.svelte';
 

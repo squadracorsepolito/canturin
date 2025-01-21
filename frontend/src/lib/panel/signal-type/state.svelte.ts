@@ -1,5 +1,5 @@
 import { SignalTypeService, type SignalType } from '$lib/api/canturin';
-import { HistorySignalTypeModify } from '$lib/api/events';
+import { HistorySignalTypeModify } from '$lib/constants/events';
 import { pushToast } from '$lib/components/toast/toast-provider.svelte';
 import { EntityState } from '../../state/entity-state.svelte';
 import layout from '../../state/layout-state.svelte';

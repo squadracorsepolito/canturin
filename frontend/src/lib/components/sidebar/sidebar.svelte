@@ -11,6 +11,7 @@
 		NetworkIcon,
 		NodeIcon,
 		SignalEnumIcon,
+		SignalIcon,
 		SignalTypeIcon,
 		SignalUnitIcon
 	} from '../icon';
@@ -37,6 +38,8 @@
 				return NodeIcon;
 			case SidebarItemKind.SidebarItemKindMessage:
 				return MessageIcon;
+			case SidebarItemKind.SidebarItemKindSignal:
+				return SignalIcon;
 			case SidebarItemKind.SidebarItemKindSignalType:
 				return SignalTypeIcon;
 			case SidebarItemKind.SidebarItemKindSignalUnit:

@@ -1,5 +1,5 @@
 import { BusService, BusType, type Bus } from '$lib/api/canturin';
-import { HistoryBusModify } from '$lib/api/events';
+import { HistoryBusModify } from '$lib/constants/events';
 import { pushToast } from '$lib/components/toast/toast-provider.svelte';
 import { EntityState } from '$lib/state/entity-state.svelte';
 import layout from '$lib/state/layout-state.svelte';

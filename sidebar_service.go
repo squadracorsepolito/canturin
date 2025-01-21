@@ -19,6 +19,7 @@ const (
 	SidebarItemKindBus        SidebarItemKind = "bus"
 	SidebarItemKindNode       SidebarItemKind = "node"
 	SidebarItemKindMessage    SidebarItemKind = "message"
+	SidebarItemKindSignal     SidebarItemKind = "signal"
 	SidebarItemKindSignalType SidebarItemKind = "signal-type"
 	SidebarItemKindSignalUnit SidebarItemKind = "signal-unit"
 	SidebarItemKindSignalEnum SidebarItemKind = "signal-enum"
@@ -93,7 +94,7 @@ func (f *sidebarItemFactory) newMessageNode(nodeInt *acmelib.NodeInterface) (str
 	parBus := nodeInt.ParentBus()
 	prefix := ""
 	if parBus != nil {
-		prefix = fmt.Sprintf("%s:%s", SidebarMessagesPrefix, parBus.EntityID())
+		prefix = fmt.Sprintf("%s/%s", SidebarMessagesPrefix, parBus.EntityID())
 	}
 
 	name := f.getMessageNodeName(nodeInt)
@@ -104,8 +105,36 @@ func (f *sidebarItemFactory) newMessageNode(nodeInt *acmelib.NodeInterface) (str
 	return key, item
 }
 
-func (f *sidebarItemFactory) newMessage(msg entity) (string, *sidebarItem) {
-	return msg.EntityID().String(), f.newItem(SidebarItemKindMessage, msg.EntityID(), SidebarMessagesPrefix, msg.Name())
+func (f *sidebarItemFactory) newMessage(msg *acmelib.Message) (string, *sidebarItem) {
+	parNodeInt := msg.SenderNodeInterface()
+	prefix := SidebarMessagesPrefix
+	if parNodeInt != nil {
+		prefix += fmt.Sprintf("/%s", parNodeInt.Node().EntityID())
+
+		parBus := parNodeInt.ParentBus()
+		if parBus != nil {
+			prefix += fmt.Sprintf("/%s/%s", parBus.EntityID(), parNodeInt.Node().EntityID())
+		}
+	}
+
+	return msg.EntityID().String(), f.newItem(SidebarItemKindMessage, msg.EntityID(), prefix, msg.Name())
+}
+
+func (f *sidebarItemFactory) newSignal(sig acmelib.Signal) (string, *sidebarItem) {
+	prefix := SidebarMessagesPrefix
+
+	parMsg := sig.ParentMessage()
+	if parMsg != nil {
+		parNodeInt := parMsg.SenderNodeInterface()
+		if parNodeInt != nil {
+			parBus := parNodeInt.ParentBus()
+			if parBus != nil {
+				prefix += fmt.Sprintf("/%s/%s/%s", parBus.EntityID(), parNodeInt.Node().EntityID(), parMsg.EntityID())
+			}
+		}
+	}
+
+	return sig.EntityID().String(), f.newItem(SidebarItemKindSignal, sig.EntityID(), prefix, sig.Name())
 }
 
 func (f *sidebarItemFactory) newSignalType(sigType entity) (string, *sidebarItem) {
@@ -121,15 +150,15 @@ func (f *sidebarItemFactory) newSignalEnum(sigEnum entity) (string, *sidebarItem
 }
 
 func (f *sidebarItemFactory) getMessageBusKey(bus entity) string {
-	return fmt.Sprintf("%s:%s", bus.EntityID(), SidebarMessagesPrefix)
+	return fmt.Sprintf("%s/%s", bus.EntityID(), SidebarMessagesPrefix)
 }
 
 func (f *sidebarItemFactory) getMessageNodeKey(nodeInt *acmelib.NodeInterface) string {
-	return fmt.Sprintf("%s:%d:%s", nodeInt.Node().EntityID(), nodeInt.Number(), SidebarMessagesPrefix)
+	return fmt.Sprintf("%s/%d/%s", nodeInt.Node().EntityID(), nodeInt.Number(), SidebarMessagesPrefix)
 }
 
 func (f *sidebarItemFactory) getMessageNodeName(nodeInt *acmelib.NodeInterface) string {
-	return fmt.Sprintf("%s:%d", nodeInt.Node().Name(), nodeInt.Number())
+	return fmt.Sprintf("%s/%d", nodeInt.Node().Name(), nodeInt.Number())
 }
 
 func (si *sidebarItem) addChild(child *sidebarItem) {
@@ -163,7 +192,7 @@ func (si *sidebarItem) convert() SidebarItem {
 func (si *sidebarItem) convertBase() SidebarItem {
 	id := ""
 	if si.kind == SidebarItemKindGroup {
-		id = fmt.Sprintf("%s:%s", SidebarGroupPrefix, si.entityID)
+		id = fmt.Sprintf("%s/%s", SidebarGroupPrefix, si.entityID)
 	} else {
 		id = si.entityID.String()
 	}
@@ -379,6 +408,10 @@ func (s *SidebarService) load(req *sidebarLoadReq) {
 
 				// selecting signal types/units/enums
 				for _, sig := range msg.Signals() {
+					sigKey, sigItem := s.f.newSignal(sig)
+					s.addItem(sigKey, sigItem)
+					msgItem.addChild(sigItem)
+
 					switch sig.Kind() {
 					case acmelib.SignalKindStandard:
 						stdSig, err := sig.ToStandard()
@@ -575,8 +608,22 @@ func (s *sidebarController) sendAdd(ent entity) {
 		}
 
 	case acmelib.EntityKindMessage:
-		msgKey, msgItem := s.f.newMessage(ent)
+		msg, ok := ent.(*acmelib.Message)
+		if !ok {
+			panic("entity is not an acmelib.Message")
+		}
+
+		msgKey, msgItem := s.f.newMessage(msg)
 		s.addCh <- newSidebarAddReq(msgItem, msgKey, SidebarMessagesPrefix)
+
+	case acmelib.EntityKindSignal:
+		sig, ok := ent.(acmelib.Signal)
+		if !ok {
+			panic("entity is not an acmelib.Signal")
+		}
+
+		sigKey, sigItem := s.f.newSignal(sig)
+		s.addCh <- newSidebarAddReq(sigItem, sigKey, sigItem.prefix)
 
 	case acmelib.EntityKindSignalType:
 		sigTypeKey, sigTypeItem := s.f.newSignalType(ent)

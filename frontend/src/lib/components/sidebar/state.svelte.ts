@@ -6,8 +6,8 @@ import {
 	SidebarSignalEnumsPrefix,
 	SidebarSignalTypesPrefix,
 	SidebarSignalUnitsPrefix
-} from '$lib/api/constants';
-import { SidebarAdd, SidebarLoad, SidebarRemove, SidebarUpdateName } from '$lib/api/events';
+} from '$lib/constants/constants';
+import { SidebarAdd, SidebarLoad, SidebarRemove, SidebarUpdateName } from '$lib/constants/events';
 import type { PanelType } from '$lib/state/layout-state.svelte';
 import { Events as wails } from '@wailsio/runtime';
 
@@ -65,6 +65,7 @@ export class SidebarState {
 
 	async load() {
 		const sidebar = await SidebarService.Get();
+		console.log(sidebar);
 		this.sidebar = sidebar;
 	}
 
@@ -82,24 +83,40 @@ export class SidebarState {
 			return;
 		}
 
-		let parentItem = this.sidebar.root;
-		for (const prefix of item.prefix.split(':')) {
-			for (const child of parentItem.children || []) {
-				const tmpSplitId = child.id.split(':');
-				if (tmpSplitId.length < 2) {
+		const prefixes = item.prefix.split('/');
+
+		let parent = this.sidebar.root;
+		let remainingPrefix = prefixes.length;
+
+		while (remainingPrefix > 0) {
+			let foundParent = false;
+			const currPrefix = prefixes[prefixes.length - remainingPrefix];
+
+			for (const child of parent.children || []) {
+				console.log(child.id);
+
+				if (child.id !== currPrefix && child.id !== 'group:' + currPrefix) {
 					continue;
 				}
 
-				if (tmpSplitId[1] === prefix) {
-					parentItem = child;
-					break;
-				}
+				parent = child;
+				foundParent = true;
+
+				break;
 			}
+
+			if (!foundParent) {
+				return;
+			}
+
+			remainingPrefix = remainingPrefix - 1;
 		}
 
-		if (!parentItem.children) return;
+		if (!parent.children) {
+			return;
+		}
 
-		for (const child of parentItem.children) {
+		for (const child of parent.children) {
 			if (child.id === item.id) {
 				child.name = item.name;
 
@@ -112,16 +129,16 @@ export class SidebarState {
 			}
 		}
 
-		parentItem.children.sort((a, b) => a.name.localeCompare(b.name));
+		parent.children.sort((a, b) => a.name.localeCompare(b.name));
 	}
 
 	private update(item: SidebarItem) {
 		if (!this.sidebar) return;
 
 		let parentItem = this.sidebar.root;
-		for (const prefix of item.prefix.split(':')) {
+		for (const prefix of item.prefix.split('/')) {
 			for (const child of parentItem.children || []) {
-				const tmpSplitId = child.id.split(':');
+				const tmpSplitId = child.id.split('/');
 				if (tmpSplitId.length < 2) {
 					continue;
 				}
@@ -144,7 +161,7 @@ export class SidebarState {
 	}
 
 	getKindOfGroup(groupId: string) {
-		const splitId = groupId.split(':');
+		const splitId = groupId.split('/');
 		const id = splitId[splitId.length - 1];
 
 		switch (id) {
@@ -184,6 +201,8 @@ export class SidebarState {
 				return 'node';
 			case SidebarItemKind.SidebarItemKindMessage:
 				return 'message';
+			case SidebarItemKind.SidebarItemKindSignal:
+				return 'signal';
 			case SidebarItemKind.SidebarItemKindSignalType:
 				return 'signal_type';
 			case SidebarItemKind.SidebarItemKindSignalUnit:

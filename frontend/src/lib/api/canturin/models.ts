@@ -247,6 +247,7 @@ export enum SidebarItemKind {
     SidebarItemKindBus = "bus",
     SidebarItemKindNode = "node",
     SidebarItemKindMessage = "message",
+    SidebarItemKindSignal = "signal",
     SidebarItemKindSignalType = "signal-type",
     SidebarItemKindSignalUnit = "signal-unit",
     SidebarItemKindSignalEnum = "signal-enum",

@@ -1,5 +1,5 @@
 import { MessageByteOrder, MessageSendType, MessageService, type Message } from '$lib/api/canturin';
-import { HistoryMessageModify } from '$lib/api/events';
+import { HistoryMessageModify } from '$lib/constants/events';
 import { EntityState } from '$lib/state/entity-state.svelte';
 import { StateProvider } from '$lib/state/state-provider.svelte';
 
