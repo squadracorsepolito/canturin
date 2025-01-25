@@ -188,11 +188,14 @@ func (h *signalHandler) updateName(sig acmelib.Signal, req *request, res *signal
 		return err
 	}
 
+	h.sidebar.sendUpdateName(sig)
+
 	res.setUndo(
 		func() (acmelib.Signal, error) {
 			if err := sig.UpdateName(oldName); err != nil {
 				return nil, err
 			}
+			h.sidebar.sendUpdateName(sig)
 			return sig, nil
 		},
 	)
@@ -202,6 +205,7 @@ func (h *signalHandler) updateName(sig acmelib.Signal, req *request, res *signal
 			if err := sig.UpdateName(name); err != nil {
 				return nil, err
 			}
+			h.sidebar.sendUpdateName(sig)
 			return sig, nil
 		},
 	)

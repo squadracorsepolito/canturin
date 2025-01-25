@@ -37,7 +37,6 @@ export class SidebarState {
 		});
 
 		wails.On(SidebarUpdateName, (e: wails.WailsEvent) => {
-			console.log(e.data[0]);
 			this.updateName(e.data[0] as SidebarItem);
 		});
 
@@ -65,7 +64,6 @@ export class SidebarState {
 
 	async load() {
 		const sidebar = await SidebarService.Get();
-		console.log(sidebar);
 		this.sidebar = sidebar;
 	}
 
@@ -93,9 +91,7 @@ export class SidebarState {
 			const currPrefix = prefixes[prefixes.length - remainingPrefix];
 
 			for (const child of parent.children || []) {
-				console.log(child.id);
-
-				if (child.id !== currPrefix && child.id !== 'group:' + currPrefix) {
+				if (child.id !== currPrefix && child.id !== 'group/' + currPrefix) {
 					continue;
 				}
 

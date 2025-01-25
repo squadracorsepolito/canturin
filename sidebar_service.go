@@ -109,8 +109,6 @@ func (f *sidebarItemFactory) newMessage(msg *acmelib.Message) (string, *sidebarI
 	parNodeInt := msg.SenderNodeInterface()
 	prefix := SidebarMessagesPrefix
 	if parNodeInt != nil {
-		prefix += fmt.Sprintf("/%s", parNodeInt.Node().EntityID())
-
 		parBus := parNodeInt.ParentBus()
 		if parBus != nil {
 			prefix += fmt.Sprintf("/%s/%s", parBus.EntityID(), parNodeInt.Node().EntityID())
@@ -158,7 +156,7 @@ func (f *sidebarItemFactory) getMessageNodeKey(nodeInt *acmelib.NodeInterface) s
 }
 
 func (f *sidebarItemFactory) getMessageNodeName(nodeInt *acmelib.NodeInterface) string {
-	return fmt.Sprintf("%s/%d", nodeInt.Node().Name(), nodeInt.Number())
+	return fmt.Sprintf("%s:%d", nodeInt.Node().Name(), nodeInt.Number())
 }
 
 func (si *sidebarItem) addChild(child *sidebarItem) {
