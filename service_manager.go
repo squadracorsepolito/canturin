@@ -29,6 +29,7 @@ func newServiceManager() *serviceManager {
 
 	signalType := newSignalTypeService(sidebarController)
 	signalUnit := newSignalUnitService(sidebarController)
+	signalEnum := newSignalEnumService(sidebarController)
 
 	return &serviceManager{
 		network: acmelib.NewNetwork("Unnamed Network"),
@@ -41,10 +42,10 @@ func newServiceManager() *serviceManager {
 		node:    newNodeService(sidebarController, bus),
 		message: newMessageService(sidebarController),
 
-		signal:     newSignalService(sidebarController, signalType, signalUnit),
+		signal:     newSignalService(sidebarController, signalType, signalUnit, signalEnum),
 		signalType: signalType,
 		signalUnit: signalUnit,
-		signalEnum: newSignalEnumService(sidebarController),
+		signalEnum: signalEnum,
 	}
 }
 

@@ -5,6 +5,7 @@
 	import { Readonly } from '$lib/components/readonly';
 	import { SegmentedControl } from '$lib/components/segmented-control';
 	import type { PanelSectionProps } from '../types';
+	import EnumAttributes from './enum-attributes.svelte';
 	import StandardAttributes from './standard-attributes.svelte';
 	import { getSignalState } from './state.svelte';
 	import { signalKindOptions } from './utils';
@@ -43,6 +44,8 @@
 
 	{#if sig.kind === SignalKind.SignalKindStandard}
 		<StandardAttributes {entityId} signal={sig.standard} />
+	{:else if sig.kind === SignalKind.SignalKindEnum}
+		<EnumAttributes {entityId} signal={sig.enum} />
 	{/if}
 {/snippet}
 

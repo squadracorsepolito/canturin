@@ -41,4 +41,20 @@ export default plugin(({ addUtilities }) => {
 			}
 		});
 	}
+
+	for (const [color, cssVar] of Object.entries(colors)) {
+		const className = `.focus-ring-${color}`;
+
+		addUtilities({
+			[className]: {
+				'--tw-ring-offset-shadow':
+					'var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color)',
+				'--tw-ring-shadow':
+					'var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color)',
+				'box-shadow':
+					'var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)',
+				'--tw-ring-color': `var(--fallback-p,oklch(var(${cssVar})/0.25))`
+			}
+		});
+	}
 });

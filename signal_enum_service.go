@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/squadracorsepolito/acmelib"
@@ -18,6 +19,20 @@ func signalEnumValueConverter(sigEnumValue *acmelib.SignalEnumValue) SignalEnumV
 		base: getBase(sigEnumValue),
 
 		Index: sigEnumValue.Index(),
+	}
+}
+
+type SignalEnumBrief struct {
+	BaseEntity
+
+	Size int `json:"size"`
+}
+
+func newSignalEnumBrief(sigEnum *acmelib.SignalEnum) SignalEnumBrief {
+	return SignalEnumBrief{
+		BaseEntity: newBaseEntity(sigEnum),
+
+		Size: sigEnum.GetSize(),
 	}
 }
 
@@ -59,7 +74,6 @@ func newSignalEnum(sigEnum *acmelib.SignalEnum) SignalEnum {
 
 		var msgRef *reference
 		msg := sig.ParentMessage()
-		sigRef.entityID = msg.EntityID()
 		msgRef, ok := refs[msg.EntityID()]
 		if !ok {
 			msgRef = newReference(msg)
@@ -167,6 +181,25 @@ func (s *SignalEnumService) Delete(entityID string) error {
 	)
 
 	return nil
+}
+
+func (s *SignalEnumService) ListBrief() []SignalEnumBrief {
+	s.mux.RLock()
+	defer s.mux.RUnlock()
+
+	res := []SignalEnumBrief{}
+	for _, sigEnum := range s.entities {
+		res = append(res, newSignalEnumBrief(sigEnum))
+	}
+
+	slices.SortFunc(res, func(a, b SignalEnumBrief) int {
+		if a.Size == b.Size {
+			return strings.Compare(a.Name, b.Name)
+		}
+		return a.Size - b.Size
+	})
+
+	return res
 }
 
 func (s *SignalEnumService) UpdateName(entityID string, req UpdateNameReq) (SignalEnum, error) {

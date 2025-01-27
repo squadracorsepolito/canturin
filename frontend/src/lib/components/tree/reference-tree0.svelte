@@ -28,11 +28,10 @@
 				break;
 
 			case ReferenceKind.ReferenceKindSignal:
-				panelType = 'message';
+				panelType = 'signal';
+				console.log(entityId);
 				break;
 		}
-
-		console.log(panelType, entityId);
 
 		layoutStateSvelte.openPanel(panelType, entityId);
 	}

@@ -102,6 +102,10 @@ export interface EntityPath {
     "name": string;
 }
 
+export interface EnumSignal {
+    "signalEnum": SignalEnumBrief;
+}
+
 export interface History {
     "operationCount": number;
     "currentIndex": number;
@@ -264,6 +268,7 @@ export interface Signal {
     "startPos": number;
     "size": number;
     "standard": StandardSignal;
+    "enum": EnumSignal;
 }
 
 export interface SignalEnum {
@@ -276,6 +281,14 @@ export interface SignalEnum {
     "maxIndex": number;
     "values": SignalEnumValue[] | null;
     "references": Reference[] | null;
+}
+
+export interface SignalEnumBrief {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+    "size": number;
 }
 
 export interface SignalEnumValue {
@@ -429,6 +442,10 @@ export interface UpdateScaleReq {
 
 export interface UpdateSendTypeReq {
     "sendType": MessageSendType;
+}
+
+export interface UpdateSignalEnumReq {
+    "signalEnumEntityId": string;
 }
 
 export interface UpdateSignalTypeReq {

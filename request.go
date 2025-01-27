@@ -304,6 +304,18 @@ func (r *request) toUpdateSignalUnit() *UpdateSignalUnitReq {
 	return req
 }
 
+type UpdateSignalEnumReq struct {
+	SignalEnumEntityID string `json:"signalEnumEntityId"`
+}
+
+func (r *request) toUpdateSignalEnum() *UpdateSignalEnumReq {
+	req, ok := r.data.(*UpdateSignalEnumReq)
+	if !ok {
+		panic("cannot convert to UpdateSignalEnumReq")
+	}
+	return req
+}
+
 //////////////////////////
 // SIGNAL TYPE REQUESTS //
 //////////////////////////

@@ -2,41 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
+@layer utilities {
 	.text-dimmed {
 		@apply opacity-85;
-	}
-
-	/* .bg-primary-ghost {
-		@apply bg-primary/5;
-	}
-
-	.bg-secondary-ghost {
-		@apply bg-secondary/5;
-	}
-
-	.bg-warning-ghost {
-		@apply bg-warning/5;
-	}
-
-	.bg-error-ghost {
-		@apply bg-error/5;
-	} */
-
-	.focus-ring-primary {
-		@apply ring-2 ring-primary/25;
-	}
-
-	.focus-ring-secondary {
-		@apply ring-2 ring-secondary/25;
-	}
-
-	.focus-ring-error {
-		@apply ring-2 ring-error/25;
-	}
-
-	.focus-ring-warning {
-		@apply ring-2 ring-warning/25;
 	}
 
 	.text-h2 {

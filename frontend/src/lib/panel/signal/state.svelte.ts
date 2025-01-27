@@ -52,4 +52,8 @@ class SignalState extends EntityState<Signal> {
 	updateSignalUnit(signalUnitEntityId: string) {
 		this.update(SignalService.UpdateSignalUnit(this.entity.entityId, { signalUnitEntityId }));
 	}
+
+	updateSignalEnum(signalEnumEntityId: string) {
+		this.update(SignalService.UpdateSignalEnum(this.entity.entityId, { signalEnumEntityId }));
+	}
 }

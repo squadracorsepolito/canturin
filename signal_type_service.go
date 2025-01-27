@@ -277,7 +277,6 @@ func (h *signalTypeHandler) toResponse(sigType *acmelib.SignalType) SignalType {
 
 		var msgRef *reference
 		msg := sig.ParentMessage()
-		sigRef.entityID = msg.EntityID()
 		msgRef, ok := refs[msg.EntityID()]
 		if !ok {
 			msgRef = newReference(msg)

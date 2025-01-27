@@ -96,7 +96,6 @@ func newSignalUnit(sigUnit *acmelib.SignalUnit) SignalUnit {
 
 		var msgRef *reference
 		msg := stdSig.ParentMessage()
-		sigRef.entityID = msg.EntityID()
 		msgRef, ok := refs[msg.EntityID()]
 		if !ok {
 			msgRef = newReference(msg)

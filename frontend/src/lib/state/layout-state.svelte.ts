@@ -15,6 +15,8 @@ class LayoutState {
 	openPanelId = $state('');
 
 	openPanel(typ: PanelType, panelId: string) {
+		console.log(panelId);
+
 		this.openPanelType = typ;
 		this.openPanelId = panelId;
 	}

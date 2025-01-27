@@ -39,6 +39,11 @@ export function ListBase(): Promise<$models.BaseEntity[] | null> & { cancel(): v
     return $resultPromise;
 }
 
+export function ListBrief(): Promise<$models.SignalEnumBrief[] | null> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1086832792) as any;
+    return $resultPromise;
+}
+
 export function RemoveValues(entityID: string, req: $models.RemoveValuesReq): Promise<$models.SignalEnum> & { cancel(): void } {
     let $resultPromise = $Call.ByID(3900736342, entityID, req) as any;
     return $resultPromise;

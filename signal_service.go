@@ -45,16 +45,26 @@ type StandardSignal struct {
 	SignalUnit BaseEntity      `json:"signalUnit"`
 }
 
-func newStandardSignal(sig *acmelib.StandardSignal) StandardSignal {
+func newStandardSignal(stdSig *acmelib.StandardSignal) StandardSignal {
 	res := StandardSignal{
-		SignalType: newSignalTypeBrief(sig.Type()),
+		SignalType: newSignalTypeBrief(stdSig.Type()),
 	}
 
-	if sig.Unit() != nil {
-		res.SignalUnit = newBaseEntity(sig.Unit())
+	if stdSig.Unit() != nil {
+		res.SignalUnit = newBaseEntity(stdSig.Unit())
 	}
 
 	return res
+}
+
+type EnumSignal struct {
+	SignalEnum SignalEnumBrief `json:"signalEnum"`
+}
+
+func newEnumSignal(enumSig *acmelib.EnumSignal) EnumSignal {
+	return EnumSignal{
+		SignalEnum: newSignalEnumBrief(enumSig.Enum()),
+	}
 }
 
 type Signal struct {
@@ -69,6 +79,7 @@ type Signal struct {
 	Size     int        `json:"size"`
 
 	Standard StandardSignal `json:"standard"`
+	Enum     EnumSignal     `json:"enum"`
 }
 
 func newSignal(sig acmelib.Signal) Signal {
@@ -94,6 +105,13 @@ func newSignal(sig acmelib.Signal) Signal {
 			panic(err)
 		}
 		res.Standard = newStandardSignal(stdSig)
+
+	case acmelib.SignalKindEnum:
+		enumSig, err := sig.ToEnum()
+		if err != nil {
+			panic(err)
+		}
+		res.Enum = newEnumSignal(enumSig)
 	}
 
 	return res
@@ -103,9 +121,9 @@ type SignalService struct {
 	*service[acmelib.Signal, Signal, *signalHandler]
 }
 
-func newSignalService(sidebar *sidebarController, sigTypeSrv *SignalTypeService, sigUnitSrv *SignalUnitService) *SignalService {
+func newSignalService(sidebar *sidebarController, sigTypeSrv *SignalTypeService, sigUnitSrv *SignalUnitService, sigEnumSrv *SignalEnumService) *SignalService {
 	return &SignalService{
-		service: newService(serviceKindSignal, newSignalHandler(sidebar, sigTypeSrv, sigUnitSrv), sidebar),
+		service: newService(serviceKindSignal, newSignalHandler(sidebar, sigTypeSrv, sigUnitSrv, sigEnumSrv), sidebar),
 	}
 }
 
@@ -152,6 +170,10 @@ func (s *SignalService) UpdateSignalUnit(entityID string, req UpdateSignalUnitRe
 	return s.handle(entityID, &req, s.handler.updateSignalUnit)
 }
 
+func (s *SignalService) UpdateSignalEnum(entityID string, req UpdateSignalEnumReq) (Signal, error) {
+	return s.handle(entityID, &req, s.handler.updateSignalEnum)
+}
+
 type signalRes = response[acmelib.Signal]
 
 type signalHandler struct {
@@ -159,14 +181,16 @@ type signalHandler struct {
 
 	sigTypeSrv *SignalTypeService
 	sigUnitSrv *SignalUnitService
+	sigEnumSrv *SignalEnumService
 }
 
-func newSignalHandler(sidebar *sidebarController, sigTypeSrv *SignalTypeService, sigUnitSrv *SignalUnitService) *signalHandler {
+func newSignalHandler(sidebar *sidebarController, sigTypeSrv *SignalTypeService, sigUnitSrv *SignalUnitService, sigEnumSrv *SignalEnumService) *signalHandler {
 	return &signalHandler{
 		commonServiceHandler: newCommonServiceHandler(sidebar),
 
 		sigTypeSrv: sigTypeSrv,
 		sigUnitSrv: sigUnitSrv,
+		sigEnumSrv: sigEnumSrv,
 	}
 }
 
@@ -270,6 +294,9 @@ func (h *signalHandler) updateSignalType(sig acmelib.Signal, req *request, res *
 
 	res.setUndo(
 		func() (acmelib.Signal, error) {
+			h.sigTypeSrv.mux.Lock()
+			defer h.sigTypeSrv.mux.Unlock()
+
 			if err := stdSig.SetType(oldSigType); err != nil {
 				return nil, err
 			}
@@ -279,6 +306,9 @@ func (h *signalHandler) updateSignalType(sig acmelib.Signal, req *request, res *
 
 	res.setRedo(
 		func() (acmelib.Signal, error) {
+			h.sigTypeSrv.mux.Lock()
+			defer h.sigTypeSrv.mux.Unlock()
+
 			if err := stdSig.SetType(sigType); err != nil {
 				return nil, err
 			}
@@ -327,6 +357,9 @@ func (h *signalHandler) updateSignalUnit(sig acmelib.Signal, req *request, res *
 
 	res.setUndo(
 		func() (acmelib.Signal, error) {
+			h.sigUnitSrv.mux.Lock()
+			defer h.sigUnitSrv.mux.Unlock()
+
 			stdSig.SetUnit(oldSigUnit)
 			return sig, nil
 		},
@@ -334,7 +367,63 @@ func (h *signalHandler) updateSignalUnit(sig acmelib.Signal, req *request, res *
 
 	res.setRedo(
 		func() (acmelib.Signal, error) {
+			h.sigUnitSrv.mux.Lock()
+			defer h.sigUnitSrv.mux.Unlock()
+
 			stdSig.SetUnit(sigUnit)
+			return sig, nil
+		},
+	)
+
+	return nil
+}
+
+func (h *signalHandler) updateSignalEnum(sig acmelib.Signal, req *request, res *signalRes) error {
+	enumSig, err := sig.ToEnum()
+	if err != nil {
+		return err
+	}
+
+	parsedReq := req.toUpdateSignalEnum()
+	sigEnumEntID := parsedReq.SignalEnumEntityID
+
+	oldSigEnum := enumSig.Enum()
+	if sigEnumEntID == oldSigEnum.EntityID().String() {
+		return nil
+	}
+
+	h.sigEnumSrv.mux.Lock()
+	defer h.sigEnumSrv.mux.Unlock()
+
+	sigEnum, err := h.sigEnumSrv.getEntity(sigEnumEntID)
+	if err != nil {
+		return err
+	}
+
+	if err := enumSig.SetEnum(sigEnum); err != nil {
+		return err
+	}
+
+	res.setUndo(
+		func() (acmelib.Signal, error) {
+			h.sigEnumSrv.mux.Lock()
+			defer h.sigEnumSrv.mux.Unlock()
+
+			if err := enumSig.SetEnum(oldSigEnum); err != nil {
+				return nil, err
+			}
+			return sig, nil
+		},
+	)
+
+	res.setRedo(
+		func() (acmelib.Signal, error) {
+			h.sigEnumSrv.mux.Lock()
+			defer h.sigEnumSrv.mux.Unlock()
+
+			if err := enumSig.SetEnum(sigEnum); err != nil {
+				return nil, err
+			}
 			return sig, nil
 		},
 	)
