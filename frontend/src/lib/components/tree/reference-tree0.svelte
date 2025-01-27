@@ -29,7 +29,6 @@
 
 			case ReferenceKind.ReferenceKindSignal:
 				panelType = 'signal';
-				console.log(entityId);
 				break;
 		}
 
