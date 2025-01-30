@@ -2,6 +2,7 @@
 	import Panel from '../panel.svelte';
 	import type { PanelSectionProps } from '../types';
 	import Attributes from './attributes.svelte';
+	import Draft from './draft.svelte';
 	import Heading from './heading.svelte';
 	import Signals from './signals.svelte';
 	import { loadMessage } from './state.svelte';
@@ -13,7 +14,7 @@
 
 <Panel>
 	{#if entityId === 'draft'}
-		draft
+		<Draft />
 	{:else}
 		{#await promise then}
 			<Heading {entityId} />
