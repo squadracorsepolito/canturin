@@ -42,6 +42,11 @@ class BusState extends EntityState<Bus> {
 		return [];
 	}
 
+	async getLoad() {
+		const load = await BusService.GetLoad(this.entity.entityId);
+		return load;
+	}
+
 	updateName(name: string) {
 		this.update(BusService.UpdateName(this.entity.entityId, { name }));
 	}

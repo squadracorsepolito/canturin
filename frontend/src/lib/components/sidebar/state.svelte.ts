@@ -65,6 +65,8 @@ export class SidebarState {
 	async load() {
 		const sidebar = await SidebarService.Get();
 		this.sidebar = sidebar;
+
+		console.log(sidebar);
 	}
 
 	private updateName(item: SidebarItem) {

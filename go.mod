@@ -5,7 +5,7 @@ go 1.22.4
 toolchain go1.23.0
 
 require (
-	github.com/squadracorsepolito/acmelib v1.5.7
+	github.com/squadracorsepolito/acmelib v1.7.0
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.9
 )
 

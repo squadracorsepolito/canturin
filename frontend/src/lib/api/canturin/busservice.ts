@@ -29,6 +29,11 @@ export function GetInvalidNames(entityID: string): Promise<string[] | null> & { 
     return $resultPromise;
 }
 
+export function GetLoad(entityID: string): Promise<$models.BusLoad> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(541458873, entityID) as any;
+    return $resultPromise;
+}
+
 export function ListBase(): Promise<$models.BaseEntity[] | null> & { cancel(): void } {
     let $resultPromise = $Call.ByID(3115506830) as any;
     return $resultPromise;

@@ -13,9 +13,10 @@
 	import { Switch } from '$lib/components/switch';
 	import { Readonly } from '$lib/components/readonly';
 	import { getHexNumber } from '$lib/utils';
-	import { MessageByteOrder, MessageService } from '$lib/api/canturin';
+	import { MessageByteOrder, MessageSendType, MessageService } from '$lib/api/canturin';
 	import { SegmentedControl } from '$lib/components/segmented-control';
-	import { byteOrderOptions } from './utils';
+	import { byteOrderOptions, sendTypeSelectItems } from './utils';
+	import { Select } from '$lib/components/select';
 
 	let invalidNames = $state<string[]>([]);
 
@@ -34,7 +35,11 @@
 		id: v.pipe(v.number(), v.integer(), v.minValue(0)),
 		canId: v.pipe(v.number(), v.integer(), v.minValue(0)),
 		size: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(8)), 1),
-		byteOrder: v.optional(v.enum(MessageByteOrder), MessageByteOrder.MessageByteOrderLittleEndian)
+		byteOrder: v.optional(v.enum(MessageByteOrder), MessageByteOrder.MessageByteOrderLittleEndian),
+		cycleTime: v.pipe(v.number(), v.integer(), v.minValue(0)),
+		sendType: v.optional(v.enum(MessageSendType), MessageSendType.MessageSendTypeCyclic),
+		delayTime: v.pipe(v.number(), v.integer(), v.minValue(0)),
+		startDelayTime: v.pipe(v.number(), v.integer(), v.minValue(0))
 	});
 
 	const { enhance, form, errors } = superForm(defaults(valibot(schema)), {
@@ -113,6 +118,44 @@
 			bind:selectedValue={$form.byteOrder}
 		/>
 	</FormField>
+
+	<Divider />
+
+	<div class="grid grid-cols-2 gap-5">
+		<FormField label="Cycle Time" desc="The cycle time of the message in ms">
+			<NumberInput
+				name="message-cycle-time"
+				bind:value={$form.cycleTime}
+				errors={$errors.cycleTime}
+			/>
+		</FormField>
+
+		<FormField label="Send Type" desc="How the message is sent">
+			<Select
+				items={sendTypeSelectItems}
+				valueKey="value"
+				labelKey="label"
+				bind:selected={$form.sendType}
+				name="message-send-type"
+			/>
+		</FormField>
+
+		<FormField label="Delay Time" desc="The delay time of the message in ms">
+			<NumberInput
+				name="message-delay-time"
+				bind:value={$form.delayTime}
+				errors={$errors.delayTime}
+			/>
+		</FormField>
+
+		<FormField label="Start Delay Time" desc="The start delay time of the message in ms">
+			<NumberInput
+				name="message-start-delay-time"
+				bind:value={$form.startDelayTime}
+				errors={$errors.startDelayTime}
+			/>
+		</FormField>
+	</div>
 
 	<div class="flex justify-end pt-5">
 		<SubmitButton label="Create Message" />

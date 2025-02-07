@@ -31,6 +31,8 @@ type SidebarItem struct {
 	ID       string          `json:"id"`
 	Name     string          `json:"name"`
 	Children []SidebarItem   `json:"children"`
+
+	Path string `json:"path"`
 }
 
 type Sidebar struct {
@@ -44,16 +46,59 @@ type sidebarItem struct {
 	name     string
 	parent   *sidebarItem
 	children []*sidebarItem
+
+	path string
 }
 
-func newSidebarItem(kind SidebarItemKind, entityID acmelib.EntityID, prefix, name string) *sidebarItem {
-	return &sidebarItem{
-		kind:     kind,
-		entityID: entityID,
-		prefix:   prefix,
-		name:     name,
-		children: []*sidebarItem{},
+func (si *sidebarItem) addChild(child *sidebarItem) {
+	si.children = append(si.children, child)
+	child.parent = si
+}
+
+func (si *sidebarItem) removeChild(child *sidebarItem) {
+	si.children = slices.DeleteFunc(si.children, func(c *sidebarItem) bool {
+		return c.kind == child.kind && c.entityID == child.entityID && c.name == child.name
+	})
+	child.parent = nil
+}
+
+func (si *sidebarItem) convert() SidebarItem {
+	base := si.convertBase()
+
+	if si.kind != SidebarItemKindNetwork {
+		slices.SortFunc(si.children, func(a, b *sidebarItem) int {
+			return strings.Compare(a.name, b.name)
+		})
 	}
+
+	for _, child := range si.children {
+		base.Children = append(base.Children, child.convert())
+	}
+
+	return base
+}
+
+func (si *sidebarItem) convertBase() SidebarItem {
+	id := ""
+	if si.kind == SidebarItemKindGroup {
+		id = fmt.Sprintf("%s/%s", SidebarGroupPrefix, si.entityID)
+	} else {
+		id = si.entityID.String()
+	}
+
+	return SidebarItem{
+		Kind:     si.kind,
+		Prefix:   si.prefix,
+		ID:       id,
+		Name:     si.name,
+		Children: []SidebarItem{},
+
+		Path: si.path,
+	}
+}
+
+func (s *sidebarItem) prependPath(entityID acmelib.EntityID) {
+	s.path = fmt.Sprintf("%s/%s", entityID, s.path)
 }
 
 type sidebarItemFactory struct{}
@@ -65,6 +110,8 @@ func (f *sidebarItemFactory) newItem(kind SidebarItemKind, entityID acmelib.Enti
 		prefix:   prefix,
 		name:     name,
 		children: []*sidebarItem{},
+
+		path: entityID.String(),
 	}
 }
 
@@ -76,8 +123,16 @@ func (f *sidebarItemFactory) newNetwork(net entity) (string, *sidebarItem) {
 	return net.EntityID().String(), f.newItem(SidebarItemKindNetwork, net.EntityID(), "", net.Name())
 }
 
-func (f *sidebarItemFactory) newBus(bus entity) (string, *sidebarItem) {
-	return bus.EntityID().String(), f.newItem(SidebarItemKindBus, bus.EntityID(), SidebarBusesPrefix, bus.Name())
+func (f *sidebarItemFactory) newBus(bus *acmelib.Bus) (string, *sidebarItem) {
+	entID := bus.EntityID()
+	item := f.newItem(SidebarItemKindBus, entID, SidebarBusesPrefix, bus.Name())
+
+	parNet := bus.ParentNetwork()
+	if parNet != nil {
+		item.prependPath(parNet.EntityID())
+	}
+
+	return entID.String(), item
 }
 
 func (f *sidebarItemFactory) newMessageBus(bus entity) (string, *sidebarItem) {
@@ -157,51 +212,6 @@ func (f *sidebarItemFactory) getMessageNodeKey(nodeInt *acmelib.NodeInterface) s
 
 func (f *sidebarItemFactory) getMessageNodeName(nodeInt *acmelib.NodeInterface) string {
 	return fmt.Sprintf("%s:%d", nodeInt.Node().Name(), nodeInt.Number())
-}
-
-func (si *sidebarItem) addChild(child *sidebarItem) {
-	si.children = append(si.children, child)
-	child.parent = si
-}
-
-func (si *sidebarItem) removeChild(child *sidebarItem) {
-	si.children = slices.DeleteFunc(si.children, func(c *sidebarItem) bool {
-		return c.kind == child.kind && c.entityID == child.entityID && c.name == child.name
-	})
-	child.parent = nil
-}
-
-func (si *sidebarItem) convert() SidebarItem {
-	base := si.convertBase()
-
-	if si.kind != SidebarItemKindNetwork {
-		slices.SortFunc(si.children, func(a, b *sidebarItem) int {
-			return strings.Compare(a.name, b.name)
-		})
-	}
-
-	for _, child := range si.children {
-		base.Children = append(base.Children, child.convert())
-	}
-
-	return base
-}
-
-func (si *sidebarItem) convertBase() SidebarItem {
-	id := ""
-	if si.kind == SidebarItemKindGroup {
-		id = fmt.Sprintf("%s/%s", SidebarGroupPrefix, si.entityID)
-	} else {
-		id = si.entityID.String()
-	}
-
-	return SidebarItem{
-		Kind:     si.kind,
-		Prefix:   si.prefix,
-		ID:       id,
-		Name:     si.name,
-		Children: []SidebarItem{},
-	}
 }
 
 type sidebarLoadReq struct {
@@ -580,7 +590,12 @@ func (s *sidebarController) sendUpdateName(ent entity) {
 func (s *sidebarController) sendAdd(ent entity) {
 	switch ent.EntityKind() {
 	case acmelib.EntityKindBus:
-		busKey, busItem := s.f.newBus(ent)
+		bus, ok := ent.(*acmelib.Bus)
+		if !ok {
+			panic("entity is not an acmelib.Bus")
+		}
+
+		busKey, busItem := s.f.newBus(bus)
 		s.addCh <- newSidebarAddReq(busItem, busKey, SidebarBusesPrefix)
 
 		msgBusKey, msgBusItem := s.f.newMessageBus(ent)

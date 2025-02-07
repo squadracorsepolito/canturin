@@ -32,6 +32,20 @@ export interface Bus {
     "attachedNodes": AttachedNode[] | null;
 }
 
+export interface BusLoad {
+    "percentage": number;
+    "messages": BusLoadMessage[] | null;
+}
+
+export interface BusLoadMessage {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+    "bitsPerSec": number;
+    "percentage": number;
+}
+
 export enum BusType {
     /**
      * The Go zero value for the underlying type of the enum.
@@ -238,6 +252,7 @@ export interface SidebarItem {
     "id": string;
     "name": string;
     "children": SidebarItem[] | null;
+    "path": string;
 }
 
 export enum SidebarItemKind {

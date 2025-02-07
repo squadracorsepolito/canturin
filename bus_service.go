@@ -52,6 +52,38 @@ type Bus struct {
 	AttachedNodes []AttachedNode `json:"attachedNodes"`
 }
 
+type BusLoadMessage struct {
+	BaseEntity
+
+	BitsPerSec float64 `json:"bitsPerSec"`
+	Percentage float64 `json:"percentage"`
+}
+
+func newBusLoadMessage(msg *acmelib.MessageLoad) BusLoadMessage {
+	return BusLoadMessage{
+		BaseEntity: newBaseEntity(msg.Message),
+		BitsPerSec: msg.BitsPerSec,
+		Percentage: msg.Percentage,
+	}
+}
+
+type BusLoad struct {
+	Percentage float64          `json:"percentage"`
+	Messages   []BusLoadMessage `json:"messages"`
+}
+
+func newBusLoad(load float64, msgLoads []*acmelib.MessageLoad) BusLoad {
+	messages := []BusLoadMessage{}
+	for _, tmpMsgLoad := range msgLoads {
+		messages = append(messages, newBusLoadMessage(tmpMsgLoad))
+	}
+
+	return BusLoad{
+		Percentage: load,
+		Messages:   messages,
+	}
+}
+
 type BusService struct {
 	*service[*acmelib.Bus, Bus, *busHandler]
 }
@@ -60,6 +92,23 @@ func newBusService(sidebar *sidebarController) *BusService {
 	return &BusService{
 		service: newService(serviceKindBus, newBusHandler(sidebar), sidebar),
 	}
+}
+
+func (s *BusService) GetLoad(entityID string) (BusLoad, error) {
+	s.mux.RLock()
+	defer s.mux.RUnlock()
+
+	bus, err := s.getEntity(entityID)
+	if err != nil {
+		return BusLoad{}, err
+	}
+
+	load, msgLoads, err := acmelib.CalculateBusLoad(bus, 1000)
+	if err != nil {
+		return BusLoad{}, err
+	}
+
+	return newBusLoad(load, msgLoads), nil
 }
 
 func (s *BusService) Create(req CreateBusReq) (Bus, error) {

@@ -5,6 +5,7 @@
 	import Attributes from './attributes.svelte';
 	import Draft from './draft.svelte';
 	import Heading from './heading.svelte';
+	import Load from './load.svelte';
 	import { loadBus } from './state.svelte';
 
 	let { entityId }: PanelSectionProps = $props();
@@ -20,6 +21,8 @@
 			<Heading {entityId} />
 
 			<Attributes {entityId} />
+
+			<Load {entityId} />
 
 			<AttachedNodes {entityId} />
 		{/await}
