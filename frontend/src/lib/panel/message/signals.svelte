@@ -125,7 +125,11 @@
 			</div>
 
 			<div class="flex-1">
-				<SignalGrid signals={msg.signals} height={msg.sizeByte} />
+				<SignalGrid
+					signals={msg.signals}
+					height={msg.sizeByte}
+					onclick={(entityId: string) => layout.openPanel('signal', entityId)}
+				/>
 			</div>
 		</div>
 	{/if}

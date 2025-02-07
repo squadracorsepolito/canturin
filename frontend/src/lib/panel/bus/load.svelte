@@ -2,6 +2,7 @@
 	import { colorByName } from '$lib/actions/color-name.svelte';
 	import type { BusLoadMessage } from '$lib/api/canturin';
 	import { LinkButton } from '$lib/components/button';
+	import { AltArrowIcon, CloseIcon } from '$lib/components/icon';
 	import layoutStateSvelte from '$lib/state/layout-state.svelte';
 	import { getColorByName } from '$lib/utils';
 	import type { PanelSectionProps } from '../types';
@@ -13,6 +14,8 @@
 	let { entityId }: PanelSectionProps = $props();
 
 	const bs = getBusState(entityId);
+
+	let othersExpanded = $state(false);
 
 	function getOthersLoadMessage(loadMsgs: BusLoadMessage[]): BusLoadMessage {
 		let percentage = 0;
@@ -38,9 +41,20 @@
 	{@const isOthers = loadMsg.entityId === othersMessageEntityId}
 
 	<div class="col-span-3 grid grid-cols-subgrid items-center">
-		<div>
+		<div class="h-full">
 			{#if isOthers}
-				<span class="font-medium px-2">{loadMsg.name}</span>
+				<button
+					onclick={() => (othersExpanded = !othersExpanded)}
+					class="w-full h-full flex items-center gap-2 hover:bg-base-content/20 transition-colors px-2 rounded-btn"
+				>
+					{#if othersExpanded}
+						<CloseIcon height="18" width="18" />
+					{:else}
+						<AltArrowIcon height="18" width="18" />
+					{/if}
+
+					<span>Others</span>
+				</button>
 			{:else}
 				<LinkButton
 					label={loadMsg.name}
@@ -91,6 +105,14 @@
 					{@render loadMessage(getOthersLoadMessage(load.messages.slice(loadMessageCount)))}
 				{/if}
 			</div>
+
+			{#if othersExpanded}
+				<div class="grid grid-cols-3 gap-x-3 gap-y-2 bg-base-200 py-2 rounded-btn mt-3">
+					{#each load.messages.slice(loadMessageCount) as loadMsg}
+						{@render loadMessage(loadMsg)}
+					{/each}
+				</div>
+			{/if}
 		{/if}
 	{/await}
 </section>

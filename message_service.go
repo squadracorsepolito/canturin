@@ -702,7 +702,7 @@ func (h *messageHandler) reorderSignal(msg *acmelib.Message, sig acmelib.Signal,
 		newStartPos = targetSig.GetStartBit()
 		offset := sig.GetSize() + sig.GetStartBit() - nearestSig.GetSize() - nearestSig.GetStartBit()
 
-		for i := to; i < from; i++ {
+		for i := from - 1; i >= to; i = i - 1 {
 			msg.ShiftSignalRight(otherSignals[i].EntityID(), offset)
 		}
 	} else {
