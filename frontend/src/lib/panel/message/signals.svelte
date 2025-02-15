@@ -1,11 +1,14 @@
 <script lang="ts">
 	import { type Message, type Signal, SignalKind } from '$lib/api/canturin';
-	import { IconButton, LinkButton } from '$lib/components/button';
+	import { Button, IconButton, LinkButton } from '$lib/components/button';
 	import { SignalGrid } from '$lib/components/grid';
 	import { HoverPreview } from '$lib/components/hover-preview';
-	import { CompactIcon, DeleteIcon } from '$lib/components/icon';
+	import { AddIcon, CompactIcon, DeleteIcon } from '$lib/components/icon';
+	import { Modal } from '$lib/components/modal';
+	import { SegmentedControl } from '$lib/components/segmented-control';
 	import { Table, TableField, TableTitle } from '$lib/components/table';
 	import layout from '$lib/state/layout-state.svelte';
+	import { signalKindOptions } from '../signal/utils';
 	import type { PanelSectionProps } from '../types';
 	import { getMessageState } from './state.svelte';
 	import { getSignalKindString } from './utils';
@@ -13,6 +16,8 @@
 	let { entityId }: PanelSectionProps = $props();
 
 	const ms = getMessageState(entityId);
+
+	let addSignalKind = $state<SignalKind>(SignalKind.SignalKindStandard);
 
 	function handleCompact() {
 		ms.compactSignals();
@@ -63,9 +68,39 @@
 				<Table items={msg.signals} idKey="entityId" reorder={handleReorder}>
 					{#snippet bulkActions({ selectedCount, selectedItems, deselectAll })}
 						<div class="flex justify-end gap-5">
-							<IconButton onclick={handleCompact} color="secondary">
+							<IconButton onclick={handleCompact} themeColor="secondary">
 								<CompactIcon />
 							</IconButton>
+
+							<Modal
+								title="Add Signal"
+								desc="Pick the kind of the signal you want to add"
+								triggerLabel="Add Signal"
+								themeColor="primary"
+								disabled={msg.maxAvailableSpace === 0}
+							>
+								{#snippet trigger()}
+									<AddIcon />
+								{/snippet}
+
+								{#snippet content()}
+									<SegmentedControl
+										name="signal-kind"
+										bind:selectedValue={addSignalKind}
+										options={signalKindOptions}
+									/>
+								{/snippet}
+
+								{#snippet actions({ close })}
+									<button
+										onclick={() => {
+											console.log('ADD');
+											close();
+										}}
+										class="btn btn-primary">Add</button
+									>
+								{/snippet}
+							</Modal>
 
 							<IconButton
 								onclick={() => {
@@ -74,7 +109,7 @@
 								}}
 								label={`Delete Signals ${selectedCount > 0 ? ` (${selectedCount})` : ''}`}
 								disabled={selectedCount === 0}
-								color="error"
+								themeColor="error"
 							>
 								<DeleteIcon />
 							</IconButton>
@@ -117,7 +152,7 @@
 					{/snippet}
 
 					{#snippet rowActions(signal)}
-						<IconButton onclick={() => handleDelete(signal)} color="error">
+						<IconButton onclick={() => handleDelete(signal)} themeColor="error">
 							<DeleteIcon />
 						</IconButton>
 					{/snippet}

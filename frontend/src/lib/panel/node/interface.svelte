@@ -119,14 +119,14 @@
 										deselectAll();
 									}}
 									label="Add Sent Message"
-									color="primary"
+									themeColor="primary"
 								>
 									<AddIcon />
 								</IconButton>
 
 								<IconButton
 									onclick={() => handleBulkDeleteSentMessages(selectedItems)}
-									color="error"
+									themeColor="error"
 									disabled={selectedCount === 0}
 									label={`Delete Sent Messages ${selectedCount > 0 ? ` (${selectedCount})` : ''}`}
 								>
@@ -157,7 +157,7 @@
 						{/snippet}
 
 						{#snippet rowActions(msg)}
-							<IconButton onclick={() => handleDeleteSentMessage(msg)} color="error">
+							<IconButton onclick={() => handleDeleteSentMessage(msg)} themeColor="error">
 								<DeleteIcon />
 							</IconButton>
 						{/snippet}
@@ -179,7 +179,7 @@
 						{#snippet bulkActions({ selectedCount, selectedItems })}
 							<IconButton
 								onclick={() => handleBulkDeleteReceivedMessages(selectedItems)}
-								color="error"
+								themeColor="error"
 								disabled={selectedCount === 0}
 								label={`Delete Received Messages ${selectedCount > 0 ? ` (${selectedCount})` : ''}`}
 							>
@@ -209,7 +209,7 @@
 						{/snippet}
 
 						{#snippet rowActions(msg)}
-							<IconButton onclick={() => handleDeleteReceivedMessage(msg)} color="error">
+							<IconButton onclick={() => handleDeleteReceivedMessage(msg)} themeColor="error">
 								<DeleteIcon />
 							</IconButton>
 						{/snippet}

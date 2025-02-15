@@ -81,8 +81,9 @@ func main() {
 			InvisibleTitleBarHeight: 50,
 			Backdrop:                application.MacBackdropTranslucent,
 		},
-		BackgroundColour: application.NewRGB(27, 38, 54),
-		URL:              "/",
+		BackgroundColour:       application.NewRGB(27, 38, 54),
+		URL:                    "/",
+		OpenInspectorOnStartup: true,
 	})
 
 	// TODO! remove this event in production

@@ -135,6 +135,7 @@ export interface Message {
     "id": number;
     "canId": number;
     "sizeByte": number;
+    "maxAvailableSpace": number;
     "byteOrder": MessageByteOrder;
     "cycleTime": number;
     "sendType": MessageSendType;

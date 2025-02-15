@@ -1,6 +1,7 @@
 package main
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/squadracorsepolito/acmelib"
@@ -84,8 +85,9 @@ type Message struct {
 	ID             uint `json:"id"`
 	CANID          uint `json:"canId"`
 
-	SizeByte  int              `json:"sizeByte"`
-	ByteOrder MessageByteOrder `json:"byteOrder"`
+	SizeByte          int              `json:"sizeByte"`
+	MaxAvailableSpace int              `json:"maxAvailableSpace"`
+	ByteOrder         MessageByteOrder `json:"byteOrder"`
 
 	CycleTime      int             `json:"cycleTime"`
 	SendType       MessageSendType `json:"sendType"`
@@ -110,8 +112,9 @@ func newMessage(msg *acmelib.Message) Message {
 		ID:             uint(msg.ID()),
 		CANID:          uint(msg.GetCANID()),
 
-		SizeByte:  msg.SizeByte(),
-		ByteOrder: newMessageByteOrder(msg.ByteOrder()),
+		SizeByte:          msg.SizeByte(),
+		MaxAvailableSpace: 0,
+		ByteOrder:         newMessageByteOrder(msg.ByteOrder()),
 
 		CycleTime:      msg.CycleTime(),
 		SendType:       newMessageSendType(msg.SendType()),
@@ -131,6 +134,8 @@ func newMessage(msg *acmelib.Message) Message {
 		}
 	}
 
+	holes := []int{}
+	currPos := 0
 	for _, sig := range msg.Signals() {
 		res.Signals = append(res.Signals, Signal{
 			base: getBase(sig),
@@ -139,6 +144,20 @@ func newMessage(msg *acmelib.Message) Message {
 			StartPos: sig.GetStartBit(),
 			Size:     sig.GetSize(),
 		})
+
+		if currPos < sig.GetStartBit() {
+			holes = append(holes, sig.GetStartBit()-currPos)
+		}
+
+		currPos = sig.GetStartBit() + sig.GetSize()
+	}
+
+	if currPos < msg.SizeByte()*8 {
+		holes = append(holes, msg.SizeByte()*8-currPos)
+	}
+
+	if len(holes) > 0 {
+		res.MaxAvailableSpace = slices.Max(holes)
 	}
 
 	return res

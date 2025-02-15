@@ -15,6 +15,7 @@
 	import layout from '$lib/state/layout-state.svelte';
 	import Combobox from '$lib/components/combobox/combobox.svelte';
 	import { HoverPreview } from '$lib/components/hover-preview';
+	import { Modal } from '$lib/components/modal';
 
 	let items = $state([
 		{
@@ -110,6 +111,18 @@
 			labelKey="label"
 			valueKey="value"
 		/>
+
+		<Divider></Divider>
+
+		<Modal title="Modal title" desc="My desc" triggerLabel="Open Modal">
+			{#snippet content()}
+				<div>content</div>
+			{/snippet}
+
+			{#snippet actions()}
+				<button class="btn btn-primary">save</button>
+			{/snippet}
+		</Modal>
 
 		<Divider></Divider>
 

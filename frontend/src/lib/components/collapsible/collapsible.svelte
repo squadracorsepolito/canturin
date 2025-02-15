@@ -4,11 +4,12 @@
 
 	type Props = {
 		initialCollapsed?: boolean;
-		trigger: Snippet;
+		raw?: boolean;
+		trigger: Snippet<[{ collapsed: boolean }]>;
 		content: Snippet;
 	};
 
-	let { initialCollapsed, trigger, content }: Props = $props();
+	let { initialCollapsed, raw, trigger, content }: Props = $props();
 
 	let collapsed = $state(initialCollapsed ?? false);
 
@@ -19,19 +20,24 @@
 
 <button
 	onclick={toggle}
-	class="w-full flex justify-between rounded-btn items-center gap-2 p-3 hover:bg-base-content/20 transition-colors"
+	class={[
+		'w-full rounded-btn hover:bg-base-content/20 transition-colors',
+		!raw && 'p-3 flex justify-between items-center gap-2'
+	]}
 >
-	{@render trigger()}
+	{@render trigger({ collapsed })}
 
-	{#if collapsed}
-		<AltArrowIcon />
-	{:else}
-		<CloseIcon />
+	{#if !raw}
+		{#if collapsed}
+			<AltArrowIcon />
+		{:else}
+			<CloseIcon />
+		{/if}
 	{/if}
 </button>
 
 {#if !collapsed}
-	<div class="pt-5">
+	<div class={[!raw && 'pt-5']}>
 		{@render content()}
 	</div>
 {/if}

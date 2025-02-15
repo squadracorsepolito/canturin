@@ -1,16 +1,15 @@
 <script lang="ts">
+	import type { ThemeColorProps } from '$lib/utils/types';
 	import type { Snippet } from 'svelte';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 
-	type Props = {
-		onclick: () => void;
-		color?: 'primary' | 'secondary' | 'error';
-		label?: string;
-		disabled?: boolean;
-		children: Snippet;
-	} & HTMLButtonAttributes;
+	type Props = HTMLButtonAttributes &
+		ThemeColorProps & {
+			label?: string;
+			children?: Snippet;
+		};
 
-	let { onclick, color, label, disabled, children, ...rest }: Props = $props();
+	let { onclick, themeColor, label, disabled, children, ...rest }: Props = $props();
 </script>
 
 <button
@@ -18,9 +17,9 @@
 	{...rest}
 	class="icon-button {!label && 'btn-square'}"
 	{disabled}
-	data-color={color}
+	data-theme-color={themeColor}
 >
-	{@render children()}
+	{@render children?.()}
 
 	{#if label}
 		{label}
@@ -35,7 +34,7 @@
 			@apply opacity-75 cursor-not-allowed;
 		}
 
-		&[data-color='primary'] {
+		&[data-theme-color='primary'] {
 			@apply text-primary;
 
 			&:hover,
@@ -44,7 +43,7 @@
 			}
 		}
 
-		&[data-color='secondary'] {
+		&[data-theme-color='secondary'] {
 			@apply text-secondary;
 
 			&:hover,
@@ -53,7 +52,7 @@
 			}
 		}
 
-		&[data-color='error'] {
+		&[data-theme-color='error'] {
 			@apply text-error;
 
 			&:hover,
