@@ -174,7 +174,7 @@ func (f *sidebarItemFactory) newMessage(msg *acmelib.Message) (string, *sidebarI
 }
 
 func (f *sidebarItemFactory) newSignal(sig acmelib.Signal) (string, *sidebarItem) {
-	prefix := SidebarMessagesPrefix
+	path := SidebarMessagesPrefix
 
 	parMsg := sig.ParentMessage()
 	if parMsg != nil {
@@ -182,12 +182,15 @@ func (f *sidebarItemFactory) newSignal(sig acmelib.Signal) (string, *sidebarItem
 		if parNodeInt != nil {
 			parBus := parNodeInt.ParentBus()
 			if parBus != nil {
-				prefix += fmt.Sprintf("/%s/%s/%s", parBus.EntityID(), parNodeInt.Node().EntityID(), parMsg.EntityID())
+				path += fmt.Sprintf("/%s/%s/%s", parBus.EntityID(), parNodeInt.Node().EntityID(), parMsg.EntityID())
 			}
 		}
 	}
 
-	return sig.EntityID().String(), f.newItem(SidebarItemKindSignal, sig.EntityID(), prefix, sig.Name())
+	item := f.newItem(SidebarItemKindSignal, sig.EntityID(), path, sig.Name())
+	item.path = path
+
+	return sig.EntityID().String(), item
 }
 
 func (f *sidebarItemFactory) newSignalType(sigType entity) (string, *sidebarItem) {
@@ -501,13 +504,7 @@ func (s *SidebarService) add(req *sidebarAddReq) {
 		return
 	}
 
-	// TODO! remove this if
-	itemKey := req.item.entityID.String()
-	if req.itemKey != "" {
-		itemKey = req.itemKey
-	}
-
-	s.addItem(itemKey, req.item)
+	s.addItem(req.item.entityID.String(), req.item)
 	parent.addChild(req.item)
 
 	app.EmitEvent(SidebarAdd, parent.convert())
@@ -636,7 +633,11 @@ func (s *sidebarController) sendAdd(ent entity) {
 		}
 
 		sigKey, sigItem := s.f.newSignal(sig)
-		s.addCh <- newSidebarAddReq(sigItem, sigKey, sigItem.prefix)
+
+		splPath := strings.Split(sigItem.path, "/")
+		parent := splPath[len(splPath)-1]
+
+		s.addCh <- newSidebarAddReq(sigItem, sigKey, parent)
 
 	case acmelib.EntityKindSignalType:
 		sigTypeKey, sigTypeItem := s.f.newSignalType(ent)

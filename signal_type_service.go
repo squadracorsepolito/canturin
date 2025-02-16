@@ -138,17 +138,17 @@ func (s *SignalTypeService) Create(req CreateSignalTypeReq) (SignalType, error) 
 	defer s.mux.Unlock()
 
 	s.addEntity(sigType)
-	s.sidebar.sendAdd(sigType)
+	s.sidebarCtr.sendAdd(sigType)
 
 	s.sendHistoryOp(
 		func() (*acmelib.SignalType, error) {
 			s.removeEntity(sigType.EntityID().String())
-			s.sidebar.sendDelete(sigType)
+			s.sidebarCtr.sendDelete(sigType)
 			return sigType, nil
 		},
 		func() (*acmelib.SignalType, error) {
 			s.addEntity(sigType)
-			s.sidebar.sendAdd(sigType)
+			s.sidebarCtr.sendAdd(sigType)
 			return sigType, nil
 		},
 	)
@@ -170,17 +170,17 @@ func (s *SignalTypeService) Delete(entityID string) error {
 	}
 
 	s.removeEntity(entityID)
-	s.sidebar.sendDelete(sigType)
+	s.sidebarCtr.sendDelete(sigType)
 
 	s.sendHistoryOp(
 		func() (*acmelib.SignalType, error) {
 			s.addEntity(sigType)
-			s.sidebar.sendAdd(sigType)
+			s.sidebarCtr.sendAdd(sigType)
 			return sigType, nil
 		},
 		func() (*acmelib.SignalType, error) {
 			s.removeEntity(sigType.EntityID().String())
-			s.sidebar.sendDelete(sigType)
+			s.sidebarCtr.sendDelete(sigType)
 			return sigType, nil
 		},
 	)
@@ -322,12 +322,12 @@ func (h *signalTypeHandler) updateName(sigType *acmelib.SignalType, req *request
 	}
 
 	sigType.SetName(name)
-	h.sidebar.sendUpdateName(sigType)
+	h.sidebarCtr.sendUpdateName(sigType)
 
 	res.setUndo(
 		func() (*acmelib.SignalType, error) {
 			sigType.SetName(oldName)
-			h.sidebar.sendUpdateName(sigType)
+			h.sidebarCtr.sendUpdateName(sigType)
 			return sigType, nil
 		},
 	)
@@ -335,7 +335,7 @@ func (h *signalTypeHandler) updateName(sigType *acmelib.SignalType, req *request
 	res.setRedo(
 		func() (*acmelib.SignalType, error) {
 			sigType.SetName(name)
-			h.sidebar.sendUpdateName(sigType)
+			h.sidebarCtr.sendUpdateName(sigType)
 			return sigType, nil
 		},
 	)

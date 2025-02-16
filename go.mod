@@ -1,12 +1,13 @@
 module canturin
 
-go 1.22.4
+go 1.24
 
-toolchain go1.23.0
+toolchain go1.24.0
 
 require (
 	github.com/squadracorsepolito/acmelib v1.7.0
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.9
+	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
 )
 
 require (
@@ -49,7 +50,6 @@ require (
 	github.com/wailsapp/mimetype v1.4.1 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.25.0 // indirect
-	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/mod v0.19.0 // indirect
 	golang.org/x/net v0.27.0 // indirect
 	golang.org/x/sync v0.9.0 // indirect

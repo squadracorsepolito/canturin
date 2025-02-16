@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"log"
+	"log/slog"
 	"os"
 
 	"github.com/squadracorsepolito/acmelib"
@@ -68,6 +69,8 @@ func main() {
 		Mac: application.MacOptions{
 			ApplicationShouldTerminateAfterLastWindowClosed: true,
 		},
+
+		LogLevel: slog.LevelError,
 	})
 
 	// Create a new window with the necessary options.

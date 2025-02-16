@@ -148,17 +148,17 @@ func (s *SignalUnitService) Create(req CreateSignalUnitReq) (SignalUnit, error) 
 	defer s.mux.Unlock()
 
 	s.addEntity(sigUnit)
-	s.sidebar.sendAdd(sigUnit)
+	s.sidebarCtr.sendAdd(sigUnit)
 
 	s.sendHistoryOp(
 		func() (*acmelib.SignalUnit, error) {
 			s.removeEntity(sigUnit.EntityID().String())
-			s.sidebar.sendDelete(sigUnit)
+			s.sidebarCtr.sendDelete(sigUnit)
 			return sigUnit, nil
 		},
 		func() (*acmelib.SignalUnit, error) {
 			s.addEntity(sigUnit)
-			s.sidebar.sendAdd(sigUnit)
+			s.sidebarCtr.sendAdd(sigUnit)
 			return sigUnit, nil
 		},
 	)
@@ -180,17 +180,17 @@ func (s *SignalUnitService) Delete(entityID string) error {
 	}
 
 	s.removeEntity(entityID)
-	s.sidebar.sendDelete(sigUnit)
+	s.sidebarCtr.sendDelete(sigUnit)
 
 	s.sendHistoryOp(
 		func() (*acmelib.SignalUnit, error) {
 			s.addEntity(sigUnit)
-			s.sidebar.sendAdd(sigUnit)
+			s.sidebarCtr.sendAdd(sigUnit)
 			return sigUnit, nil
 		},
 		func() (*acmelib.SignalUnit, error) {
 			s.removeEntity(sigUnit.EntityID().String())
-			s.sidebar.sendDelete(sigUnit)
+			s.sidebarCtr.sendDelete(sigUnit)
 			return sigUnit, nil
 		},
 	)
@@ -261,12 +261,12 @@ func (h *signalUnitHandler) updateName(sigUnit *acmelib.SignalUnit, req *request
 	}
 
 	sigUnit.SetName(name)
-	h.sidebar.sendUpdateName(sigUnit)
+	h.sidebarCtr.sendUpdateName(sigUnit)
 
 	res.setUndo(
 		func() (*acmelib.SignalUnit, error) {
 			sigUnit.SetName(oldName)
-			h.sidebar.sendUpdateName(sigUnit)
+			h.sidebarCtr.sendUpdateName(sigUnit)
 			return sigUnit, nil
 		},
 	)
@@ -274,7 +274,7 @@ func (h *signalUnitHandler) updateName(sigUnit *acmelib.SignalUnit, req *request
 	res.setRedo(
 		func() (*acmelib.SignalUnit, error) {
 			sigUnit.SetName(name)
-			h.sidebar.sendUpdateName(sigUnit)
+			h.sidebarCtr.sendUpdateName(sigUnit)
 			return sigUnit, nil
 		},
 	)

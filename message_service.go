@@ -167,9 +167,9 @@ type MessageService struct {
 	*service[*acmelib.Message, Message, *messageHandler]
 }
 
-func newMessageService(sidebar *sidebarController) *MessageService {
+func newMessageService(sidebarCtr *sidebarController, signalCtr *signalController) *MessageService {
 	return &MessageService{
-		service: newService(serviceKindMessage, newMessageHandler(sidebar), sidebar),
+		service: newService(serviceKindMessage, newMessageHandler(sidebarCtr, signalCtr), sidebarCtr),
 	}
 }
 
@@ -282,8 +282,12 @@ func (s *MessageService) UpdateStartDelayTime(entityID string, req UpdateStartDe
 	return s.handle(entityID, &req, s.handler.updateStartDelayTime)
 }
 
-func (s *MessageService) RemoveSignals(entityID string, req RemoveSignalsReq) (Message, error) {
-	return s.handle(entityID, &req, s.handler.removeSignals)
+func (s *MessageService) AddSignal(entityID string, req AddSignalReq) (Message, error) {
+	return s.handle(entityID, &req, s.handler.addSignal)
+}
+
+func (s *MessageService) DeleteSignals(entityID string, req DeleteSignalsReq) (Message, error) {
+	return s.handle(entityID, &req, s.handler.deleteSignals)
 }
 
 func (s *MessageService) CompactSignals(entityID string) (Message, error) {
@@ -298,11 +302,15 @@ type messageRes = response[*acmelib.Message]
 
 type messageHandler struct {
 	*commonServiceHandler
+
+	signalCtr *signalController
 }
 
-func newMessageHandler(sidebar *sidebarController) *messageHandler {
+func newMessageHandler(sidebar *sidebarController, signalCtr *signalController) *messageHandler {
 	return &messageHandler{
 		commonServiceHandler: newCommonServiceHandler(sidebar),
+
+		signalCtr: signalCtr,
 	}
 }
 
@@ -323,14 +331,14 @@ func (h *messageHandler) updateName(msg *acmelib.Message, req *request, res *mes
 	if err := msg.UpdateName(name); err != nil {
 		return err
 	}
-	h.sidebar.sendUpdateName(msg)
+	h.sidebarCtr.sendUpdateName(msg)
 
 	res.setUndo(
 		func() (*acmelib.Message, error) {
 			if err := msg.UpdateName(oldName); err != nil {
 				return nil, err
 			}
-			h.sidebar.sendUpdateName(msg)
+			h.sidebarCtr.sendUpdateName(msg)
 			return msg, nil
 		},
 	)
@@ -340,7 +348,7 @@ func (h *messageHandler) updateName(msg *acmelib.Message, req *request, res *mes
 			if err := msg.UpdateName(name); err != nil {
 				return nil, err
 			}
-			h.sidebar.sendUpdateName(msg)
+			h.sidebarCtr.sendUpdateName(msg)
 			return msg, nil
 		},
 	)
@@ -605,8 +613,98 @@ func (h *messageHandler) updateStartDelayTime(msg *acmelib.Message, req *request
 	return nil
 }
 
-func (h *messageHandler) removeSignals(msg *acmelib.Message, req *request, res *messageRes) error {
-	parsedReq := req.toRemoveSignals()
+func (h *messageHandler) addSignal(msg *acmelib.Message, req *request, res *messageRes) error {
+	parsedReq := req.toAddSignal()
+
+	sigKind := parsedReq.SignalKind.parse()
+
+	otherSignals := []entity{}
+
+	type payloadHole struct {
+		startPos int
+		size     int
+	}
+
+	payloadHoles := []payloadHole{}
+	currPos := 0
+
+	for _, sig := range msg.Signals() {
+		otherSignals = append(otherSignals, sig)
+
+		if currPos < sig.GetStartBit() {
+			payloadHoles = append(payloadHoles, payloadHole{startPos: currPos, size: sig.GetStartBit() - currPos})
+		}
+
+		currPos = sig.GetStartBit() + sig.GetSize()
+	}
+	sigName := getNextNewName("signal", otherSignals)
+
+	if currPos < msg.SizeByte()*8 {
+		payloadHoles = append(payloadHoles, payloadHole{startPos: currPos, size: msg.SizeByte()*8 - currPos})
+	}
+
+	if len(payloadHoles) == 0 {
+		return nil
+	}
+
+	startPos := slices.MaxFunc(payloadHoles, func(a, b payloadHole) int {
+		return a.size - b.size
+	}).startPos
+
+	var sig acmelib.Signal
+	switch sigKind {
+	case acmelib.SignalKindStandard:
+		tmpSig, err := acmelib.NewStandardSignal(sigName, defaultSignalType)
+		if err != nil {
+			return err
+		}
+		sig = tmpSig
+
+	case acmelib.SignalKindEnum:
+		tmpSig, err := acmelib.NewEnumSignal(sigName, defaultSignalEnum)
+		if err != nil {
+			return err
+		}
+		sig = tmpSig
+
+	case acmelib.SignalKindMultiplexer:
+	}
+
+	if err := msg.InsertSignal(sig, startPos); err != nil {
+		return err
+	}
+
+	h.signalCtr.sendAdd(sig)
+
+	res.setUndo(
+		func() (*acmelib.Message, error) {
+			if err := msg.RemoveSignal(sig.EntityID()); err != nil {
+				return nil, err
+			}
+
+			h.signalCtr.sendDelete(sig)
+
+			return msg, nil
+		},
+	)
+
+	res.setRedo(
+		func() (*acmelib.Message, error) {
+			if err := msg.InsertSignal(sig, startPos); err != nil {
+				return nil, err
+			}
+
+			h.signalCtr.sendAdd(sig)
+
+			return msg, nil
+		},
+	)
+
+	return nil
+}
+
+func (h *messageHandler) deleteSignals(msg *acmelib.Message, req *request, res *messageRes) error {
+	parsedReq := req.toDeleteSignals()
 
 	if len(parsedReq.SignalEntityIDs) == 0 {
 		return nil
@@ -634,6 +732,10 @@ func (h *messageHandler) removeSignals(msg *acmelib.Message, req *request, res *
 		}
 	}
 
+	for _, sig := range remSignals {
+		h.signalCtr.sendDelete(sig)
+	}
+
 	res.setUndo(
 		func() (*acmelib.Message, error) {
 			for _, sig := range remSignals {
@@ -647,6 +749,10 @@ func (h *messageHandler) removeSignals(msg *acmelib.Message, req *request, res *
 				}
 			}
 
+			for _, sig := range remSignals {
+				h.signalCtr.sendAdd(sig)
+			}
+
 			return msg, nil
 		},
 	)
@@ -658,6 +764,11 @@ func (h *messageHandler) removeSignals(msg *acmelib.Message, req *request, res *
 					return nil, err
 				}
 			}
+
+			for _, sig := range remSignals {
+				h.signalCtr.sendDelete(sig)
+			}
+
 			return msg, nil
 		},
 	)

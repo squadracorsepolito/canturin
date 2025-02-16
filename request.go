@@ -249,14 +249,26 @@ func (r *request) toUpdateStartDelayTime() *UpdateStartDelayTimeReq {
 	return req
 }
 
-type RemoveSignalsReq struct {
+type AddSignalReq struct {
+	SignalKind SignalKind `json:"signalKind"`
+}
+
+func (r *request) toAddSignal() *AddSignalReq {
+	req, ok := r.data.(*AddSignalReq)
+	if !ok {
+		panic("cannot convert to AddSignalReq")
+	}
+	return req
+}
+
+type DeleteSignalsReq struct {
 	SignalEntityIDs []string `json:"signalEntityIds"`
 }
 
-func (r *request) toRemoveSignals() *RemoveSignalsReq {
-	req, ok := r.data.(*RemoveSignalsReq)
+func (r *request) toDeleteSignals() *DeleteSignalsReq {
+	req, ok := r.data.(*DeleteSignalsReq)
 	if !ok {
-		panic("cannot convert to RemoveSignalsReq")
+		panic("cannot convert to DeleteSignalsReq")
 	}
 	return req
 }

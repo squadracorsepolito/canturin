@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/squadracorsepolito/acmelib"
 	"github.com/wailsapp/wails/v3/pkg/application"
+	"golang.org/x/exp/maps"
 )
 
 type serviceManager struct {
@@ -12,40 +13,80 @@ type serviceManager struct {
 	sidebarController *sidebarController
 	history           *HistoryService
 
-	bus        *BusService
-	node       *NodeService
-	message    *MessageService
-	signal     *SignalService
-	signalType *SignalTypeService
-	signalUnit *SignalUnitService
-	signalEnum *SignalEnumService
+	busSrv *BusService
+	busCtr *busController
+
+	nodeSrv *NodeService
+	nodeCtr *nodeController
+
+	messageSrv *MessageService
+	messageCtr *messageController
+
+	signalSrv *SignalService
+	signalCtr *signalController
+
+	signalTypeSrv *SignalTypeService
+	signalTypeCtr *signalTypeController
+
+	signalUnitSrv *SignalUnitService
+	signalUnitCtr *signalUnitController
+
+	signalEnumSrv *SignalEnumService
+	signalEnumCtr *signalEnumController
 }
 
 func newServiceManager() *serviceManager {
 	sidebar := newSidebarService()
-	sidebarController := sidebar.getController()
+	sidebarCtr := sidebar.getController()
 
-	bus := newBusService(sidebarController)
+	busSrv := newBusService(sidebarCtr)
+	busCtr := busSrv.getController()
 
-	signalType := newSignalTypeService(sidebarController)
-	signalUnit := newSignalUnitService(sidebarController)
-	signalEnum := newSignalEnumService(sidebarController)
+	nodeSrv := newNodeService(sidebarCtr, busSrv)
+	nodeCtr := nodeSrv.getController()
+
+	signalTypeSrv := newSignalTypeService(sidebarCtr)
+	signalTypeCtr := signalTypeSrv.getController()
+
+	signalUnitSrv := newSignalUnitService(sidebarCtr)
+	signalUnitCtr := signalUnitSrv.getController()
+
+	signalEnumSrv := newSignalEnumService(sidebarCtr)
+	signalEnumCtr := signalEnumSrv.getController()
+
+	signalSrv := newSignalService(sidebarCtr, signalTypeCtr, signalUnitCtr, signalEnumCtr)
+	signalCtr := signalSrv.getController()
+
+	messageSrv := newMessageService(sidebarCtr, signalCtr)
+	messageCtr := messageSrv.getController()
 
 	return &serviceManager{
 		network: acmelib.NewNetwork("Unnamed Network"),
 
 		sidebar:           sidebar,
-		sidebarController: sidebarController,
+		sidebarController: sidebarCtr,
 		history:           newHistoryService(),
 
-		bus:     bus,
-		node:    newNodeService(sidebarController, bus),
-		message: newMessageService(sidebarController),
+		busSrv: busSrv,
+		busCtr: busCtr,
 
-		signal:     newSignalService(sidebarController, signalType, signalUnit, signalEnum),
-		signalType: signalType,
-		signalUnit: signalUnit,
-		signalEnum: signalEnum,
+		nodeSrv: nodeSrv,
+		nodeCtr: nodeCtr,
+
+		messageSrv: messageSrv,
+		messageCtr: messageCtr,
+
+		signalSrv: signalSrv,
+		signalCtr: signalCtr,
+
+		signalTypeSrv: signalTypeSrv,
+		signalTypeCtr: signalTypeCtr,
+
+		signalUnitSrv: signalUnitSrv,
+		signalUnitCtr: signalUnitCtr,
+
+		signalEnumSrv: signalEnumSrv,
+		signalEnumCtr: signalEnumCtr,
 	}
 }
 
@@ -54,13 +95,13 @@ func (m *serviceManager) getServices() []application.Service {
 		application.NewService(m.sidebar),
 		application.NewService(manager.history),
 
-		application.NewService(manager.bus),
-		application.NewService(manager.node),
-		application.NewService(manager.message),
-		application.NewService(manager.signal),
-		application.NewService(manager.signalType),
-		application.NewService(manager.signalUnit),
-		application.NewService(manager.signalEnum),
+		application.NewService(manager.busSrv),
+		application.NewService(manager.nodeSrv),
+		application.NewService(manager.messageSrv),
+		application.NewService(manager.signalSrv),
+		application.NewService(manager.signalTypeSrv),
+		application.NewService(manager.signalUnitSrv),
+		application.NewService(manager.signalEnumSrv),
 	}
 }
 
@@ -69,29 +110,29 @@ func (m *serviceManager) initNetwork(net *acmelib.Network) {
 
 	m.sidebar.sendLoad(newSidebarLoadReq(net))
 
+	buses := net.Buses()
 	nodes := make(map[acmelib.EntityID]*acmelib.Node)
-
+	messages := []*acmelib.Message{}
+	signals := []acmelib.Signal{}
 	sigTypes := make(map[acmelib.EntityID]*acmelib.SignalType)
 	sigUnits := make(map[acmelib.EntityID]*acmelib.SignalUnit)
 	sigEnums := make(map[acmelib.EntityID]*acmelib.SignalEnum)
 
-	// Iterate over the buses, node interfaces and messages
-	for _, bus := range net.Buses() {
-		manager.bus.sendLoad(bus)
-
+	for _, bus := range buses {
 		for _, nodeInt := range bus.NodeInterfaces() {
 			tmpNode := nodeInt.Node()
 			nodes[tmpNode.EntityID()] = tmpNode
 
-			for _, msg := range nodeInt.SentMessages() {
-				manager.message.sendLoad(msg)
+			tmpMessages := nodeInt.SentMessages()
+			messages = append(messages, tmpMessages...)
 
-				// Iterate over the signals
+			for _, msg := range tmpMessages {
+				tmpSignals := msg.Signals()
+				signals = append(signals, tmpSignals...)
+
 				for _, sig := range msg.Signals() {
-					manager.signal.sendLoad(sig)
 
 					switch sig.Kind() {
-					// Standard Signal
 					case acmelib.SignalKindStandard:
 						stdSig, err := sig.ToStandard()
 						if err != nil {
@@ -103,7 +144,6 @@ func (m *serviceManager) initNetwork(net *acmelib.Network) {
 							sigUnits[stdSig.Unit().EntityID()] = stdSig.Unit()
 						}
 
-					// Enum Signal
 					case acmelib.SignalKindEnum:
 						enumSig, err := sig.ToEnum()
 						if err != nil {
@@ -116,21 +156,13 @@ func (m *serviceManager) initNetwork(net *acmelib.Network) {
 		}
 	}
 
-	for _, node := range nodes {
-		m.node.sendLoad(node)
-	}
-
-	for _, sigType := range sigTypes {
-		m.signalType.sendLoad(sigType)
-	}
-
-	for _, sigUnit := range sigUnits {
-		m.signalUnit.sendLoad(sigUnit)
-	}
-
-	for _, sigEnum := range sigEnums {
-		m.signalEnum.sendLoad(sigEnum)
-	}
+	m.busCtr.sendLoad(buses)
+	m.nodeCtr.sendLoad(maps.Values(nodes))
+	m.messageCtr.sendLoad(messages)
+	m.signalCtr.sendLoad(signals)
+	m.signalTypeCtr.sendLoad(maps.Values(sigTypes))
+	m.signalUnitCtr.sendLoad(maps.Values(sigUnits))
+	m.signalEnumCtr.sendLoad(maps.Values(sigEnums))
 }
 
 func (m *serviceManager) loadNetwork(net *acmelib.Network) {
@@ -145,11 +177,11 @@ func (m *serviceManager) reloadNetwork() {
 func (m *serviceManager) clearServices() {
 	m.sidebar.clear()
 
-	m.bus.sendClear()
-	m.node.sendClear()
-	m.message.sendClear()
-	m.signal.sendClear()
-	m.signalType.sendClear()
-	m.signalUnit.sendClear()
-	m.signalEnum.sendClear()
+	m.busCtr.sendClear()
+	m.nodeCtr.sendClear()
+	m.messageCtr.sendClear()
+	m.signalCtr.sendClear()
+	m.signalTypeCtr.sendClear()
+	m.signalUnitCtr.sendClear()
+	m.signalEnumCtr.sendClear()
 }

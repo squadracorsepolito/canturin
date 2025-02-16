@@ -121,9 +121,9 @@ type SignalService struct {
 	*service[acmelib.Signal, Signal, *signalHandler]
 }
 
-func newSignalService(sidebar *sidebarController, sigTypeSrv *SignalTypeService, sigUnitSrv *SignalUnitService, sigEnumSrv *SignalEnumService) *SignalService {
+func newSignalService(sidebar *sidebarController, sigTypeCtr *signalTypeController, sigUnitCtr *signalUnitController, sigEnumCtr *signalEnumController) *SignalService {
 	return &SignalService{
-		service: newService(serviceKindSignal, newSignalHandler(sidebar, sigTypeSrv, sigUnitSrv, sigEnumSrv), sidebar),
+		service: newService(serviceKindSignal, newSignalHandler(sidebar, sigTypeCtr, sigUnitCtr, sigEnumCtr), sidebar),
 	}
 }
 
@@ -179,18 +179,18 @@ type signalRes = response[acmelib.Signal]
 type signalHandler struct {
 	*commonServiceHandler
 
-	sigTypeSrv *SignalTypeService
-	sigUnitSrv *SignalUnitService
-	sigEnumSrv *SignalEnumService
+	sigTypeCtr *signalTypeController
+	sigUnitCtr *signalUnitController
+	sigEnumCtr *signalEnumController
 }
 
-func newSignalHandler(sidebar *sidebarController, sigTypeSrv *SignalTypeService, sigUnitSrv *SignalUnitService, sigEnumSrv *SignalEnumService) *signalHandler {
+func newSignalHandler(sidebar *sidebarController, sigTypeCtr *signalTypeController, sigUnitCtr *signalUnitController, sigEnumCtr *signalEnumController) *signalHandler {
 	return &signalHandler{
 		commonServiceHandler: newCommonServiceHandler(sidebar),
 
-		sigTypeSrv: sigTypeSrv,
-		sigUnitSrv: sigUnitSrv,
-		sigEnumSrv: sigEnumSrv,
+		sigTypeCtr: sigTypeCtr,
+		sigUnitCtr: sigUnitCtr,
+		sigEnumCtr: sigEnumCtr,
 	}
 }
 
@@ -212,14 +212,14 @@ func (h *signalHandler) updateName(sig acmelib.Signal, req *request, res *signal
 		return err
 	}
 
-	h.sidebar.sendUpdateName(sig)
+	h.sidebarCtr.sendUpdateName(sig)
 
 	res.setUndo(
 		func() (acmelib.Signal, error) {
 			if err := sig.UpdateName(oldName); err != nil {
 				return nil, err
 			}
-			h.sidebar.sendUpdateName(sig)
+			h.sidebarCtr.sendUpdateName(sig)
 			return sig, nil
 		},
 	)
@@ -229,7 +229,7 @@ func (h *signalHandler) updateName(sig acmelib.Signal, req *request, res *signal
 			if err := sig.UpdateName(name); err != nil {
 				return nil, err
 			}
-			h.sidebar.sendUpdateName(sig)
+			h.sidebarCtr.sendUpdateName(sig)
 			return sig, nil
 		},
 	)
@@ -280,10 +280,10 @@ func (h *signalHandler) updateSignalType(sig acmelib.Signal, req *request, res *
 		return nil
 	}
 
-	h.sigTypeSrv.mux.Lock()
-	defer h.sigTypeSrv.mux.Unlock()
+	h.sigTypeCtr.lock()
+	defer h.sigTypeCtr.unlock()
 
-	sigType, err := h.sigTypeSrv.getEntity(sigTypeEntID)
+	sigType, err := h.sigTypeCtr.get(sigTypeEntID)
 	if err != nil {
 		return err
 	}
@@ -294,8 +294,8 @@ func (h *signalHandler) updateSignalType(sig acmelib.Signal, req *request, res *
 
 	res.setUndo(
 		func() (acmelib.Signal, error) {
-			h.sigTypeSrv.mux.Lock()
-			defer h.sigTypeSrv.mux.Unlock()
+			h.sigTypeCtr.lock()
+			defer h.sigTypeCtr.unlock()
 
 			if err := stdSig.SetType(oldSigType); err != nil {
 				return nil, err
@@ -306,8 +306,8 @@ func (h *signalHandler) updateSignalType(sig acmelib.Signal, req *request, res *
 
 	res.setRedo(
 		func() (acmelib.Signal, error) {
-			h.sigTypeSrv.mux.Lock()
-			defer h.sigTypeSrv.mux.Unlock()
+			h.sigTypeCtr.lock()
+			defer h.sigTypeCtr.unlock()
 
 			if err := stdSig.SetType(sigType); err != nil {
 				return nil, err
@@ -340,14 +340,14 @@ func (h *signalHandler) updateSignalUnit(sig acmelib.Signal, req *request, res *
 		return nil
 	}
 
-	h.sigUnitSrv.mux.Lock()
-	defer h.sigUnitSrv.mux.Unlock()
+	h.sigUnitCtr.lock()
+	defer h.sigUnitCtr.unlock()
 
 	var sigUnit *acmelib.SignalUnit
 	sigUnit = nil
 
 	if !isClearing {
-		sigUnit, err = h.sigUnitSrv.getEntity(sigUnitEntID)
+		sigUnit, err = h.sigUnitCtr.get(sigUnitEntID)
 		if err != nil {
 			return err
 		}
@@ -357,8 +357,8 @@ func (h *signalHandler) updateSignalUnit(sig acmelib.Signal, req *request, res *
 
 	res.setUndo(
 		func() (acmelib.Signal, error) {
-			h.sigUnitSrv.mux.Lock()
-			defer h.sigUnitSrv.mux.Unlock()
+			h.sigUnitCtr.lock()
+			defer h.sigUnitCtr.unlock()
 
 			stdSig.SetUnit(oldSigUnit)
 			return sig, nil
@@ -367,8 +367,8 @@ func (h *signalHandler) updateSignalUnit(sig acmelib.Signal, req *request, res *
 
 	res.setRedo(
 		func() (acmelib.Signal, error) {
-			h.sigUnitSrv.mux.Lock()
-			defer h.sigUnitSrv.mux.Unlock()
+			h.sigUnitCtr.lock()
+			defer h.sigUnitCtr.unlock()
 
 			stdSig.SetUnit(sigUnit)
 			return sig, nil
@@ -392,10 +392,10 @@ func (h *signalHandler) updateSignalEnum(sig acmelib.Signal, req *request, res *
 		return nil
 	}
 
-	h.sigEnumSrv.mux.Lock()
-	defer h.sigEnumSrv.mux.Unlock()
+	h.sigEnumCtr.lock()
+	defer h.sigEnumCtr.unlock()
 
-	sigEnum, err := h.sigEnumSrv.getEntity(sigEnumEntID)
+	sigEnum, err := h.sigEnumCtr.get(sigEnumEntID)
 	if err != nil {
 		return err
 	}
@@ -406,8 +406,8 @@ func (h *signalHandler) updateSignalEnum(sig acmelib.Signal, req *request, res *
 
 	res.setUndo(
 		func() (acmelib.Signal, error) {
-			h.sigEnumSrv.mux.Lock()
-			defer h.sigEnumSrv.mux.Unlock()
+			h.sigEnumCtr.lock()
+			defer h.sigEnumCtr.unlock()
 
 			if err := enumSig.SetEnum(oldSigEnum); err != nil {
 				return nil, err
@@ -418,8 +418,8 @@ func (h *signalHandler) updateSignalEnum(sig acmelib.Signal, req *request, res *
 
 	res.setRedo(
 		func() (acmelib.Signal, error) {
-			h.sigEnumSrv.mux.Lock()
-			defer h.sigEnumSrv.mux.Unlock()
+			h.sigEnumCtr.lock()
+			defer h.sigEnumCtr.unlock()
 
 			if err := enumSig.SetEnum(sigEnum); err != nil {
 				return nil, err

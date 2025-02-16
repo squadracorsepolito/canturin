@@ -79,17 +79,17 @@ func (s *NodeService) Create(req CreateNodeReq) (Node, error) {
 	defer s.mux.Unlock()
 
 	s.addEntity(node)
-	s.sidebar.sendAdd(node)
+	s.sidebarCtr.sendAdd(node)
 
 	s.sendHistoryOp(
 		func() (*acmelib.Node, error) {
 			s.removeEntity(node.EntityID().String())
-			s.sidebar.sendDelete(node)
+			s.sidebarCtr.sendDelete(node)
 			return node, nil
 		},
 		func() (*acmelib.Node, error) {
 			s.addEntity(node)
-			s.sidebar.sendAdd(node)
+			s.sidebarCtr.sendAdd(node)
 			return node, nil
 		},
 	)
@@ -126,7 +126,7 @@ func (s *NodeService) Delete(entityID string) error {
 	}
 
 	s.removeEntity(entityID)
-	s.sidebar.sendDelete(node)
+	s.sidebarCtr.sendDelete(node)
 
 	s.sendHistoryOp(
 		func() (*acmelib.Node, error) {
@@ -139,7 +139,7 @@ func (s *NodeService) Delete(entityID string) error {
 			}
 
 			s.addEntity(node)
-			s.sidebar.sendAdd(node)
+			s.sidebarCtr.sendAdd(node)
 
 			return node, nil
 		},
@@ -151,7 +151,7 @@ func (s *NodeService) Delete(entityID string) error {
 			}
 
 			s.removeEntity(node.EntityID().String())
-			s.sidebar.sendDelete(node)
+			s.sidebarCtr.sendDelete(node)
 
 			return node, nil
 		},
@@ -229,7 +229,7 @@ func (h *nodeHandler) updateName(node *acmelib.Node, req *request, res *nodeRes)
 		return err
 	}
 
-	h.sidebar.sendUpdateName(node)
+	h.sidebarCtr.sendUpdateName(node)
 
 	res.setUndo(
 		func() (*acmelib.Node, error) {
@@ -237,7 +237,7 @@ func (h *nodeHandler) updateName(node *acmelib.Node, req *request, res *nodeRes)
 				return nil, err
 			}
 
-			h.sidebar.sendUpdateName(node)
+			h.sidebarCtr.sendUpdateName(node)
 
 			return node, nil
 		},
@@ -249,7 +249,7 @@ func (h *nodeHandler) updateName(node *acmelib.Node, req *request, res *nodeRes)
 				return nil, err
 			}
 
-			h.sidebar.sendUpdateName(node)
+			h.sidebarCtr.sendUpdateName(node)
 
 			return node, nil
 		},
@@ -434,7 +434,7 @@ func (h *nodeHandler) removeSentMessages(node *acmelib.Node, req *request, res *
 			return err
 		}
 
-		h.sidebar.sendDelete(tmpMsg)
+		h.sidebarCtr.sendDelete(tmpMsg)
 	}
 
 	res.setUndo(
@@ -444,7 +444,7 @@ func (h *nodeHandler) removeSentMessages(node *acmelib.Node, req *request, res *
 					return nil, err
 				}
 
-				h.sidebar.sendAdd(tmpMsg)
+				h.sidebarCtr.sendAdd(tmpMsg)
 			}
 
 			return node, nil
@@ -458,7 +458,7 @@ func (h *nodeHandler) removeSentMessages(node *acmelib.Node, req *request, res *
 					return nil, err
 				}
 
-				h.sidebar.sendDelete(tmpMsg)
+				h.sidebarCtr.sendDelete(tmpMsg)
 			}
 
 			return node, nil

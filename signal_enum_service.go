@@ -133,17 +133,17 @@ func (s *SignalEnumService) Create(req CreateSignalEnumReq) (SignalEnum, error) 
 	defer s.mux.Unlock()
 
 	s.addEntity(sigEnum)
-	s.sidebar.sendAdd(sigEnum)
+	s.sidebarCtr.sendAdd(sigEnum)
 
 	s.sendHistoryOp(
 		func() (*acmelib.SignalEnum, error) {
 			s.removeEntity(sigEnum.EntityID().String())
-			s.sidebar.sendDelete(sigEnum)
+			s.sidebarCtr.sendDelete(sigEnum)
 			return sigEnum, nil
 		},
 		func() (*acmelib.SignalEnum, error) {
 			s.addEntity(sigEnum)
-			s.sidebar.sendAdd(sigEnum)
+			s.sidebarCtr.sendAdd(sigEnum)
 			return sigEnum, nil
 		},
 	)
@@ -165,17 +165,17 @@ func (s *SignalEnumService) Delete(entityID string) error {
 	}
 
 	s.removeEntity(entityID)
-	s.sidebar.sendDelete(sigEnum)
+	s.sidebarCtr.sendDelete(sigEnum)
 
 	s.sendHistoryOp(
 		func() (*acmelib.SignalEnum, error) {
 			s.addEntity(sigEnum)
-			s.sidebar.sendAdd(sigEnum)
+			s.sidebarCtr.sendAdd(sigEnum)
 			return sigEnum, nil
 		},
 		func() (*acmelib.SignalEnum, error) {
 			s.removeEntity(sigEnum.EntityID().String())
-			s.sidebar.sendDelete(sigEnum)
+			s.sidebarCtr.sendDelete(sigEnum)
 			return sigEnum, nil
 		},
 	)
@@ -261,12 +261,12 @@ func (h *signalEnumHandler) updateName(sigEnum *acmelib.SignalEnum, req *request
 	}
 
 	sigEnum.UpdateName(name)
-	h.sidebar.sendUpdateName(sigEnum)
+	h.sidebarCtr.sendUpdateName(sigEnum)
 
 	res.setUndo(
 		func() (*acmelib.SignalEnum, error) {
 			sigEnum.UpdateName(oldName)
-			h.sidebar.sendUpdateName(sigEnum)
+			h.sidebarCtr.sendUpdateName(sigEnum)
 			return sigEnum, nil
 		},
 	)
@@ -274,7 +274,7 @@ func (h *signalEnumHandler) updateName(sigEnum *acmelib.SignalEnum, req *request
 	res.setRedo(
 		func() (*acmelib.SignalEnum, error) {
 			sigEnum.UpdateName(name)
-			h.sidebar.sendUpdateName(sigEnum)
+			h.sidebarCtr.sendUpdateName(sigEnum)
 			return sigEnum, nil
 		},
 	)

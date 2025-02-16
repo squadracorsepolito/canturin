@@ -1,4 +1,10 @@
-import { MessageByteOrder, MessageSendType, MessageService, type Message } from '$lib/api/canturin';
+import {
+	MessageByteOrder,
+	MessageSendType,
+	MessageService,
+	SignalKind,
+	type Message
+} from '$lib/api/canturin';
 import { HistoryMessageModify } from '$lib/constants/events';
 import { EntityState } from '$lib/state/entity-state.svelte';
 import { StateProvider } from '$lib/state/state-provider.svelte';
@@ -96,8 +102,12 @@ class MessageState extends EntityState<Message> {
 		this.update(MessageService.UpdateStartDelayTime(this.entity.entityId, { startDelayTime }));
 	}
 
+	addSignal(signalKind: SignalKind) {
+		this.update(MessageService.AddSignal(this.entity.entityId, { signalKind }));
+	}
+
 	deleteSignals(signalEntityIds: string[]) {
-		this.update(MessageService.RemoveSignals(this.entity.entityId, { signalEntityIds }));
+		this.update(MessageService.DeleteSignals(this.entity.entityId, { signalEntityIds }));
 	}
 
 	deleteSignal(signalEntityId: string) {

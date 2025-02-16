@@ -121,18 +121,18 @@ func (s *BusService) Create(req CreateBusReq) (Bus, error) {
 	bus.SetBaudrate(req.Baudrate)
 
 	s.addEntity(bus)
-	s.sidebar.sendAdd(bus)
+	s.sidebarCtr.sendAdd(bus)
 
 	s.sendHistoryOp(
 		func() (*acmelib.Bus, error) {
 			s.removeEntity(bus.EntityID().String())
-			s.sidebar.sendDelete(bus)
+			s.sidebarCtr.sendDelete(bus)
 
 			return bus, nil
 		},
 		func() (*acmelib.Bus, error) {
 			s.addEntity(bus)
-			s.sidebar.sendAdd(bus)
+			s.sidebarCtr.sendAdd(bus)
 
 			return bus, nil
 		},
@@ -154,7 +154,7 @@ func (s *BusService) Delete(entityID string) error {
 	bus.RemoveAllNodeInterfaces()
 
 	s.removeEntity(entityID)
-	s.sidebar.sendDelete(bus)
+	s.sidebarCtr.sendDelete(bus)
 
 	s.sendHistoryOp(
 		func() (*acmelib.Bus, error) {
@@ -165,7 +165,7 @@ func (s *BusService) Delete(entityID string) error {
 			}
 
 			s.addEntity(bus)
-			s.sidebar.sendAdd(bus)
+			s.sidebarCtr.sendAdd(bus)
 
 			return bus, nil
 		},
@@ -173,7 +173,7 @@ func (s *BusService) Delete(entityID string) error {
 			bus.RemoveAllNodeInterfaces()
 
 			s.removeEntity(entityID)
-			s.sidebar.sendDelete(bus)
+			s.sidebarCtr.sendDelete(bus)
 
 			return bus, nil
 		},
@@ -241,7 +241,7 @@ func (h *busHandler) updateName(bus *acmelib.Bus, req *request, res *busRes) err
 		return err
 	}
 
-	h.sidebar.sendUpdateName(bus)
+	h.sidebarCtr.sendUpdateName(bus)
 
 	res.setUndo(
 		func() (*acmelib.Bus, error) {
@@ -249,7 +249,7 @@ func (h *busHandler) updateName(bus *acmelib.Bus, req *request, res *busRes) err
 				return nil, err
 			}
 
-			h.sidebar.sendUpdateName(bus)
+			h.sidebarCtr.sendUpdateName(bus)
 
 			return bus, nil
 		},
@@ -261,7 +261,7 @@ func (h *busHandler) updateName(bus *acmelib.Bus, req *request, res *busRes) err
 				return nil, err
 			}
 
-			h.sidebar.sendUpdateName(bus)
+			h.sidebarCtr.sendUpdateName(bus)
 
 			return bus, nil
 		},

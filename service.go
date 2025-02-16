@@ -43,12 +43,12 @@ type serviceHandler[E entity, R any] interface {
 }
 
 type commonServiceHandler struct {
-	sidebar *sidebarController
+	sidebarCtr *sidebarController
 }
 
 func newCommonServiceHandler(sidebar *sidebarController) *commonServiceHandler {
 	return &commonServiceHandler{
-		sidebar: sidebar,
+		sidebarCtr: sidebar,
 	}
 }
 
@@ -60,13 +60,15 @@ type service[E entity, R any, H serviceHandler[E, R]] struct {
 	mux      sync.RWMutex
 	entities map[acmelib.EntityID]E
 
-	loadCh  chan E
-	clearCh chan struct{}
+	loadCh   chan []E
+	addCh    chan E
+	deleteCh chan E
+	clearCh  chan struct{}
 
-	sidebar *sidebarController
+	sidebarCtr *sidebarController
 }
 
-func newService[E entity, R any, H serviceHandler[E, R]](kind serviceKind, handlers H, sidebar *sidebarController) *service[E, R, H] {
+func newService[E entity, R any, H serviceHandler[E, R]](kind serviceKind, handlers H, sidebarCtr *sidebarController) *service[E, R, H] {
 	return &service[E, R, H]{
 		kind: kind,
 
@@ -74,44 +76,13 @@ func newService[E entity, R any, H serviceHandler[E, R]](kind serviceKind, handl
 
 		entities: make(map[acmelib.EntityID]E),
 
-		loadCh:  make(chan E),
-		clearCh: make(chan struct{}),
+		loadCh:   make(chan []E),
+		addCh:    make(chan E),
+		deleteCh: make(chan E),
+		clearCh:  make(chan struct{}),
 
-		sidebar: sidebar,
+		sidebarCtr: sidebarCtr,
 	}
-}
-
-func (s *service[E, R, H]) sendLoad(ent E) {
-	s.loadCh <- ent
-}
-
-func (s *service[E, R, H]) sendClear() {
-	s.clearCh <- struct{}{}
-}
-
-func (s *service[E, R, H]) run(ctx context.Context) {
-	for {
-		select {
-		case ent := <-s.loadCh:
-			s.mux.Lock()
-			s.addEntity(ent)
-			s.mux.Unlock()
-
-		case <-s.clearCh:
-			s.clear()
-
-		case <-ctx.Done():
-			close(s.loadCh)
-			return
-		}
-	}
-}
-
-func (s *service[E, R, H]) clear() {
-	s.mux.Lock()
-	defer s.mux.Unlock()
-
-	clear(s.entities)
 }
 
 func (s *service[E, R, H]) OnStartup(ctx context.Context, _ application.ServiceOptions) error {
@@ -120,6 +91,59 @@ func (s *service[E, R, H]) OnStartup(ctx context.Context, _ application.ServiceO
 }
 
 func (s *service[E, R, H]) OnShutdown() {}
+
+func (s *service[E, R, H]) run(ctx context.Context) {
+	for {
+		select {
+		case entities := <-s.loadCh:
+			s.handleLoad(entities)
+
+		case ent := <-s.addCh:
+			s.handleAdd(ent)
+
+		case ent := <-s.deleteCh:
+			s.handleDelete(ent)
+
+		case <-s.clearCh:
+			s.handleClear()
+
+		case <-ctx.Done():
+			return
+		}
+	}
+}
+
+func (s *service[E, R, H]) handleLoad(entities []E) {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	for _, ent := range entities {
+		s.addEntity(ent)
+	}
+}
+
+func (s *service[E, R, H]) handleAdd(ent E) {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	s.addEntity(ent)
+	s.sidebarCtr.sendAdd(ent)
+}
+
+func (s *service[E, R, H]) handleDelete(ent E) {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	s.removeEntity(ent.EntityID().String())
+	s.sidebarCtr.sendDelete(ent)
+}
+
+func (s *service[E, R, H]) handleClear() {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	clear(s.entities)
+}
 
 func (s *service[E, R, H]) sendHistoryOp(undo, redo func() (E, error)) {
 	var opDomain operationDomain
@@ -196,22 +220,6 @@ func (s *service[E, R, H]) handle(entityID string, reqDataPtr any, handlerFn fun
 	return s.handler.toResponse(ent), nil
 }
 
-func (s *service[E, R, H]) crossHandle(entityID string, handlerFn func(E) error) (E, error) {
-	s.mux.Lock()
-	defer s.mux.Unlock()
-
-	ent, err := s.getEntity(entityID)
-	if err != nil {
-		return ent, err
-	}
-
-	if err := handlerFn(ent); err != nil {
-		return ent, err
-	}
-
-	return ent, nil
-}
-
 func (s *service[E, R, H]) addEntity(ent E) {
 	s.entities[ent.EntityID()] = ent
 }
@@ -268,3 +276,63 @@ func (s *service[E, R, H]) ListBase() []BaseEntity {
 
 	return res
 }
+
+func (s *service[E, R, H]) getController() *serviceController[E] {
+	return &serviceController[E]{
+		lockFn:   s.mux.Lock,
+		unlockFn: s.mux.Unlock,
+		getFn:    s.getEntity,
+
+		loadCh:   s.loadCh,
+		addCh:    s.addCh,
+		deleteCh: s.deleteCh,
+		clearCh:  s.clearCh,
+	}
+}
+
+type serviceController[E entity] struct {
+	lockFn   func()
+	unlockFn func()
+	getFn    func(entityID string) (E, error)
+
+	loadCh   chan<- []E
+	addCh    chan<- E
+	deleteCh chan<- E
+	clearCh  chan<- struct{}
+}
+
+func (sc *serviceController[E]) lock() {
+	sc.lockFn()
+}
+
+func (sc *serviceController[E]) unlock() {
+	sc.unlockFn()
+}
+
+func (sc *serviceController[E]) get(entityID string) (E, error) {
+	return sc.getFn(entityID)
+}
+
+func (sc *serviceController[E]) sendLoad(entities []E) {
+	sc.loadCh <- entities
+}
+
+func (sc *serviceController[E]) sendAdd(ent E) {
+	sc.addCh <- ent
+}
+
+func (sc *serviceController[E]) sendDelete(ent E) {
+	sc.deleteCh <- ent
+}
+
+func (sc *serviceController[E]) sendClear() {
+	sc.clearCh <- struct{}{}
+}
+
+type busController = serviceController[*acmelib.Bus]
+type nodeController = serviceController[*acmelib.Node]
+type messageController = serviceController[*acmelib.Message]
+type signalController = serviceController[acmelib.Signal]
+type signalTypeController = serviceController[*acmelib.SignalType]
+type signalUnitController = serviceController[*acmelib.SignalUnit]
+type signalEnumController = serviceController[*acmelib.SignalEnum]

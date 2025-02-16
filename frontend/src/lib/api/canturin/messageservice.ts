@@ -9,8 +9,18 @@ import {Call as $Call} from "@wailsio/runtime";
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+export function AddSignal(entityID: string, req: $models.AddSignalReq): Promise<$models.Message> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1824820117, entityID, req) as any;
+    return $resultPromise;
+}
+
 export function CompactSignals(entityID: string): Promise<$models.Message> & { cancel(): void } {
     let $resultPromise = $Call.ByID(1903844292, entityID) as any;
+    return $resultPromise;
+}
+
+export function DeleteSignals(entityID: string, req: $models.DeleteSignalsReq): Promise<$models.Message> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1775886934, entityID, req) as any;
     return $resultPromise;
 }
 
@@ -41,11 +51,6 @@ export function GetSpaceLeft(entityID: string): Promise<number> & { cancel(): vo
 
 export function ListBase(): Promise<$models.BaseEntity[] | null> & { cancel(): void } {
     let $resultPromise = $Call.ByID(417424819) as any;
-    return $resultPromise;
-}
-
-export function RemoveSignals(entityID: string, req: $models.RemoveSignalsReq): Promise<$models.Message> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(1417096119, entityID, req) as any;
     return $resultPromise;
 }
 

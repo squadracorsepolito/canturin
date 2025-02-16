@@ -6,6 +6,10 @@
 // @ts-ignore: Unused imports
 import * as time$0 from "../time/models.js";
 
+export interface AddSignalReq {
+    "signalKind": SignalKind;
+}
+
 export interface AttachedNode {
     "entityId": string;
     "name": string;
@@ -92,6 +96,10 @@ export interface CreateSignalUnitReq {
     "desc": string;
     "kind": SignalUnitKind;
     "symbol": string;
+}
+
+export interface DeleteSignalsReq {
+    "signalEntityIds": string[] | null;
 }
 
 export enum EntityKind {
@@ -221,10 +229,6 @@ export interface RemoveReceivedMessagesReq {
 export interface RemoveSentMessagesReq {
     "interfaceNumber": number;
     "messageEntityIds": string[] | null;
-}
-
-export interface RemoveSignalsReq {
-    "signalEntityIds": string[] | null;
 }
 
 export interface RemoveValuesReq {

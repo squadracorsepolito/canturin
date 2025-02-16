@@ -68,7 +68,7 @@
 
 <style lang="postcss">
 	[data-scope='dialog'][data-part='backdrop'] {
-		@apply bg-neutral opacity-50 block fixed w-full h-full top-0 left-0;
+		@apply bg-neutral opacity-75 block fixed w-full h-full top-0 left-0;
 	}
 
 	[data-scope='dialog'][data-part='positioner'] {

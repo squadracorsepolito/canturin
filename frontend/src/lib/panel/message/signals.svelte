@@ -94,7 +94,7 @@
 								{#snippet actions({ close })}
 									<button
 										onclick={() => {
-											console.log('ADD');
+											ms.addSignal(addSignalKind);
 											close();
 										}}
 										class="btn btn-primary">Add</button
