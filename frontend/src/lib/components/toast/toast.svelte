@@ -1,17 +1,25 @@
 <script lang="ts">
-	import { normalizeProps, useActor } from '@zag-js/svelte';
-	import * as toast from '@zag-js/toast';
+	import { normalizeProps, useMachine } from '@zag-js/svelte';
+	import * as zagToast from '@zag-js/toast';
 	import { CloseIcon } from '../icon';
 
 	type Props = {
-		actor: toast.Service;
+		toast: zagToast.Options;
+		index: number;
+		parent: zagToast.GroupService;
 	};
 
-	const { actor }: Props = $props();
+	const { toast, index, parent }: Props = $props();
 
-	const [snapshot, send] = useActor(actor);
+	const toastProps: zagToast.Props = $derived({
+		...toast,
+		parent,
+		index
+	});
 
-	const api = $derived(toast.connect(snapshot, send, normalizeProps));
+	const service = useMachine(zagToast.machine, () => toastProps);
+
+	const api = $derived(zagToast.connect(service, normalizeProps));
 </script>
 
 <div {...api.getRootProps()}>

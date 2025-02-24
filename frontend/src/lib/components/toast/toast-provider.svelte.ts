@@ -1,14 +1,14 @@
 import * as toast from '@zag-js/toast';
 
 class ToastProvider {
-	#apiGetter: () => toast.GroupApi;
+	#toaster: toast.Store;
 
-	constructor(apiGetter: () => toast.GroupApi) {
-		this.#apiGetter = apiGetter;
+	constructor(store: toast.Store) {
+		this.#toaster = store;
 	}
 
 	push(type: toast.Type, title: string, description: string) {
-		return this.#apiGetter().create({
+		return this.#toaster.create({
 			type,
 			title,
 			description
@@ -18,8 +18,8 @@ class ToastProvider {
 
 let provider: ToastProvider;
 
-export function createToastProvider(apiGetter: () => toast.GroupApi) {
-	provider = new ToastProvider(apiGetter);
+export function createToastProvider(store: toast.Store) {
+	provider = new ToastProvider(store);
 }
 
 export function pushToast(type: toast.Type, title: string, description: string) {

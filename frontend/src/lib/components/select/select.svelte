@@ -33,34 +33,28 @@
 		itemToValue: (item) => item[valueKey]
 	});
 
-	const [snapshot, send] = useMachine(
-		select.machine({
-			id: uniqueId(),
-			collection,
-			name: name,
-			onValueChange: (details) => {
-				if (details.items.length === 0) {
-					return;
-				}
-
-				const item = details.items[0] as T;
-				const value = details.value[0] as V;
-
-				selected = value;
-				onselect?.(value);
-				onitemselect?.(item);
+	const selectProps: select.Props = $derived({
+		id: uniqueId(),
+		collection,
+		name: name,
+		value: [selected],
+		onValueChange: (details) => {
+			if (details.items.length === 0) {
+				return;
 			}
-		}),
-		{
-			context: {
-				get value() {
-					return [selected];
-				}
-			}
+
+			const item = details.items[0] as T;
+			const value = details.value[0] as V;
+
+			selected = value;
+			onselect?.(value);
+			onitemselect?.(item);
 		}
-	);
+	});
 
-	const api = $derived(select.connect(snapshot, send, normalizeProps));
+	const service = useMachine(select.machine, () => selectProps);
+
+	const api = $derived(select.connect(service, normalizeProps));
 </script>
 
 <div {...api.getRootProps()}>

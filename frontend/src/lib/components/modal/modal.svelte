@@ -19,13 +19,11 @@
 	let { themeColor, title, desc, triggerLabel, disabled, trigger, content, actions }: Props =
 		$props();
 
-	const [snapshot, send] = useMachine(
-		dialog.machine({
-			id: uniqueId()
-		})
-	);
+	const service = useMachine(dialog.machine, {
+		id: uniqueId()
+	});
 
-	const api = $derived(dialog.connect(snapshot, send, normalizeProps));
+	const api = $derived(dialog.connect(service, normalizeProps));
 
 	const triggerProps = $derived(
 		mergeProps(api.getTriggerProps(), {

@@ -15,21 +15,23 @@
 
 	let { selectedValue = $bindable(), name, options, readOnly, onchange }: Props = $props();
 
-	const [snapshot, send] = useMachine(
-		radioGroup.machine({
-			id: uniqueId(),
-			name,
-			orientation: 'horizontal',
-			value: selectedValue,
-			readOnly,
-			onValueChange: (details) => {
+	const radioGroupProps: radioGroup.Props = $derived({
+		id: uniqueId(),
+		name,
+		orientation: 'horizontal',
+		value: selectedValue,
+		readOnly,
+		onValueChange: (details) => {
+			if (details.value) {
 				selectedValue = details.value;
 				onchange?.(details.value);
 			}
-		})
-	);
+		}
+	});
 
-	const api = $derived(radioGroup.connect(snapshot, send, normalizeProps));
+	const service = useMachine(radioGroup.machine, () => radioGroupProps);
+
+	const api = $derived(radioGroup.connect(service, normalizeProps));
 </script>
 
 <div {...api.getRootProps()} style:grid-template-columns="repeat({options.length}, minmax(0, 1fr))">

@@ -16,83 +16,72 @@
 		textSize = 'md',
 		fontWeight = 'normal',
 		border = 'visible',
-		readonly = false,
+		readOnly = false,
 		oncommit
 	}: EditableProps<number> = $props();
 
 	let fallbackValue = $state(value);
 
-	const [snpshot, send] = useMachine(
-		editable.machine({
-			id: uniqueId(),
-			name: name,
-			activationMode: 'dblclick',
-			placeholder: placeholder
-				? {
-						edit: '',
-						preview: placeholder
-					}
-				: undefined,
-			submitMode: 'both',
-			autoResize: true,
-			onValueCommit: (details) => {
-				if (errors) {
-					api.setValue(fallbackValue + '');
-					value = fallbackValue;
-					return;
+	const editableProps: editable.Props = $derived({
+		id: uniqueId(),
+		name: name,
+		value: value + '',
+		readOnly: readOnly,
+		activationMode: 'dblclick',
+		placeholder: placeholder
+			? {
+					edit: '',
+					preview: placeholder
 				}
-
-				const numValue = +details.value;
-
-				fallbackValue = numValue;
-				oncommit?.(numValue);
-			},
-			onValueRevert(details) {
-				value = +details.value;
-			},
-			ids: {
-				input: inputId
+			: undefined,
+		submitMode: 'both',
+		autoResize: true,
+		onValueCommit: (details) => {
+			if (errors) {
+				api.setValue(fallbackValue + '');
+				value = fallbackValue;
+				return;
 			}
-		}),
-		{
-			context: {
-				get value() {
-					return value + '';
-				},
-				get readOnly() {
-					return readonly;
-				}
+
+			const numValue = +details.value;
+			if (fallbackValue === numValue) {
+				return;
 			}
+			fallbackValue = numValue;
+
+			oncommit?.(numValue);
+		},
+		onValueRevert(details) {
+			value = +details.value;
+		},
+		ids: {
+			input: inputId
 		}
-	);
+	});
 
-	const [inputSnapshot, inputSend] = useMachine(
-		numberInput.machine({
-			id: uniqueId(),
-			name: name,
-			onValueChange(details) {
-				if (isNaN(details.valueAsNumber)) {
-					value = 0;
-					return;
-				}
+	const editableService = useMachine(editable.machine, () => editableProps);
 
-				value = details.valueAsNumber;
-			},
-			ids: {
-				input: inputId
+	const numberInputProps: numberInput.Props = $derived({
+		id: uniqueId(),
+		name: name,
+		value: value + '',
+		onValueChange(details) {
+			if (isNaN(details.valueAsNumber)) {
+				value = 0;
+				return;
 			}
-		}),
-		{
-			context: {
-				get value() {
-					return value + '';
-				}
-			}
+
+			value = details.valueAsNumber;
+		},
+		ids: {
+			input: inputId
 		}
-	);
+	});
 
-	const api = $derived(editable.connect(snpshot, send, normalizeProps));
-	const inputApi = $derived(numberInput.connect(inputSnapshot, inputSend, normalizeProps));
+	const numberInputService = useMachine(numberInput.machine, () => numberInputProps);
+
+	const api = $derived(editable.connect(editableService, normalizeProps));
+	const inputApi = $derived(numberInput.connect(numberInputService, normalizeProps));
 
 	const rootProps = $derived(
 		mergeProps(api.getRootProps(), {
@@ -114,7 +103,7 @@
 			data-text-size={textSize}
 			data-font-weight={fontWeight}
 			data-border={border}
-			data-readonly={readonly ? true : undefined}
+			data-readonly={readOnly ? true : undefined}
 		>
 			<input {...inputProps} />
 

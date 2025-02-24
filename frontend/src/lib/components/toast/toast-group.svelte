@@ -5,25 +5,25 @@
 	import Toast from './toast.svelte';
 	import { createToastProvider } from './toast-provider.svelte';
 
-	const [snapshot, send] = useMachine(
-		toast.group.machine({
-			id: uniqueId(),
-			placement: 'bottom-end',
-			duration: 3000,
-			overlap: true,
-			max: 5
-		})
-	);
+	const store = toast.createStore({
+		placement: 'bottom-end',
+		duration: 3000,
+		max: 5,
+		overlap: true
+	});
 
-	const api = $derived(toast.group.connect(snapshot, send, normalizeProps));
+	const service = useMachine(toast.group.machine, {
+		id: uniqueId(),
+		store: store
+	});
 
-	createToastProvider(() => api);
+	const api = $derived(toast.group.connect(service, normalizeProps));
+
+	createToastProvider(store);
 </script>
 
-{#each api.getPlacements() as placement}
-	<div {...api.getGroupProps({ placement })}>
-		{#each api.getToastsByPlacement(placement) as toast (toast.id)}
-			<Toast actor={toast} />
-		{/each}
-	</div>
-{/each}
+<div {...api.getGroupProps()}>
+	{#each api.getToasts() as toast, index (toast.id)}
+		<Toast {toast} {index} parent={service} />
+	{/each}
+</div>

@@ -39,60 +39,50 @@
 		isItemDisabled: filter
 	});
 
-	const [snapshot, send] = useMachine(
-		combobox.machine({
-			id: uniqueId(),
-			name,
-			collection,
-			inputBehavior: 'autocomplete',
-			selectionBehavior: 'replace',
-			onOpenChange: () => {
-				options = items;
-			},
-			onInputValueChange: (detalis) => {
-				const value = detalis.inputValue;
-				const filtered = items.filter((item) =>
-					item[labelKey].toLowerCase().includes(value.toLowerCase())
-				);
+	const comboboxProps: combobox.Props = $derived({
+		id: uniqueId(),
+		name,
+		collection,
+		defaultValue: [selected],
+		value: [selected],
+		inputBehavior: 'autocomplete',
+		selectionBehavior: 'replace',
+		onOpenChange: () => {
+			options = items;
+		},
+		onInputValueChange: (detalis) => {
+			const value = detalis.inputValue;
+			const filtered = items.filter((item) =>
+				item[labelKey].toLowerCase().includes(value.toLowerCase())
+			);
 
-				if (filtered.length === 0) {
-					collection.setItems([]);
-					options = [];
-					return;
-				}
-
-				collection.setItems(filtered);
-				options = filtered;
-			},
-			onValueChange: (details) => {
-				if (details.items.length === 0) {
-					return;
-				}
-
-				const item = details.items[0] as T;
-				const value = details.value[0] as V;
-
-				selected = value;
-				onselect?.(value);
-				onitemselect?.(item);
+			if (filtered.length === 0) {
+				collection.setItems([]);
+				options = [];
+				return;
 			}
-		}),
-		{
-			context: {
-				get value() {
-					collection.setItems(items);
 
-					if (!selected) {
-						return [];
-					}
-
-					return [selected];
-				}
+			collection.setItems(filtered);
+			options = filtered;
+		},
+		onValueChange: (details) => {
+			if (details.items.length === 0) {
+				return;
 			}
+
+			const item = details.items[0] as T;
+			const value = details.value[0] as V;
+
+			selected = value;
+
+			onselect?.(value);
+			onitemselect?.(item);
 		}
-	);
+	});
 
-	const api = $derived(combobox.connect(snapshot, send, normalizeProps));
+	const service = useMachine(combobox.machine, () => comboboxProps);
+
+	const api = $derived(combobox.connect(service, normalizeProps));
 
 	const clearTriggerProps = $derived(
 		mergeProps(api.getClearTriggerProps(), {

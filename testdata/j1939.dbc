@@ -159,107 +159,6 @@ BO_ 2566711550 IVAC: 8 Vector__XXX
  SG_ IntkVlvActtnSystmOlPrss2SlndCtrl : 2|2@1+ (1,0) [0|3] "" Vector__XXX
  SG_ IntkVlvActtnSystmOlPrss1SlndCtrl : 0|2@1+ (1,0) [0|3] "" Vector__XXX
 
-BO_ 2633832958 ILI: 200 Vector__XXX
- SG_ SpecialIgnitorLoop90Resistance : 1584|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop89Resistance : 1568|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop88Resistance : 1552|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop87Resistance : 1536|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop86Resistance : 1520|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop85Resistance : 1504|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop84Resistance : 1488|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop83Resistance : 1472|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop82Resistance : 1456|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop81Resistance : 1440|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop80Resistance : 1424|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop79Resistance : 1408|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop78Resistance : 1392|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop77Resistance : 1376|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop76Resistance : 1360|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop75Resistance : 1344|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop74Resistance : 1328|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop73Resistance : 1312|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop72Resistance : 1296|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop71Resistance : 1280|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop70Resistance : 1264|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop69Resistance : 1248|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop68Resistance : 1232|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop67Resistance : 1216|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop66Resistance : 1200|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop65Resistance : 1184|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop64Resistance : 1168|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop63Resistance : 1152|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop61Resistance : 1120|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop60Resistance : 1104|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop59Resistance : 1088|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop58Resistance : 1072|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop57Resistance : 1056|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop56Resistance : 1040|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop55Resistance : 1024|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop54Resistance : 1008|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop53Resistance : 992|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop52Resistance : 976|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop51Resistance : 960|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop50Resistance : 944|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop49Resistance : 928|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop48Resistance : 912|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop47Resistance : 896|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop46Resistance : 880|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop45Resistance : 864|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop44Resistance : 848|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop43Resistance : 832|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop42Resistance : 816|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop41Resistance : 800|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop40Resistance : 784|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop39Resistance : 768|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop38Resistance : 752|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop37Resistance : 736|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop36Resistance : 720|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop35Resistance : 704|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop34Resistance : 688|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop33Resistance : 672|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop32Resistance : 656|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop31Resistance : 640|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop30Resistance : 624|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop29Resistance : 608|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop28Resistance : 592|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop27Resistance : 576|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop26Resistance : 560|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop25Resistance : 544|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop24Resistance : 528|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop23Resistance : 512|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop22Resistance : 496|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop21Resistance : 480|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop20Resistance : 464|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop19Resistance : 448|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop18Resistance : 432|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop17Resistance : 416|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop16Resistance : 400|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop15Resistance : 384|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop14Resistance : 368|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop13Resistance : 352|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop12Resistance : 336|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop11Resistance : 320|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop10Resistance : 304|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop9Resistance : 288|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop8Resistance : 272|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop7Resistance : 256|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop6Resistance : 240|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop5Resistance : 224|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop4Resistance : 208|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop3Resistance : 192|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop2Resistance : 176|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SpecialIgnitorLoop1Resistance : 160|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SdBgIgnitorLoop2RightResistance : 144|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SdBgIgnitorLoop1RightResistance : 128|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SdBagIgnitorLoop2LeftResistance : 112|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ SdBagIgnitorLoop1LeftResistance : 96|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ PssngrBltTnsnrIgntrLpResistance : 80|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ DrvrBltTnsnrIgntrLoopResistance : 64|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ PssngrArbgIgntrLp2ndStgRsstance : 48|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ DrvrArbgIgntrLp2ndStgResistance : 32|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ PssngrArbgIgntrLp1stStgRsstance : 16|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
- SG_ DrvrArbgIgntrLp1stStgResistance : 0|16@1+ (0.1,0) [0|6425.5] "ohm" Vector__XXX
-
 BO_ 2566719998 HRLFC: 8 Vector__XXX
  SG_ HighResolutionEngTotalFuelUsed : 32|32@1+ (0.001,0) [0|4211081.215] "L" Vector__XXX
  SG_ HighResolutionEngTripFuel : 0|32@1+ (0.001,0) [0|4211081.215] "L" Vector__XXX
@@ -699,12 +598,6 @@ BO_ 2566755838 TRF2: 8 Vector__XXX
 BO_ 2566752766 VDS2: 8 Vector__XXX
  SG_ VehicleRoll : 0|16@1+ (0.0078125,-200) [-200|301.99] "deg" Vector__XXX
 
-BO_ 2633938942 LF: 10 Vector__XXX
- SG_ TotalEngCruiseTime : 48|32@1+ (0.05,0) [0|210554060.75] "hr" Vector__XXX
- SG_ TotalDriveAverageLoadFactor : 40|8@1+ (0.4,0) [0|100] "%" Vector__XXX
- SG_ TripDriveAverageLoadFactor : 32|8@1+ (0.4,0) [0|100] "%" Vector__XXX
- SG_ TripAverageEngSpeed : 16|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
- SG_ TripMaxEngSpeed : 0|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
 
 BO_ 2566799614 LD: 8 Vector__XXX
  SG_ ImplementRearWorkLight : 62|2@1+ (1,0) [0|3] "" Vector__XXX
@@ -919,13 +812,6 @@ BO_ 2365449982 HBS: 8 Vector__XXX
  SG_ HydBrakePressCircuit2 : 8|8@1+ (100,0) [0|25] "MPa" Vector__XXX
  SG_ HydBrakePressCircuit1 : 0|8@1+ (100,0) [0|25] "MPa" Vector__XXX
 
-BO_ 2633939198 GTFI: 22 Vector__XXX
- SG_ TripDriveFuelEconomy : 160|16@1+ (0.001953125,0) [0|125.5] "km/kg" Vector__XXX
- SG_ TrpPTOGovernorNonmovingFuelUsed : 64|32@1+ (0.5,0) [0|2105540607.5] "kg" Vector__XXX
- SG_ TripVehicleIdleFuelUsed : 96|32@1+ (0.5,0) [0|2105540607.5] "kg" Vector__XXX
- SG_ TripCruiseFuelUsed : 128|32@1+ (0.5,0) [0|2105540607.5] "kg" Vector__XXX
- SG_ TripDriveFuelUsed : 0|32@1+ (0.5,0) [0|2105540607.5] "kg" Vector__XXX
- SG_ TripPTOGovernorMovingFuelUsed : 32|32@1+ (0.5,0) [0|2105540607.5] "kg" Vector__XXX
 
 BO_ 2633927678 GFP: 8 Vector__XXX
  SG_ EngFuelValve1OutletAbsPress : 48|16@1+ (0.1,0) [0|6425.5] "kPa" Vector__XXX
@@ -1476,18 +1362,6 @@ BO_ 2633938686 TVI: 8 Vector__XXX
  SG_ TripCruiseDistance : 16|32@1+ (0.125,0) [0|526385151.9] "km" Vector__XXX
  SG_ TripMaxVehicleSpeed : 0|16@1+ (0.00390625,0) [0|250.996] "km/h" Vector__XXX
 
-BO_ 2633937150 TTI2: 20 Vector__XXX
- SG_ TripAirCompressorOnTime : 128|32@1+ (0.05,0) [0|210554060.75] "hr" Vector__XXX
- SG_ TripIdleTime : 96|32@1+ (0.05,0) [0|210554060.75] "hr" Vector__XXX
- SG_ TripEngRunningTime : 64|32@1+ (0.05,0) [0|210554060.75] "hr" Vector__XXX
- SG_ TripCruiseTime : 0|32@1+ (0.05,0) [0|210554060.75] "hr" Vector__XXX
- SG_ TripPTOGovernorTime : 32|32@1+ (0.05,0) [0|210554060.75] "hr" Vector__XXX
-
-BO_ 2633938174 TTI1: 16 Vector__XXX
- SG_ TripTimeInDerateByEng : 96|32@1+ (0.05,0) [0|210554060.75] "hr" Vector__XXX
- SG_ TripTimeInGearDown : 64|32@1+ (0.05,0) [0|210554060.75] "hr" Vector__XXX
- SG_ TripTimeInTopGear : 32|32@1+ (0.05,0) [0|210554060.75] "hr" Vector__XXX
- SG_ TripTimeInVSL : 0|32@1+ (0.05,0) [0|210554060.75] "hr" Vector__XXX
 
 BO_ 2633938430 TSI: 8 Vector__XXX
  SG_ TripSuddenDecelerations : 48|16@1+ (1,0) [0|64255] "counts" Vector__XXX
@@ -1530,18 +1404,6 @@ BO_ 2566765566 TR5: 8 Vector__XXX
  SG_ TypeOfFare : 8|4@1+ (1,0) [0|15] "" Vector__XXX
  SG_ PassengerType : 4|4@1+ (1,0) [0|15] "" Vector__XXX
  SG_ TransactionType : 0|4@1+ (1,0) [0|15] "" Vector__XXX
-
-BO_ 2566765822 TR4: 15 Vector__XXX
- SG_ DriversFareboxSecurityCode : 104|16@1+ (1,0) [0|65535] "counts" Vector__XXX
- SG_ AssignedBlock : 88|16@1+ (1,0) [0|65535] "counts" Vector__XXX
- SG_ AssignedRun : 72|16@1+ (1,0) [0|65535] "counts" Vector__XXX
- SG_ AssignedRoute : 56|16@1+ (1,0) [0|65535] "counts" Vector__XXX
- SG_ PatternNumber : 40|16@1+ (1,0) [0|65535] "counts" Vector__XXX
- SG_ TripNumber : 24|16@1+ (1,0) [0|65535] "counts" Vector__XXX
- SG_ FarePresets : 16|8@1+ (1,0) [0|255] "" Vector__XXX
- SG_ TripDirection : 8|4@1+ (1,0) [0|15] "" Vector__XXX
- SG_ TripStatus : 2|3@1+ (1,0) [0|7] "" Vector__XXX
- SG_ FareboxServiceStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
 
 BO_ 2566766078 TR3: 8 Vector__XXX
  SG_ VehicleID : 16|16@1+ (1,0) [0|65535] "counts" Vector__XXX
@@ -1718,17 +1580,6 @@ BO_ 2566845694 TIRE: 8 Vector__XXX
  SG_ CTIWheelEndElectricalFault_00 m0 : 36|2@1+ (1,0) [0|3] "" Vector__XXX
  SG_ CTITireStatus_00 m0 : 34|2@1+ (1,0) [0|3] "" Vector__XXX
  SG_ TireLocation M : 0|8@1+ (1,0) [0|255] "" Vector__XXX
-
-BO_ 2633939966 TFI: 16 Vector__XXX
- SG_ TripFanOnTimeDueToAManualSwitch : 64|32@1+ (0.05,0) [0|210554060.75] "hr" Vector__XXX
- SG_ TripFanOnTime : 0|32@1+ (0.05,0) [0|210554060.75] "hr" Vector__XXX
- SG_ TripFanOnTimeDueToA_CSystem : 96|32@1+ (0.05,0) [0|210554060.75] "hr" Vector__XXX
- SG_ TripFanOnTimeDueToEngSystem : 32|32@1+ (0.05,0) [0|210554060.75] "hr" Vector__XXX
-
-BO_ 2633939710 TDI: 12 Vector__XXX
- SG_ TripDistanceInTopGear : 64|32@1+ (0.125,0) [0|526385151.9] "km" Vector__XXX
- SG_ TripGearDownDistance : 32|32@1+ (0.125,0) [0|526385151.9] "km" Vector__XXX
- SG_ TripDistanceOnVSL : 0|32@1+ (0.125,0) [0|526385151.9] "km" Vector__XXX
 
 BO_ 2564161278 TDA: 8 Vector__XXX
  SG_ AdjustLocalHourOffset : 56|8@1+ (1,-125) [-125|125] "hr" Vector__XXX
@@ -1929,21 +1780,6 @@ BO_ 2631859966 RESET: 8 Vector__XXX
  SG_ ServiceComponentIdentification : 8|8@1+ (1,0) [0|250] "ID" Vector__XXX
  SG_ ServiceComponentIdentificationC : 24|8@1+ (1,0) [0|250] "ID" Vector__XXX
 
-BO_ 2566840830 RC: 19 Vector__XXX
- SG_ PercentTorqueAtPeakTorquePoint5 : 144|8@1+ (1,-125) [-125|125] "%" Vector__XXX
- SG_ ReferenceRetarderTorque : 128|16@1+ (1,0) [0|64255] "Nm" Vector__XXX
- SG_ RetarderSpeedAtPeakTorquePoint5 : 112|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
- SG_ PercentTorqueAtPoint4 : 104|8@1+ (1,-125) [-125|125] "%" Vector__XXX
- SG_ RetarderSpeedAtPoint4 : 88|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
- SG_ PercentTorqueAtPoint3 : 80|8@1+ (1,-125) [-125|125] "%" Vector__XXX
- SG_ RetarderSpeedAtPoint3 : 64|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
- SG_ PercentTorqueAtMaxSpeedPoint2 : 56|8@1+ (1,-125) [-125|125] "%" Vector__XXX
- SG_ MaxRetarderSpeedPoint2 : 40|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
- SG_ PercentTorqueAtIdlePoint1 : 32|8@1+ (1,-125) [-125|125] "%" Vector__XXX
- SG_ RetarderSpeedAtIdlePoint1 : 16|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
- SG_ RetarderCtrlMethod : 8|8@1+ (1,0) [0|250] "steps" Vector__XXX
- SG_ RetarderLocation : 4|4@1+ (1,0) [0|15] "" Vector__XXX
- SG_ RetarderType : 0|4@1+ (1,0) [0|15] "" Vector__XXX
 
 BO_ 2633930238 RBI: 8 Vector__XXX
  SG_ EngOperationTimeSinceRebuild : 0|32@1+ (1,0) [0|4211081215] "s" Vector__XXX
@@ -2064,14 +1900,6 @@ BO_ 2365485566 LTP: 8 Vector__XXX
  SG_ LaserTracerVerticalDistance : 16|16@1+ (0.1,0) [0|6425.5] "mm" Vector__XXX
  SG_ LaserTracerTargetDeviation : 0|16@1+ (0.1,-3200) [-3200|3225.5] "mm" Vector__XXX
 
-BO_ 2633939454 LTFI: 22 Vector__XXX
- SG_ TripCruiseFuelUsed : 128|32@1+ (0.5,0) [0|2105540607.5] "L" Vector__XXX
- SG_ TripVehicleIdleFuelUsed : 96|32@1+ (0.5,0) [0|2105540607.5] "L" Vector__XXX
- SG_ TripDriveFuelUsed : 0|32@1+ (0.5,0) [0|2105540607.5] "L" Vector__XXX
- SG_ TrpPTOGovernorNonmovingFuelUsed : 64|32@1+ (0.5,0) [0|2105540607.5] "L" Vector__XXX
- SG_ TripPTOGovernorMovingFuelUsed : 32|32@1+ (0.5,0) [0|2105540607.5] "L" Vector__XXX
- SG_ TripDriveFuelEconomy : 160|16@1+ (0.001953125,0) [0|125.5] "km/L" Vector__XXX
-
 BO_ 2365486334 LSP: 8 Vector__XXX
  SG_ BldHeightSetPointHighResolution : 16|32@1+ (100,-209.7152) [-209.7152|211.3929215] "m" Vector__XXX
  SG_ ModifyLevelingSystemSetPoint : 0|16@1+ (0.1,-3200) [-3200|3225.5] "mm" Vector__XXX
@@ -2137,27 +1965,6 @@ BO_ 2566831614 FD: 8 Vector__XXX
  SG_ EstPercentFanSpeed : 0|8@1+ (0.4,0) [0|100] "%" Vector__XXX
  SG_ HydFanMotorPress : 32|16@1+ (0.5,0) [0|32127.5] "kPa" Vector__XXX
  SG_ FanDriveBypassCmdStatus : 48|8@1+ (0.4,0) [0|100] "%" Vector__XXX
-
-BO_ 2566820094 ETH: 33 Vector__XXX
- SG_ EngTorqueLimit6AxleInput : 248|16@1+ (2,0) [0|128510] "Nm" Vector__XXX
- SG_ EngTorqueLimit5Switch : 232|16@1+ (1,0) [0|64255] "Nm" Vector__XXX
- SG_ EngTorqueLimit4Trans : 216|16@1+ (1,0) [0|64255] "Nm" Vector__XXX
- SG_ EngTorqueLimit3Trans : 200|16@1+ (1,0) [0|64255] "Nm" Vector__XXX
- SG_ TransGearRatio3 : 184|16@1+ (0.01,0) [0|642.55] "" Vector__XXX
- SG_ EngTorqueLimit2Trans : 168|16@1+ (1,0) [0|64255] "Nm" Vector__XXX
- SG_ TransGearRatio2 : 152|16@1+ (0.01,0) [0|642.55] "" Vector__XXX
- SG_ EngTorqueLimit1Trans : 136|16@1+ (1,0) [0|64255] "Nm" Vector__XXX
- SG_ TransGearRatio1 : 120|16@1+ (0.01,0) [0|642.55] "" Vector__XXX
- SG_ EngTorqueLimitFeature : 114|3@1+ (1,0) [0|7] "" Vector__XXX
- SG_ TorqueLimitingFeatureStatus : 112|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ CalibRecordDurationTime : 80|32@1+ (0.05,0) [0|210554060.75] "hr" Vector__XXX
- SG_ CalibRecordStartYear : 72|8@1+ (1,1985) [1985|2235] "years" Vector__XXX
- SG_ CalibRecordStartDay : 64|8@1+ (0.25,0) [0|62.5] "days" Vector__XXX
- SG_ CalibRecordStartMonth : 56|8@1+ (1,0) [0|250] "months" Vector__XXX
- SG_ EngPeakTorque2 : 40|16@1+ (1,0) [0|64255] "Nm" Vector__XXX
- SG_ EngPeakTorque1 : 24|16@1+ (1,0) [0|64255] "Nm" Vector__XXX
- SG_ EngPower : 8|16@1+ (0.5,0) [0|32127.5] "kW" Vector__XXX
- SG_ NumberOfEngTorqueHistoryRecords : 0|8@1+ (1,0) [0|250] "records" Vector__XXX
 
 BO_ 2364542206 ETC8: 8 Vector__XXX
  SG_ TransClutch_ConverterInputSpeed : 16|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
@@ -2512,35 +2319,6 @@ BO_ 2566804734 ECT1: 8 Vector__XXX
  SG_ EngMinContinuousRPM : 40|8@1+ (32,0) [0|8000] "rpm" Vector__XXX
  SG_ EngMaxContinuousRPM : 32|8@1+ (32,0) [0|8000] "rpm" Vector__XXX
 
-BO_ 2566841342 EC1: 39 Vector__XXX
- SG_ SupportTSC1CtrlPurposeGroup4 : 304|8@1+ (1,0) [0|255] "" Vector__XXX
- SG_ SupportTSC1CtrlPurposeGroup3 : 296|8@1+ (1,0) [0|255] "" Vector__XXX
- SG_ SupportTSC1CtrlPurposeGroup2 : 288|8@1+ (1,0) [0|255] "" Vector__XXX
- SG_ SupportTSC1CtrlPurposeGroup1 : 280|8@1+ (1,0) [0|255] "" Vector__XXX
- SG_ SupportVariableRateTSC1Message : 272|8@1+ (1,0) [0|255] "" Vector__XXX
- SG_ EngDefaultTorqueLimit : 256|16@1+ (1,0) [0|64255] "Nm" Vector__XXX
- SG_ EngMomentOfInertia : 240|16@1+ (0.004,0) [0|257.02] "kg*m*m" Vector__XXX
- SG_ EngExRngRqdSpdCtrlRngUpperLimit : 224|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
- SG_ EngRqdTorqueCtrlRangeUpperLimit : 216|8@1+ (1,-125) [-125|125] "%" Vector__XXX
- SG_ EngRqdTorqueCtrlRangeLowerLimit : 208|8@1+ (1,-125) [-125|125] "%" Vector__XXX
- SG_ EngRqedSpeedCtrlRangeUpperLimit : 200|8@1+ (10,0) [0|2500] "rpm" Vector__XXX
- SG_ EngRqedSpeedCtrlRangeLowerLimit : 192|8@1+ (10,0) [0|2500] "rpm" Vector__XXX
- SG_ EngMxMomentaryOverrideTimeLimit : 184|8@1+ (0.1,0) [0|25] "s" Vector__XXX
- SG_ EngMxMmntaryOverrideSpeedPoint7 : 168|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
- SG_ EngReferenceTorque : 152|16@1+ (1,0) [0|64255] "Nm" Vector__XXX
- SG_ EngSpeedAtHighIdlePoint6 : 120|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
- SG_ EngGainOfEndspeedGovernor : 136|16@1+ (0.00078125,0) [0|50.2] "%/rpm" Vector__XXX
- SG_ EngPercentTorqueAtPoint5 : 112|8@1+ (1,-125) [-125|125] "%" Vector__XXX
- SG_ EngSpeedAtPoint5 : 96|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
- SG_ EngPercentTorqueAtPoint4 : 88|8@1+ (1,-125) [-125|125] "%" Vector__XXX
- SG_ EngSpeedAtPoint4 : 72|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
- SG_ EngPercentTorqueAtPoint3 : 64|8@1+ (1,-125) [-125|125] "%" Vector__XXX
- SG_ EngSpeedAtPoint3 : 48|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
- SG_ EngPercentTorqueAtPoint2 : 40|8@1+ (1,-125) [-125|125] "%" Vector__XXX
- SG_ EngSpeedAtPoint2 : 24|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
- SG_ EngPercentTorqueAtIdlePoint1 : 16|8@1+ (1,-125) [-125|125] "%" Vector__XXX
- SG_ EngSpeedAtIdlePoint1 : 0|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
-
 BO_ 2566767870 EBC5: 8 Vector__XXX
  SG_ BrakeTempWarning : 0|2@1+ (1,0) [0|3] "" Vector__XXX
  SG_ PrkngBrkeActuatorFullyActivated : 24|2@1+ (1,0) [0|3] "" Vector__XXX
@@ -2753,12 +2531,6 @@ BO_ 2566843902 CCSS: 8 Vector__XXX
 
 BO_ 2566809598 CCC: 8 Vector__XXX
  SG_ AuxHeaterMaxOutputPower : 0|16@1+ (2,0) [0|128510] "W" Vector__XXX
-
-BO_ 2633940222 CBI: 16 Vector__XXX
- SG_ TripServiceBrakeApps : 96|32@1+ (1,0) [0|4227858431] "appl" Vector__XXX
- SG_ TripServiceBrakeDistance : 64|32@1+ (0.125,0) [0|526385151.9] "km" Vector__XXX
- SG_ TripCompressionBrakeDistance : 32|32@1+ (0.125,0) [0|526385151.9] "km" Vector__XXX
- SG_ TotalCompressionBrakeDistance : 0|32@1+ (0.125,0) [0|526385151.9] "km" Vector__XXX
 
 BO_ 2566775294 CACI: 8 Vector__XXX
  SG_ CbA_CRfrgrntCmprssorOutletPress : 0|8@1+ (16,0) [0|4000] "kPa" Vector__XXX
@@ -3368,10 +3140,6 @@ BO_ 2560687870 DM34: 8 Vector__XXX
  SG_ MnfcNOxNTECarveOutAreaStatus : 4|2@1+ (1,0) [0|3] "" Vector__XXX
  SG_ NOxNTEControlAreaStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
 
-BO_ 2292317950 DM33: 9 Vector__XXX
- SG_ AECDEngineHours1Timer2 : 40|32@1+ (1,0) [0|4294967295] "min" Vector__XXX
- SG_ AECDEngineHours1Timer1 : 8|32@1+ (1,0) [0|4294967295] "min" Vector__XXX
- SG_ AECDNumber1 : 0|8@1+ (1,0) [0|250] "" Vector__XXX
 
 BO_ 2566809342 BM: 8 Vector__XXX
  SG_ BatteryMainSwitchHoldState : 0|2@1+ (1,0) [0|3] "" Vector__XXX
@@ -3570,16 +3338,6 @@ BO_ 2566753534 AT1GP: 8 Vector__XXX
  SG_ DslPrticulateFilterOutletPress1 : 16|16@1+ (0.1,0) [0|6425.5] "kPa" Vector__XXX
  SG_ DslPrticulateFilterIntakePress1 : 0|16@1+ (0.1,0) [0|6425.5] "kPa" Vector__XXX
 
-BO_ 2566756606 AT1HI: 36 Vector__XXX
- SG_ Aftrtrtmnt1TtlNmbrOfActvRgnrtnMn : 224|32@1+ (1,0) [0|4294967295] "counts" Vector__XXX
- SG_ Aftrtrtmnt1TtlNmbrOfActvRgnrtnIn : 192|32@1+ (1,0) [0|4294967295] "counts" Vector__XXX
- SG_ Aftrtrtmnt1AvrgTmBtwnActvRgnrtns : 256|32@1+ (1,0) [0|4211081215] "s" Vector__XXX
- SG_ Aftrtrtmnt1TtlNmbrOfPssvRgnrtns : 160|32@1+ (1,0) [0|4294967295] "counts" Vector__XXX
- SG_ Aftrtrtmnt1TtlPssvRgnrationTime : 128|32@1+ (1,0) [0|4211081215] "s" Vector__XXX
- SG_ Aftrtrtmnt1TtlNmbrOfActvRgnrtns : 96|32@1+ (1,0) [0|4294967295] "counts" Vector__XXX
- SG_ Aftrtreatment1TotalDisabledTime : 64|32@1+ (1,0) [0|4211081215] "s" Vector__XXX
- SG_ Aftrtrtmnt1TtalRegenerationTime : 32|32@1+ (1,0) [0|4211081215] "s" Vector__XXX
- SG_ Aftertreatment1TotalFuelUsed : 0|32@1+ (0.5,0) [0|2105540607.5] "L" Vector__XXX
 
 BO_ 2565869310 AT1IG1: 8 Vector__XXX
  SG_ Aftrtrtmnt1IntkOxygnSnsrPrlmnryF : 56|5@1+ (1,0) [0|31] "" Vector__XXX
@@ -3633,16 +3391,6 @@ BO_ 2365478910 ASC5: 8 Vector__XXX
  SG_ DamperStiffnessRearAxle : 8|8@1+ (0.4,0) [0|100] "%" Vector__XXX
  SG_ DamperStiffnessFrontAxle : 0|8@1+ (0.4,0) [0|100] "%" Vector__XXX
 
-BO_ 2560950014 DM30: 12 Vector__XXX
- SG_ TestLimitMinimum : 80|16@1+ (1,0) [0|64255] "" Vector__XXX
- SG_ TestLimitMaximum : 64|16@1+ (1,0) [0|64255] "" Vector__XXX
- SG_ TestValue : 48|16@1+ (1,0) [0|64255] "" Vector__XXX
- SG_ SlotId : 32|16@1+ (1,0) [0|64255] "" Vector__XXX
- SG_ TestIdentifier : 0|8@1+ (1,0) [0|255] "" Vector__XXX
- SG_ FailureModeIdentifier1 : 24|5@1+ (1,0) [0|0] "" Vector__XXX
- SG_ SPN1High : 29|3@1+ (1,0) [0|7] "" Vector__XXX
- SG_ SPN1 : 8|16@1+ (1,0) [0|65536] "" Vector__XXX
-
 BO_ 2566763262 AT1IMG: 8 Vector__XXX
  SG_ Aftrtrtmnt1DslPrtcltFltrIntrmdtG : 58|5@1+ (1,0) [0|31] "" Vector__XXX
  SG_ Aftrtrtmnt1DslPrtcltFltrInt_0001 : 16|16@1+ (0.03125,-273) [-273|1734.96875] "deg C" Vector__XXX
@@ -3675,15 +3423,6 @@ BO_ 2566749182 AT1S: 8 Vector__XXX
  SG_ DslPrtcltFilter1SootLoadPercent : 0|8@1+ (1,0) [0|250] "%" Vector__XXX
  SG_ Aftrtrtmnt1DslPrtcltFltrStLdRgnr : 48|16@1+ (0.0025,0) [0|160.6375] "%" Vector__XXX
 
-BO_ 2566748670 AT1TI: 32 Vector__XXX
- SG_ Aftrtrtmnt1TrpNmbrOfActvRgnrtnMn : 224|32@1+ (1,0) [0|4294967295] "counts" Vector__XXX
- SG_ Aftrtrtmnt1TrpNmbrOfActvRgnrtnIn : 192|32@1+ (1,0) [0|4294967295] "counts" Vector__XXX
- SG_ Aftrtrtmnt1TrpNmbrOfPssvRgnrtns : 160|32@1+ (1,0) [0|4294967295] "counts" Vector__XXX
- SG_ Aftrtrtmnt1TrpPssvRgnrationTime : 128|32@1+ (1,0) [0|4211081215] "s" Vector__XXX
- SG_ Aftrtrtmnt1TrpNmbrOfActvRgnrtns : 96|32@1+ (1,0) [0|4294967295] "counts" Vector__XXX
- SG_ Aftertreatment1TripDisabledTime : 64|32@1+ (1,0) [0|4211081215] "s" Vector__XXX
- SG_ Aftrtrtmnt1TrpActvRgnrationTime : 32|32@1+ (1,0) [0|4211081215] "s" Vector__XXX
- SG_ Aftertreatment1TripFuelUsed : 0|32@1+ (0.5,0) [0|2105540607.5] "L" Vector__XXX
 
 BO_ 2566758142 AT2AC1: 8 Vector__XXX
  SG_ Aftrtreatment2AirEnableActuator : 62|2@1+ (1,0) [0|3] "" Vector__XXX
@@ -3715,16 +3454,6 @@ BO_ 2566753278 AT2GP: 8 Vector__XXX
  SG_ DslPrticulateFilterOutletPress2 : 16|16@1+ (0.1,0) [0|6425.5] "kPa" Vector__XXX
  SG_ DslPrticulateFilterIntakePress2 : 0|16@1+ (0.1,0) [0|6425.5] "kPa" Vector__XXX
 
-BO_ 2566756862 AT2HI: 36 Vector__XXX
- SG_ Aftrtrtmnt2TtlNmbrOfActvRgnrtnMn : 224|32@1+ (1,0) [0|4294967295] "counts" Vector__XXX
- SG_ Aftrtrtmnt2TtlNmbrOfActvRgnrtnIn : 192|32@1+ (1,0) [0|4294967295] "counts" Vector__XXX
- SG_ Aftrtrtmnt2AvrgTmBtwnActvRgnrtns : 256|32@1+ (1,0) [0|4211081215] "s" Vector__XXX
- SG_ Aftrtrtmnt2TtlNmbrOfPssvRgnrtns : 160|32@1+ (1,0) [0|4294967295] "counts" Vector__XXX
- SG_ Aftrtrtmnt2TtlPssvRgnrationTime : 128|32@1+ (1,0) [0|4211081215] "s" Vector__XXX
- SG_ Aftrtrtmnt2TtlNmbrOfActvRgnrtns : 96|32@1+ (1,0) [0|4294967295] "counts" Vector__XXX
- SG_ Aftrtreatment2TotalDisabledTime : 64|32@1+ (1,0) [0|4211081215] "s" Vector__XXX
- SG_ Aftrtrtmnt2TtalRegenerationTime : 32|32@1+ (1,0) [0|4211081215] "s" Vector__XXX
- SG_ Aftertreatment2TotalFuelUsed : 0|32@1+ (0.5,0) [0|2105540607.5] "L" Vector__XXX
 
 BO_ 2565869822 AT2IG1: 8 Vector__XXX
  SG_ Aftrtrtmnt2IntkOxygnSnsrPrlmnryF : 56|5@1+ (1,0) [0|31] "" Vector__XXX
@@ -3776,15 +3505,6 @@ BO_ 2566748926 AT2S: 8 Vector__XXX
  SG_ DslPrtcltFilter2SootLoadPercent : 0|8@1+ (1,0) [0|250] "%" Vector__XXX
  SG_ Aftrtrtmnt2DslPrtcltFltrStLdRgnr : 48|16@1+ (0.0025,0) [0|160.6375] "%" Vector__XXX
 
-BO_ 2566748414 AT2TI: 32 Vector__XXX
- SG_ Aftrtrtmnt2TrpNmbrOfActvRgnrtnMn : 224|32@1+ (1,0) [0|4294967295] "counts" Vector__XXX
- SG_ Aftrtrtmnt2TrpNmbrOfActvRgnrtnIn : 192|32@1+ (1,0) [0|4294967295] "counts" Vector__XXX
- SG_ Aftrtrtmnt2TrpNmbrOfPssvRgnrtns : 160|32@1+ (1,0) [0|4294967295] "counts" Vector__XXX
- SG_ Aftrtrtmnt2TrpPssvRgnrationTime : 128|32@1+ (1,0) [0|4211081215] "s" Vector__XXX
- SG_ Aftrtrtmnt2TrpNmbrOfActvRgnrtns : 96|32@1+ (1,0) [0|4294967295] "counts" Vector__XXX
- SG_ Aftertreatment2TripDisabledTime : 64|32@1+ (1,0) [0|4211081215] "s" Vector__XXX
- SG_ Aftrtrtmnt2TrpActvRgnrationTime : 32|32@1+ (1,0) [0|4211081215] "s" Vector__XXX
- SG_ Aftertreatment2TripFuelUsed : 0|32@1+ (0.5,0) [0|2105540607.5] "L" Vector__XXX
 
 BO_ 2365428478 EOI: 8 Vector__XXX
  SG_ EngDerateRq : 56|8@1+ (0.4,0) [0|100] "%" Vector__XXX
@@ -3910,20 +3630,6 @@ BO_ 2565078782 DM7: 8 Vector__XXX
  SG_ TestIdentifier : 0|8@1+ (1,0) [1|64] "" Vector__XXX
  SG_ FailureModeIdentifier1 : 24|5@1+ (1,0) [0|0] "" Vector__XXX
 
-BO_ 2566836222 DM6: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
 
 BO_ 2566835966 DM5: 8 Vector__XXX
  SG_ BoostPressureControlSystemStatus : 57|1@1- (1,0) [0|0] "" Vector__XXX
@@ -3962,56 +3668,8 @@ BO_ 2566835966 DM5: 8 Vector__XXX
  SG_ ComprehensiveComponentMonSupp : 26|1@1+ (1,0) [0|0] "" Vector__XXX
  SG_ FuelSystemMonitoringSupport : 25|1@1+ (1,0) [0|1] "" Vector__XXX
 
-BO_ 2566835710 DM4: 13 Vector__XXX
- SG_ EngIntakeManifold1Press : 48|8@1+ (2,0) [0|500] "kPa" Vector__XXX
- SG_ FreezeFrameLength : 0|8@1+ (1,0) [0|255] "Byte" Vector__XXX
- SG_ EngSpeed : 56|16@1+ (0.125,0) [0|8031.875] "rpm" Vector__XXX
- SG_ EngTorqueMode : 40|4@1+ (1,0) [0|15] "" Vector__XXX
- SG_ WheelBasedVehicleSpeed : 88|16@1+ (0.00390625,0) [0|250.996] "km/h" Vector__XXX
- SG_ EngPercentLoadAtCurrentSpeed : 72|8@1+ (1,0) [0|250] "%" Vector__XXX
- SG_ EngineCoolantTemperature : 80|8@1+ (1,-40) [-40|210] "deg C" Vector__XXX
- SG_ DTC1 : 8|32@1+ (1,0) [0|4294967295] "" Vector__XXX
 
 BO_ 2566835454 DM3: 0 Vector__XXX
-
-BO_ 2566764542 DM25: 13 Vector__XXX
- SG_ ExpandedFreezeFrameLength : 0|8@1+ (1,0) [0|255] "Byte" Vector__XXX
- SG_ DTC1 : 8|32@1+ (1,0) [0|4294967295] "" Vector__XXX
-
-BO_ 2566764286 DM24: 12 Vector__XXX
- SG_ SPNSupported1High : 21|3@1+ (1,0) [0|7] "" Vector__XXX
- SG_ SPNSupportTypeSTR3 : 82|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ SPNSupportTypeSTR2 : 81|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ SPNSupportTypeEFF3 : 80|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ SPNSupportTypeEFF2 : 48|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ SPNSupportTypeDS3 : 50|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ SPNSupportTypeDS2 : 49|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ SPNSupported3High : 85|3@1+ (1,0) [0|7] "" Vector__XXX
- SG_ SPNSupported2High : 53|3@1+ (1,0) [0|7] "" Vector__XXX
- SG_ SPNSupported3 : 64|16@1+ (1,0) [0|65535] "" Vector__XXX
- SG_ SPNSupported2 : 32|16@1+ (1,0) [0|65535] "" Vector__XXX
- SG_ SPNDataLength3 : 88|8@1+ (1,0) [0|240] "" Vector__XXX
- SG_ SPNSupportTypeSTR1 : 18|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ SPNSupportTypeDS1 : 17|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ SPNSupportTypeEFF1 : 16|1@1+ (1,0) [0|1] "" Vector__XXX
- SG_ SPNDataLength2 : 56|8@1+ (1,0) [0|240] "" Vector__XXX
- SG_ SPNDataLength1 : 24|8@1+ (1,0) [0|240] "" Vector__XXX
- SG_ SPNSupported1 : 0|16@1+ (1,0) [0|65535] "" Vector__XXX
-
-BO_ 2566764030 DM23: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
 
 BO_ 2562981630 DM22: 8 Vector__XXX
  SG_ IndividualDTCClearControlByte : 0|8@1+ (1,0) [0|255] "" Vector__XXX
@@ -4025,35 +3683,6 @@ BO_ 2562850558 DM21: 8 Vector__XXX
  SG_ MinutesRunByEngineMILActivated : 32|16@1+ (1,0) [0|64255] "mins" Vector__XXX
  SG_ DistanceSinceDTCsCleared : 16|16@1+ (1,0) [0|64255] "km" Vector__XXX
  SG_ DistanceWhileMILisActivated : 0|16@1+ (1,0) [0|64255] "km" Vector__XXX
-
-BO_ 2562916094 DM20: 11 Vector__XXX
- SG_ ApplSysMonitorDenominator : 72|16@1+ (1,0) [0|65535] "" Vector__XXX
- SG_ ApplSysMonitorNumerator : 56|16@1+ (1,0) [0|65535] "" Vector__XXX
- SG_ SPNofApplSysMonitor : 32|24@1+ (1,0) [0|524287] "" Vector__XXX
- SG_ OBDMonitoringCondEncountered : 16|16@1+ (1,0) [0|65535] "" Vector__XXX
- SG_ IgnitionCycleCounter : 0|16@1+ (1,0) [0|65535] "" Vector__XXX
-
-BO_ 2566835198 DM2: 22 Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
-
-BO_ 2564030206 DM19: 20 Vector__XXX
- SG_ CalibrationID4 : 128|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ CalibrationID3 : 96|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ CalibrationID2 : 64|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ CalibrationID1 : 32|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ CalibrationVerificationNumber : 0|32@1+ (1,0) [0|4294967295] "" Vector__XXX
 
 BO_ 2564226814 DM17: 1 Vector__XXX
  SG_ BootLoadData : 0|8@1- (1,0) [0|0] "" Vector__XXX
@@ -4093,40 +3722,10 @@ BO_ 2564816638 DM13: 8 Vector__XXX
  SG_ SuspendSignal : 24|4@1+ (1,0) [0|15] "" Vector__XXX
  SG_ SuspendDuration : 32|16@1+ (1,0) [0|64255] "sec" Vector__XXX
 
-BO_ 2566837502 DM12: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
-
 BO_ 2566837246 DM11: 0 Vector__XXX
 
 BO_ 2566836990 DM10: 8 Vector__XXX
  SG_ TestIdentifierSupported : 0|64@1+ (1,0) [1|1.844674407371E+019] "" Vector__XXX
-
-BO_ 2566834942 DM1: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
 
 BO_ 2566780926 UTACR: 8 Vector__XXX
  SG_ UtlityOverallPowerFactorLagging : 48|2@1+ (1,0) [0|3] "" Vector__XXX
@@ -4356,201 +3955,6 @@ BO_ 2566745086 AAGW: 8 Vector__XXX
  SG_ LiftAxleGroupWeightAvailable : 2|2@1+ (1,0) [0|3] "" Vector__XXX
  SG_ SteerAxleGroupWeightAvailable : 0|2@1+ (1,0) [0|3] "" Vector__XXX
 
-BO_ 2566739198 DM52: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
-
-BO_ 2566739454 DM51: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
-
-BO_ 2566739710 DM50: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
-
-BO_ 2566739966 DM49: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
-
-BO_ 2566740222 DM48: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
-
-BO_ 2566740478 DM47: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
-
-BO_ 2566740734 DM46: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
-
-BO_ 2566740990 DM45: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
-
-BO_ 2566741246 DM44: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
-
-BO_ 2566741502 DM43: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
-
-BO_ 2566741758 DM42: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
-
-BO_ 2566742014 DM41: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
-
-BO_ 2560622334 DM35: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
-
 BO_ 2566744062 ZNVW: 8 Vector__XXX
  SG_ ZeroNetVehicleWeightChange : 0|2@1+ (1,0) [0|3] "" Vector__XXX
 
@@ -4565,36 +3969,6 @@ BO_ 2560556798 DM29: 8 Vector__XXX
  SG_ MILOnDTCs : 16|8@1+ (1,0) [0|255] "" Vector__XXX
  SG_ AllPendingDTCs : 8|8@1+ (1,0) [0|255] "" Vector__XXX
  SG_ PendingDTCs : 0|8@1+ (1,0) [0|255] "" Vector__XXX
-
-BO_ 2566750462 DM28: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
-
-BO_ 2566750974 DM27: 22 Vector__XXX
- SG_ FlashRedStopLamp : 12|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashProtectLamp : 8|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashMalfuncIndicatorLamp : 14|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ FlashAmberWarningLamp : 10|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ MalfunctionIndicatorLampStatus : 6|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ AmberWarningLampStatus : 2|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ RedStopLampState : 4|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ ProtectLampStatus : 0|2@1+ (1,0) [0|3] "" Vector__XXX
- SG_ DTC5 : 144|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC4 : 112|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC3 : 80|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC2 : 48|32@1+ (1,0) [0|4294967295] "" Vector__XXX
- SG_ DTC1 : 16|32@1+ (1,0) [0|4294967295] "" Vector__XXX
 
 BO_ 2566754558 AETC: 5 Vector__XXX
  SG_ AETCSpeedValue : 8|16@1- (1,0) [0|8031.875] "rpm" Vector__XXX

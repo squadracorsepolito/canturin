@@ -34,29 +34,19 @@
 		nodeToString: (node) => node[labelKey]
 	});
 
-	const [snapshot, send] = useMachine(
-		tree.machine({
-			id: uniqueId(),
-			collection,
-			onSelectionChange: (details) => {
-				onselect?.(details.selectedValue[0]);
-				selectedValue = details.selectedValue[0];
-			}
-		}),
-		{
-			context: {
-				get selectedValue() {
-					return [selectedValue];
-				}
-			}
+	const zagTreeProps: tree.Props = $derived({
+		id: uniqueId(),
+		collection,
+		selectedValue: [selectedValue],
+		onSelectionChange: (details) => {
+			selectedValue = details.selectedValue[0];
+			onselect?.(details.selectedValue[0]);
 		}
-	);
-
-	const api = $derived(tree.connect(snapshot, send, normalizeProps));
-
-	$effect(() => {
-		untrack(() => api.expandParent)(selectedValue);
 	});
+
+	const service = useMachine(tree.machine, () => zagTreeProps);
+
+	const api = $derived(tree.connect(service, normalizeProps));
 
 	const RootIcon = getIcon(root);
 
@@ -66,7 +56,6 @@
 				if (!selectedValue) {
 					return;
 				}
-
 				if (event.key === 'Delete' || (event.metaKey && event.key === 'Backspace')) {
 					ondelete?.(selectedValue);
 					selectedValue = '';

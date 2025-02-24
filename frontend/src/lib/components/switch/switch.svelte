@@ -12,28 +12,19 @@
 
 	let { checked = $bindable(), label, readOnly, oncheckedchange: oncheckchange }: Props = $props();
 
-	const [snapshot, send] = useMachine(
-		zagSwitch.machine({
-			id: uniqueId(),
-
-			onCheckedChange: (details) => {
-				checked = details.checked;
-				oncheckchange?.(details.checked);
-			}
-		}),
-		{
-			context: {
-				get checked() {
-					return checked;
-				},
-				get readOnly() {
-					return readOnly;
-				}
-			}
+	const switchProps: zagSwitch.Props = $derived({
+		id: uniqueId(),
+		checked: checked,
+		readOnly: readOnly,
+		onCheckedChange: (details) => {
+			checked = details.checked;
+			oncheckchange?.(details.checked);
 		}
-	);
+	});
 
-	const api = $derived(zagSwitch.connect(snapshot, send, normalizeProps));
+	const service = useMachine(zagSwitch.machine, () => switchProps);
+
+	const api = $derived(zagSwitch.connect(service, normalizeProps));
 </script>
 
 <label {...api.getRootProps()}>

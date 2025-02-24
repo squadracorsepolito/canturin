@@ -11,29 +11,23 @@
 
 	let { checked = $bindable(), label, oncheckchange }: Props = $props();
 
-	const [snapshot, send] = useMachine(
-		checkbox.machine({
-			id: uniqueId(),
-			onCheckedChange: (details) => {
-				let tmpChecked = false;
-				if (details.checked !== 'indeterminate') {
-					tmpChecked = details.checked;
-				}
+	const checkboxProps: checkbox.Props = $derived({
+		id: uniqueId(),
+		checked: checked,
+		onCheckedChange: (details) => {
+			let tmpChecked = false;
+			if (details.checked !== 'indeterminate') {
+				tmpChecked = details.checked;
+			}
 
-				checked = tmpChecked;
-				oncheckchange?.(tmpChecked);
-			}
-		}),
-		{
-			context: {
-				get checked() {
-					return checked;
-				}
-			}
+			checked = tmpChecked;
+			oncheckchange?.(tmpChecked);
 		}
-	);
+	});
 
-	const api = $derived(checkbox.connect(snapshot, send, normalizeProps));
+	const service = useMachine(checkbox.machine, () => checkboxProps);
+
+	const api = $derived(checkbox.connect(service, normalizeProps));
 
 	const controlProps = $derived(
 		mergeProps(api.getControlProps(), {

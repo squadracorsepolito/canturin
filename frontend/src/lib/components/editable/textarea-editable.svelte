@@ -4,7 +4,6 @@
 	import { useMachine, normalizeProps } from '@zag-js/svelte';
 	import { AddIcon } from '../icon';
 	import { untrack } from 'svelte';
-	import { IconButton } from '../button';
 
 	type Props = {
 		initialValue: string;
@@ -16,23 +15,21 @@
 
 	let { initialValue, name, triggerLabel, rows = 8, onsubmit }: Props = $props();
 
-	const [snpshot, send] = useMachine(
-		editable.machine({
-			id: uniqueId(),
-			value: initialValue,
-			name: name,
-			activationMode: 'dblclick',
-			submitMode: 'both',
-			onInteractOutside: (e) => {
-				console.log(e);
-			},
-			onValueCommit: (details) => {
-				onsubmit(details.value);
-			}
-		})
-	);
+	const service = useMachine(editable.machine, {
+		id: uniqueId(),
+		value: initialValue,
+		name: name,
+		activationMode: 'dblclick',
+		submitMode: 'both',
+		onInteractOutside: (e) => {
+			console.log(e);
+		},
+		onValueCommit: (details) => {
+			onsubmit(details.value);
+		}
+	});
 
-	const api = $derived(editable.connect(snpshot, send, normalizeProps));
+	const api = $derived(editable.connect(service, normalizeProps));
 
 	$effect(() => {
 		untrack(() => api.setValue)(initialValue);

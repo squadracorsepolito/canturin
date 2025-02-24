@@ -12,21 +12,19 @@
 
 	let { trigger, content, placement }: Props = $props();
 
-	const [snapshot, send] = useMachine(
-		hoverCard.machine({
-			id: uniqueId(),
-			openDelay: 1300,
-			closeDelay: 200,
-			positioning: {
-				offset: {
-					mainAxis: 2
-				},
-				placement: placement
-			}
-		})
-	);
+	const service = useMachine(hoverCard.machine, {
+		id: uniqueId(),
+		openDelay: 1300,
+		closeDelay: 200,
+		positioning: {
+			offset: {
+				mainAxis: 2
+			},
+			placement: placement
+		}
+	});
 
-	const api = $derived(hoverCard.connect(snapshot, send, normalizeProps));
+	const api = $derived(hoverCard.connect(service, normalizeProps));
 </script>
 
 <div {...api.getTriggerProps()}>

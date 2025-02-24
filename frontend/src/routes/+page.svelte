@@ -16,6 +16,7 @@
 	import Combobox from '$lib/components/combobox/combobox.svelte';
 	import { HoverPreview } from '$lib/components/hover-preview';
 	import { Modal } from '$lib/components/modal';
+	import { pushToast } from '$lib/components/toast/toast-provider.svelte';
 
 	let items = $state([
 		{
@@ -92,7 +93,7 @@
 	<SignalEnumPanel entityId={layout.openPanelId} />
 {:else}
 	<div>
-		<Select name="select-test" items={selectData} bind:selected labelKey="label" valueKey="value" />
+		<!-- <Select name="select-test" items={selectData} bind:selected labelKey="label" valueKey="value" />
 
 		<Divider></Divider>
 
@@ -134,6 +135,6 @@
 			{#snippet content()}
 				content
 			{/snippet}
-		</HoverPreview>
+		</HoverPreview> -->
 	</div>
 {/if}

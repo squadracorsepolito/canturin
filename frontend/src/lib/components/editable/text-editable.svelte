@@ -13,52 +13,47 @@
 		textSize = 'md',
 		fontWeight = 'normal',
 		border = 'visible',
-		readonly = false,
+		readOnly = false,
 		oncommit
 	}: EditableProps<string> = $props();
 
 	let fallbackValue = $state(value);
 
-	const [snapshot, send] = useMachine(
-		editable.machine({
-			id: uniqueId(),
-			name: name,
-			activationMode: 'dblclick',
-			placeholder: placeholder
-				? {
-						edit: '',
-						preview: placeholder
-					}
-				: undefined,
-			autoResize: true,
-			submitMode: 'both',
-			onValueCommit: (details) => {
-				if (errors) {
-					api.setValue(fallbackValue);
-					return;
+	const editableProps: editable.Props = $derived({
+		id: uniqueId(),
+		name: name,
+		value: value,
+		activationMode: 'dblclick',
+		placeholder: placeholder
+			? {
+					edit: '',
+					preview: placeholder
 				}
+			: undefined,
+		autoResize: true,
+		submitMode: 'both',
+		onValueCommit: (details) => {
+			if (errors) {
+				api.setValue(fallbackValue);
+				return;
+			}
 
-				const tmpValue = details.value;
-				fallbackValue = tmpValue;
-				oncommit?.(tmpValue);
-			},
-			onValueChange: (details) => {
-				value = details.value;
+			const tmpValue = details.value;
+			if (fallbackValue === tmpValue) {
+				return;
 			}
-		}),
-		{
-			context: {
-				get value() {
-					return value;
-				},
-				get readOnly() {
-					return readonly;
-				}
-			}
+			fallbackValue = tmpValue;
+
+			oncommit?.(details.value);
+		},
+		onValueChange: (details) => {
+			value = details.value;
 		}
-	);
+	});
 
-	const api = $derived(editable.connect(snapshot, send, normalizeProps));
+	const service = useMachine(editable.machine, () => editableProps);
+
+	const api = $derived(editable.connect(service, normalizeProps));
 
 	const rootProps = $derived(
 		mergeProps(api.getRootProps(), {
@@ -79,7 +74,7 @@
 			data-text-size={textSize}
 			data-font-weight={fontWeight}
 			data-border={border}
-			data-readonly={readonly ? true : undefined}
+			data-readonly={readOnly ? true : undefined}
 		>
 			<input {...api.getInputProps()} />
 
