@@ -39,12 +39,6 @@ func newServiceManager() *serviceManager {
 	sidebar := newSidebarService()
 	sidebarCtr := sidebar.getController()
 
-	busSrv := newBusService(sidebarCtr)
-	busCtr := busSrv.getController()
-
-	nodeSrv := newNodeService(sidebarCtr, busSrv)
-	nodeCtr := nodeSrv.getController()
-
 	signalTypeSrv := newSignalTypeService(sidebarCtr)
 	signalTypeCtr := signalTypeSrv.getController()
 
@@ -59,6 +53,12 @@ func newServiceManager() *serviceManager {
 
 	messageSrv := newMessageService(sidebarCtr, signalCtr)
 	messageCtr := messageSrv.getController()
+
+	busSrv := newBusService(sidebarCtr)
+	busCtr := busSrv.getController()
+
+	nodeSrv := newNodeService(sidebarCtr, busSrv, messageCtr)
+	nodeCtr := nodeSrv.getController()
 
 	return &serviceManager{
 		network: acmelib.NewNetwork("Unnamed Network"),

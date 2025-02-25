@@ -161,16 +161,20 @@ func (f *sidebarItemFactory) newMessageNode(nodeInt *acmelib.NodeInterface) (str
 }
 
 func (f *sidebarItemFactory) newMessage(msg *acmelib.Message) (string, *sidebarItem) {
+	path := SidebarMessagesPrefix
+
 	parNodeInt := msg.SenderNodeInterface()
-	prefix := SidebarMessagesPrefix
 	if parNodeInt != nil {
 		parBus := parNodeInt.ParentBus()
 		if parBus != nil {
-			prefix += fmt.Sprintf("/%s/%s", parBus.EntityID(), parNodeInt.Node().EntityID())
+			path += fmt.Sprintf("/%s/%s/%d", parBus.EntityID(), parNodeInt.Node().EntityID(), parNodeInt.Number())
 		}
 	}
 
-	return msg.EntityID().String(), f.newItem(SidebarItemKindMessage, msg.EntityID(), prefix, msg.Name())
+	item := f.newItem(SidebarItemKindMessage, msg.EntityID(), path, msg.Name())
+	item.path = path
+
+	return msg.EntityID().String(), item
 }
 
 func (f *sidebarItemFactory) newSignal(sig acmelib.Signal) (string, *sidebarItem) {
@@ -473,10 +477,6 @@ func (s *SidebarService) load(req *sidebarLoadReq) {
 	app.EmitEvent(SidebarLoad)
 }
 
-func (s *SidebarService) sendUpdateName(req *sidebarUpdateNameReq) {
-	s.updateNameCh <- req
-}
-
 func (s *SidebarService) updateName(req *sidebarUpdateNameReq) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
@@ -489,10 +489,6 @@ func (s *SidebarService) updateName(req *sidebarUpdateNameReq) {
 	item.name = req.name
 
 	app.EmitEvent(SidebarUpdateName, item.convertBase())
-}
-
-func (s *SidebarService) sendAdd(req *sidebarAddReq) {
-	s.addCh <- req
 }
 
 func (s *SidebarService) add(req *sidebarAddReq) {
@@ -508,10 +504,6 @@ func (s *SidebarService) add(req *sidebarAddReq) {
 	parent.addChild(req.item)
 
 	app.EmitEvent(SidebarAdd, parent.convert())
-}
-
-func (s *SidebarService) sendDelete(req *sidebarDeleteReq) {
-	s.deleteCh <- req
 }
 
 func (s *SidebarService) delete(req *sidebarDeleteReq) {
@@ -624,7 +616,10 @@ func (s *sidebarController) sendAdd(ent entity) {
 		}
 
 		msgKey, msgItem := s.f.newMessage(msg)
-		s.addCh <- newSidebarAddReq(msgItem, msgKey, SidebarMessagesPrefix)
+
+		parent := s.f.getMessageNodeKey(msg.SenderNodeInterface())
+
+		s.addCh <- newSidebarAddReq(msgItem, msgKey, parent)
 
 	case acmelib.EntityKindSignal:
 		sig, ok := ent.(acmelib.Signal)

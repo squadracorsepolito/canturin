@@ -114,7 +114,7 @@ func newMessage(msg *acmelib.Message) Message {
 		CANID:          uint(msg.GetCANID()),
 
 		SizeByte:               msg.SizeByte(),
-		AvailableTrailingBytes: 0,
+		AvailableTrailingBytes: msg.SizeByte(),
 		MaxAvailableSpace:      0,
 		ByteOrder:              newMessageByteOrder(msg.ByteOrder()),
 
@@ -138,9 +138,11 @@ func newMessage(msg *acmelib.Message) Message {
 
 	signals := msg.Signals()
 
-	lastSig := signals[len(signals)-1]
-	trailingBits := msg.SizeByte()*8 - lastSig.GetStartBit() - lastSig.GetSize()
-	res.AvailableTrailingBytes = trailingBits / 8
+	if len(signals) > 0 {
+		lastSig := signals[len(signals)-1]
+		trailingBits := msg.SizeByte()*8 - lastSig.GetStartBit() - lastSig.GetSize()
+		res.AvailableTrailingBytes = trailingBits / 8
+	}
 
 	holes := []int{}
 	currPos := 0

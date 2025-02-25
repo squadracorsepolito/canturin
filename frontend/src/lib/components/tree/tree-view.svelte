@@ -5,6 +5,7 @@
 	import { AddIcon, AltArrowIcon, CollapseIcon } from '../icon';
 	import { untrack, type Component } from 'svelte';
 	import type { IconProps } from '../icon/types';
+	import { IconButton } from '../button';
 
 	type Props = {
 		root: T;
@@ -120,20 +121,19 @@
 			{root[labelKey]}
 		</div>
 
-		<button
+		<IconButton
 			onclick={() => {
 				if (!selectedValue) return;
 
 				onadd?.(selectedValue);
 			}}
-			class="rounded-btn btn-ghost p-1"
 		>
 			<AddIcon height="20" width="20" />
-		</button>
+		</IconButton>
 
-		<button onclick={() => api.collapse()} class="rounded-btn btn-ghost p-1">
+		<IconButton onclick={() => api.collapse()}>
 			<CollapseIcon height="20" width="20" />
-		</button>
+		</IconButton>
 	</div>
 
 	<div {...treeProps}>

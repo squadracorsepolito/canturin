@@ -6,6 +6,10 @@
 // @ts-ignore: Unused imports
 import * as time$0 from "../time/models.js";
 
+export interface AddSentMessageReq {
+    "interfaceNumber": number;
+}
+
 export interface AddSignalReq {
     "signalKind": SignalKind;
 }

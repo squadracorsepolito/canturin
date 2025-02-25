@@ -1,4 +1,10 @@
-import { SidebarItemKind, SidebarService, type Sidebar, type SidebarItem } from '$lib/api/canturin';
+import {
+	NodeService,
+	SidebarItemKind,
+	SidebarService,
+	type Sidebar,
+	type SidebarItem
+} from '$lib/api/canturin';
 import {
 	SidebarBusesPrefix,
 	SidebarMessagesPrefix,
@@ -212,5 +218,23 @@ export class SidebarState {
 
 	setSelectedItemId(id: string) {
 		this.selectedItemId = id;
+	}
+
+	async handleAdd(item: SidebarItem) {
+		const splPath = item.path.split('/');
+		const pathLen = splPath.length;
+
+		switch (item.kind) {
+			case SidebarItemKind.SidebarItemKindMessage:
+				try {
+					await NodeService.AddSentMessage(splPath[pathLen - 2], {
+						interfaceNumber: +splPath[pathLen - 1]
+					});
+				} catch (err) {
+					console.error(err);
+				}
+
+				break;
+		}
 	}
 }

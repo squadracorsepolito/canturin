@@ -1,17 +1,18 @@
 <script lang="ts">
 	import { type Message, type Signal, SignalKind } from '$lib/api/canturin';
-	import { Button, IconButton, LinkButton } from '$lib/components/button';
+	import { IconButton, LinkButton } from '$lib/components/button';
 	import { SignalGrid } from '$lib/components/grid';
 	import { HoverPreview } from '$lib/components/hover-preview';
 	import { AddIcon, CompactIcon, DeleteIcon } from '$lib/components/icon';
-	import { Modal } from '$lib/components/modal';
-	import { SegmentedControl } from '$lib/components/segmented-control';
 	import { Table, TableField, TableTitle } from '$lib/components/table';
 	import layout from '$lib/state/layout-state.svelte';
-	import { signalKindOptions } from '../signal/utils';
 	import type { PanelSectionProps } from '../types';
 	import { getMessageState } from './state.svelte';
 	import { getSignalKindString } from './utils';
+	import { getModalTrigger } from '$lib/components/modal/modal-provider.svelte';
+	import { Modal } from '$lib/components/modal';
+	import { SegmentedControl } from '$lib/components/segmented-control';
+	import { signalKindOptions } from '../signal/utils';
 
 	let { entityId }: PanelSectionProps = $props();
 

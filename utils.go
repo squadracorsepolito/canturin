@@ -16,7 +16,7 @@ func getNextNewName(baseName string, entities []entity) string {
 			break
 		}
 
-		res = fmt.Sprintf("%s_%d", baseName, count)
+		res = fmt.Sprintf("new_%s_%d", baseName, count)
 		count++
 	}
 

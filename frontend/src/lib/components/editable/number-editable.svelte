@@ -27,8 +27,6 @@
 		max
 	}: EditableProps<number> & Props = $props();
 
-	$inspect(min);
-
 	let fallbackValue = $state(value);
 
 	const editableProps: editable.Props = $derived({

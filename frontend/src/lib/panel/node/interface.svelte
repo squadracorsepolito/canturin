@@ -44,6 +44,10 @@
 		return arr.length;
 	}
 
+	function handleAddSentMessage() {
+		ns.addSentMessage(int.number);
+	}
+
 	function handleBulkDeleteSentMessages(msgs: BaseEntity[]) {
 		ns.removeSentMessages(
 			int.number,
@@ -115,7 +119,7 @@
 							<div class="flex gap-5">
 								<IconButton
 									onclick={() => {
-										layout.openMessageDraftPanel();
+										handleAddSentMessage();
 										deselectAll();
 									}}
 									label="Add Sent Message"

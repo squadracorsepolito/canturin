@@ -74,6 +74,10 @@ class NodeState extends EntityState<Node> {
 		);
 	}
 
+	addSentMessage(interfaceNumber: number) {
+		this.update(NodeService.AddSentMessage(this.entity.entityId, { interfaceNumber }));
+	}
+
 	removeSentMessages(interfaceNumber: number, messageEntityIds: string[]) {
 		this.update(
 			NodeService.RemoveSentMessages(this.entity.entityId, {

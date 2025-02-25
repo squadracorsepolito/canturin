@@ -1,12 +1,11 @@
 <script lang="ts">
+	import '../app.css';
 	import { EditorIcon, SettingIcon, UndoIcon, RedoIcon } from '$lib/components/icon';
 	import { ToastGroup } from '$lib/components/toast';
 	import { IconButton } from '$lib/components/button';
 	import history from '$lib/state/history-state.svelte';
 	import { PaneGroup, Pane, PaneResizer } from 'paneforge';
 	import { Sidebar } from '$lib/components/sidebar';
-
-	import '../app.css';
 
 	let { children } = $props();
 

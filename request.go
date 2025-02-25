@@ -131,6 +131,18 @@ func (r *request) toUpdateAttachedBus() *UpdateAttachedBusReq {
 	return req
 }
 
+type AddSentMessageReq struct {
+	InterfaceNumber int `json:"interfaceNumber"`
+}
+
+func (r *request) toAddSentMessage() *AddSentMessageReq {
+	req, ok := r.data.(*AddSentMessageReq)
+	if !ok {
+		panic("cannot convert to AddSentMessageReq")
+	}
+	return req
+}
+
 type RemoveSentMessagesReq struct {
 	InterfaceNumber  int      `json:"interfaceNumber"`
 	MessageEntityIDs []string `json:"messageEntityIds"`

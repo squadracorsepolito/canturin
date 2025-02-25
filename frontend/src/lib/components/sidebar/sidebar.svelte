@@ -61,7 +61,14 @@
 
 	function handleAdd(id: string) {
 		const leafItem = s.getItem(id);
+
 		if (leafItem) {
+			switch (leafItem.kind) {
+				case SidebarItemKind.SidebarItemKindMessage:
+					s.handleAdd(leafItem);
+					return;
+			}
+
 			layout.openPanel(s.getPanelType(leafItem.kind), 'draft');
 			return;
 		}

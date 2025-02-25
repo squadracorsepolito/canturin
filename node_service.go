@@ -48,9 +48,9 @@ type NodeService struct {
 	*service[*acmelib.Node, Node, *nodeHandler]
 }
 
-func newNodeService(sidebar *sidebarController, bus *BusService) *NodeService {
+func newNodeService(sidebar *sidebarController, bus *BusService, messageCtr *messageController) *NodeService {
 	return &NodeService{
-		service: newService(serviceKindNode, newNodeHandler(sidebar, bus), sidebar),
+		service: newService(serviceKindNode, newNodeHandler(sidebar, bus, messageCtr), sidebar),
 	}
 }
 
@@ -176,6 +176,10 @@ func (s *NodeService) UpdateAttachedBus(entityID string, req UpdateAttachedBusRe
 	return s.handle(entityID, &req, s.handler.updateAttachedBus)
 }
 
+func (s *NodeService) AddSentMessage(entityID string, req AddSentMessageReq) (Node, error) {
+	return s.handle(entityID, &req, s.handler.addSentMessage)
+}
+
 func (s *NodeService) RemoveSentMessages(entityID string, req RemoveSentMessagesReq) (Node, error) {
 	return s.handle(entityID, &req, s.handler.removeSentMessages)
 }
@@ -189,14 +193,16 @@ type nodeRes = response[*acmelib.Node]
 type nodeHandler struct {
 	*commonServiceHandler
 
-	bus *BusService
+	bus        *BusService
+	messageCtr *messageController
 }
 
-func newNodeHandler(sidebar *sidebarController, bus *BusService) *nodeHandler {
+func newNodeHandler(sidebar *sidebarController, bus *BusService, messageCtr *messageController) *nodeHandler {
 	return &nodeHandler{
 		commonServiceHandler: newCommonServiceHandler(sidebar),
 
-		bus: bus,
+		bus:        bus,
+		messageCtr: messageCtr,
 	}
 }
 
@@ -394,6 +400,64 @@ func (h *nodeHandler) updateAttachedBus(node *acmelib.Node, req *request, res *n
 			if err := bus.AddNodeInterface(nodeInt); err != nil {
 				return nil, err
 			}
+
+			return node, nil
+		},
+	)
+
+	return nil
+}
+
+func (h *nodeHandler) addSentMessage(node *acmelib.Node, req *request, res *nodeRes) error {
+	parsedReq := req.toAddSentMessage()
+
+	intNum := parsedReq.InterfaceNumber
+
+	nodeInt, err := node.GetInterface(intNum)
+	if err != nil {
+		return err
+	}
+
+	msgID := acmelib.MessageID(1)
+	sentMessages := nodeInt.SentMessages()
+	sentMsgEntities := []entity{}
+	for idx, tmpSentMsg := range sentMessages {
+		sentMsgEntities = append(sentMsgEntities, tmpSentMsg)
+
+		if idx == len(sentMessages)-1 {
+			msgID = acmelib.MessageID(tmpSentMsg.ID() + 1)
+		}
+	}
+
+	msgName := getNextNewName("message", sentMsgEntities)
+
+	msg := acmelib.NewMessage(msgName, msgID, 8)
+
+	if err := nodeInt.AddSentMessage(msg); err != nil {
+		return err
+	}
+
+	h.messageCtr.sendAdd(msg)
+
+	res.setUndo(
+		func() (*acmelib.Node, error) {
+			if err := nodeInt.RemoveSentMessage(msg.EntityID()); err != nil {
+				return nil, err
+			}
+
+			h.messageCtr.sendDelete(msg)
+
+			return node, nil
+		},
+	)
+
+	res.setRedo(
+		func() (*acmelib.Node, error) {
+			if err := nodeInt.AddSentMessage(msg); err != nil {
+				return nil, err
+			}
+
+			h.messageCtr.sendAdd(msg)
 
 			return node, nil
 		},
