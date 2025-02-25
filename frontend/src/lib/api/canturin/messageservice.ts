@@ -94,6 +94,11 @@ export function UpdateSendType(entityID: string, req: $models.UpdateSendTypeReq)
     return $resultPromise;
 }
 
+export function UpdateSizeByte(entityID: string, req: $models.UpdateSizeByteReq): Promise<$models.Message> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(2659680480, entityID, req) as any;
+    return $resultPromise;
+}
+
 export function UpdateStartDelayTime(entityID: string, req: $models.UpdateStartDelayTimeReq): Promise<$models.Message> & { cancel(): void } {
     let $resultPromise = $Call.ByID(3149167501, entityID, req) as any;
     return $resultPromise;

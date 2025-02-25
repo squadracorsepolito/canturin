@@ -6,6 +6,11 @@
 	import { useMachine, normalizeProps, mergeProps } from '@zag-js/svelte';
 	import type { EditableProps } from './types';
 
+	type Props = {
+		min?: number;
+		max?: number;
+	};
+
 	const inputId = uniqueId() + ':input';
 
 	let {
@@ -17,8 +22,12 @@
 		fontWeight = 'normal',
 		border = 'visible',
 		readOnly = false,
-		oncommit
-	}: EditableProps<number> = $props();
+		oncommit,
+		min,
+		max
+	}: EditableProps<number> & Props = $props();
+
+	$inspect(min);
 
 	let fallbackValue = $state(value);
 
@@ -65,6 +74,8 @@
 		id: uniqueId(),
 		name: name,
 		value: value + '',
+		min: min,
+		max: max,
 		onValueChange(details) {
 			if (isNaN(details.valueAsNumber)) {
 				value = 0;

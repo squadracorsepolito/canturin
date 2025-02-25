@@ -85,9 +85,10 @@ type Message struct {
 	ID             uint `json:"id"`
 	CANID          uint `json:"canId"`
 
-	SizeByte          int              `json:"sizeByte"`
-	MaxAvailableSpace int              `json:"maxAvailableSpace"`
-	ByteOrder         MessageByteOrder `json:"byteOrder"`
+	SizeByte               int              `json:"sizeByte"`
+	AvailableTrailingBytes int              `json:"availableTrailingBytes"`
+	MaxAvailableSpace      int              `json:"maxAvailableSpace"`
+	ByteOrder              MessageByteOrder `json:"byteOrder"`
 
 	CycleTime      int             `json:"cycleTime"`
 	SendType       MessageSendType `json:"sendType"`
@@ -112,9 +113,10 @@ func newMessage(msg *acmelib.Message) Message {
 		ID:             uint(msg.ID()),
 		CANID:          uint(msg.GetCANID()),
 
-		SizeByte:          msg.SizeByte(),
-		MaxAvailableSpace: 0,
-		ByteOrder:         newMessageByteOrder(msg.ByteOrder()),
+		SizeByte:               msg.SizeByte(),
+		AvailableTrailingBytes: 0,
+		MaxAvailableSpace:      0,
+		ByteOrder:              newMessageByteOrder(msg.ByteOrder()),
 
 		CycleTime:      msg.CycleTime(),
 		SendType:       newMessageSendType(msg.SendType()),
@@ -134,9 +136,15 @@ func newMessage(msg *acmelib.Message) Message {
 		}
 	}
 
+	signals := msg.Signals()
+
+	lastSig := signals[len(signals)-1]
+	trailingBits := msg.SizeByte()*8 - lastSig.GetStartBit() - lastSig.GetSize()
+	res.AvailableTrailingBytes = trailingBits / 8
+
 	holes := []int{}
 	currPos := 0
-	for _, sig := range msg.Signals() {
+	for _, sig := range signals {
 		res.Signals = append(res.Signals, Signal{
 			base: getBase(sig),
 
@@ -259,7 +267,10 @@ func (s *MessageService) UpdateMessageID(entityID string, req UpdateMessageIDReq
 
 func (s *MessageService) UpdateStaticCANID(entityID string, req UpdateStaticCANIDReq) (Message, error) {
 	return s.handle(entityID, &req, s.handler.updateStaticCANID)
+}
 
+func (s *MessageService) UpdateSizeByte(entityID string, req UpdateSizeByteReq) (Message, error) {
+	return s.handle(entityID, &req, s.handler.updateSizeByte)
 }
 
 func (s *MessageService) UpdateByteOrder(entityID string, req UpdateByteOrderReq) (Message, error) {
@@ -459,6 +470,41 @@ func (h *messageHandler) updateStaticCANID(msg *acmelib.Message, req *request, r
 	res.setRedo(
 		func() (*acmelib.Message, error) {
 			if err := msg.SetStaticCANID(staticCANID); err != nil {
+				return nil, err
+			}
+			return msg, nil
+		},
+	)
+
+	return nil
+}
+
+func (h *messageHandler) updateSizeByte(msg *acmelib.Message, req *request, res *messageRes) error {
+	parsedReq := req.toUpdateSizeByte()
+
+	sizeByte := parsedReq.SizeByte
+
+	oldSizeByte := msg.SizeByte()
+	if sizeByte == oldSizeByte {
+		return nil
+	}
+
+	if err := msg.UpdateSizeByte(sizeByte); err != nil {
+		return err
+	}
+
+	res.setUndo(
+		func() (*acmelib.Message, error) {
+			if err := msg.UpdateSizeByte(oldSizeByte); err != nil {
+				return nil, err
+			}
+			return msg, nil
+		},
+	)
+
+	res.setRedo(
+		func() (*acmelib.Message, error) {
+			if err := msg.UpdateSizeByte(sizeByte); err != nil {
 				return nil, err
 			}
 			return msg, nil

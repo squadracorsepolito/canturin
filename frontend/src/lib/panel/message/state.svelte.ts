@@ -82,6 +82,10 @@ class MessageState extends EntityState<Message> {
 		this.update(MessageService.UpdateStaticCANID(this.entity.entityId, { staticCanId }));
 	}
 
+	updateSizeByte(sizeByte: number) {
+		this.update(MessageService.UpdateSizeByte(this.entity.entityId, { sizeByte }));
+	}
+
 	updateByteOrder(byteOrder: MessageByteOrder) {
 		this.update(MessageService.UpdateByteOrder(this.entity.entityId, { byteOrder }));
 	}

@@ -143,6 +143,7 @@ export interface Message {
     "id": number;
     "canId": number;
     "sizeByte": number;
+    "availableTrailingBytes": number;
     "maxAvailableSpace": number;
     "byteOrder": MessageByteOrder;
     "cycleTime": number;
@@ -478,6 +479,10 @@ export interface UpdateSignalUnitKindReq {
 
 export interface UpdateSignalUnitReq {
     "signalUnitEntityId": string;
+}
+
+export interface UpdateSizeByteReq {
+    "sizeByte": number;
 }
 
 export interface UpdateStartDelayTimeReq {

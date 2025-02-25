@@ -1,10 +1,5 @@
 <script lang="ts">
-	import {
-		MessageByteOrder,
-		MessageService,
-		type Message,
-		type MessageSendType
-	} from '$lib/api/canturin';
+	import { MessageByteOrder, type Message, type MessageSendType } from '$lib/api/canturin';
 	import { Attribute, AttributeGroup } from '$lib/components/attribute';
 	import { NumberEditable } from '$lib/components/editable';
 	import { Select } from '$lib/components/select';
@@ -19,6 +14,7 @@
 	import { Switch } from '$lib/components/switch';
 	import { onMount } from 'svelte';
 	import { SegmentedControl } from '$lib/components/segmented-control';
+	import { DerivedBindable } from '$lib/utils/state.svelte';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -55,6 +51,30 @@
 		() => ms.entity.canId
 	);
 
+	let tmpSizeByte = new DerivedBindable(() => ms.entity.sizeByte);
+
+	function sizeByteGetter() {
+		return ms.entity.sizeByte;
+	}
+
+	function availableTrailingBytesGetter() {
+		return ms.entity.availableTrailingBytes;
+	}
+
+	const sizeByteValidator = new Validator(
+		v.pipe(
+			v.number(),
+			v.integer(),
+			v.maxValue(8),
+			v.check(
+				(value) => value >= sizeByteGetter() - availableTrailingBytesGetter(),
+				(issue) =>
+					`Invalid Size: Expected >= ${sizeByteGetter() - availableTrailingBytesGetter()} but received ${issue.received}`
+			)
+		),
+		() => tmpSizeByte.value
+	);
+
 	const cycleTimeValidator = new Validator(
 		v.pipe(v.number(), v.integer(), v.minValue(0)),
 		() => ms.entity.cycleTime
@@ -76,6 +96,10 @@
 
 	function handleCanId(canId: number) {
 		ms.updateStaticCanId(canId);
+	}
+
+	function handleSizeByte(sizeByte: number) {
+		ms.updateSizeByte(sizeByte);
 	}
 
 	function handleByteOrder(byteOrder: string) {
@@ -111,7 +135,7 @@
 				name="message-id"
 				errors={messageIdValidator.errors}
 				oncommit={handleMessageId}
-				readonly={msg.hasStaticCANID}
+				readOnly={msg.hasStaticCANID}
 			/>
 		</Attribute>
 
@@ -128,7 +152,7 @@
 				name="message-can-id"
 				errors={canIdValidator.errors}
 				oncommit={handleCanId}
-				readonly={!msg.hasStaticCANID}
+				readOnly={!msg.hasStaticCANID}
 			/>
 		</Attribute>
 
@@ -141,9 +165,14 @@
 
 	<AttributeGroup>
 		<Attribute label="Size" desc="The size of the message in bytes" fullSpan>
-			<Readonly>
-				{msg.sizeByte}
-			</Readonly>
+			<NumberEditable
+				name="message-size-byte"
+				bind:value={tmpSizeByte.value}
+				errors={sizeByteValidator.errors}
+				oncommit={handleSizeByte}
+				min={msg.sizeByte - msg.availableTrailingBytes}
+				max={8}
+			/>
 		</Attribute>
 
 		<Attribute label="Byte Order" desc="The byte order of the message payload" fullSpan>
