@@ -1,42 +1,28 @@
 <script lang="ts">
 	import { uniqueId } from '$lib/utils';
 	import * as dialog from '@zag-js/dialog';
-	import { portal, normalizeProps, useMachine, mergeProps } from '@zag-js/svelte';
+	import { portal, normalizeProps, useMachine } from '@zag-js/svelte';
 	import type { Snippet } from 'svelte';
-	import { IconButton } from '../button';
-	import type { ThemeColorProps } from '$lib/utils/types';
+	import type { HTMLButtonAttributes } from 'svelte/elements';
 
-	type Props = ThemeColorProps & {
+	type Props = {
 		title: string;
 		desc?: string;
-		triggerLabel?: string;
-		disabled?: boolean;
-		trigger?: Snippet;
+		trigger: Snippet<[{ getProps: () => HTMLButtonAttributes }]>;
 		content?: Snippet;
 		actions?: Snippet<[{ close: () => void }]>;
 	};
 
-	let { themeColor, title, desc, triggerLabel, disabled, trigger, content, actions }: Props =
-		$props();
+	let { title, desc, trigger, content, actions }: Props = $props();
 
 	const service = useMachine(dialog.machine, {
 		id: uniqueId()
 	});
 
 	const api = $derived(dialog.connect(service, normalizeProps));
-
-	const triggerProps = $derived(
-		mergeProps(api.getTriggerProps(), {
-			themeColor,
-			label: triggerLabel,
-			disabled
-		})
-	);
 </script>
 
-<IconButton {...triggerProps}>
-	{@render trigger?.()}
-</IconButton>
+{@render trigger({ getProps: api.getTriggerProps })}
 
 {#if api.open}
 	<div use:portal {...api.getBackdropProps()}></div>

@@ -9,16 +9,15 @@
 	import type { PanelSectionProps } from '../types';
 	import { getMessageState } from './state.svelte';
 	import { getSignalKindString } from './utils';
-	import { getModalTrigger } from '$lib/components/modal/modal-provider.svelte';
-	import { Modal } from '$lib/components/modal';
-	import { SegmentedControl } from '$lib/components/segmented-control';
-	import { signalKindOptions } from '../signal/utils';
+	import { AddSignalModal } from '$lib/components/modal';
 
 	let { entityId }: PanelSectionProps = $props();
 
 	const ms = getMessageState(entityId);
 
-	let addSignalKind = $state<SignalKind>(SignalKind.SignalKindStandard);
+	function handleAdd(signalKind: SignalKind) {
+		ms.addSignal(signalKind);
+	}
 
 	function handleCompact() {
 		ms.compactSignals();
@@ -73,35 +72,18 @@
 								<CompactIcon />
 							</IconButton>
 
-							<Modal
-								title="Add Signal"
-								desc="Pick the kind of the signal you want to add"
-								triggerLabel="Add Signal"
-								themeColor="primary"
-								disabled={msg.maxAvailableSpace === 0}
-							>
-								{#snippet trigger()}
-									<AddIcon />
-								{/snippet}
-
-								{#snippet content()}
-									<SegmentedControl
-										name="signal-kind"
-										bind:selectedValue={addSignalKind}
-										options={signalKindOptions}
-									/>
-								{/snippet}
-
-								{#snippet actions({ close })}
-									<button
-										onclick={() => {
-											ms.addSignal(addSignalKind);
-											close();
-										}}
-										class="btn btn-primary">Add</button
+							<AddSignalModal onsubmit={handleAdd}>
+								{#snippet trigger({ getProps })}
+									<IconButton
+										label="Add Signal"
+										themeColor="primary"
+										disabled={msg.maxAvailableSpace === 0}
+										{...getProps()}
 									>
+										<AddIcon />
+									</IconButton>
 								{/snippet}
-							</Modal>
+							</AddSignalModal>
 
 							<IconButton
 								onclick={() => {
