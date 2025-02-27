@@ -1,11 +1,8 @@
 package main
 
 const (
-	SidebarGroupPrefix       = "group"
-	SidebarBusesPrefix       = "buses"
-	SidebarNodesPrefix       = "nodes"
-	SidebarMessagesPrefix    = "messages"
-	SidebarSignalTypesPrefix = "signal-types"
-	SidebarSignalUnitsPrefix = "signal-units"
-	SidebarSignalEnumsPrefix = "signal-enums"
+	SidebarNodeGroupID       = "nodes"
+	SidebarSignalTypeGroupID = "signal-types"
+	SidebarSignalUnitGroupID = "signal-units"
+	SidebarSignalEnumGroupID = "signal-enums"
 )

@@ -14,25 +14,24 @@ import (
 type SidebarItemKind string
 
 const (
-	SidebarItemKindGroup      SidebarItemKind = "group"
-	SidebarItemKindNetwork    SidebarItemKind = "network"
-	SidebarItemKindBus        SidebarItemKind = "bus"
-	SidebarItemKindNode       SidebarItemKind = "node"
-	SidebarItemKindMessage    SidebarItemKind = "message"
-	SidebarItemKindSignal     SidebarItemKind = "signal"
-	SidebarItemKindSignalType SidebarItemKind = "signal-type"
-	SidebarItemKindSignalUnit SidebarItemKind = "signal-unit"
-	SidebarItemKindSignalEnum SidebarItemKind = "signal-enum"
+	SidebarItemKindGroup         SidebarItemKind = "group"
+	SidebarItemKindNetwork       SidebarItemKind = "network"
+	SidebarItemKindBus           SidebarItemKind = "bus"
+	SidebarItemKindNode          SidebarItemKind = "node"
+	SidebarItemKindNodeInterface SidebarItemKind = "node-interface"
+	SidebarItemKindMessage       SidebarItemKind = "message"
+	SidebarItemKindSignal        SidebarItemKind = "signal"
+	SidebarItemKindSignalType    SidebarItemKind = "signal-type"
+	SidebarItemKindSignalUnit    SidebarItemKind = "signal-unit"
+	SidebarItemKindSignalEnum    SidebarItemKind = "signal-enum"
 )
 
 type SidebarItem struct {
 	Kind     SidebarItemKind `json:"kind"`
-	Prefix   string          `json:"prefix"`
 	ID       string          `json:"id"`
+	Path     string          `json:"path"`
 	Name     string          `json:"name"`
 	Children []SidebarItem   `json:"children"`
-
-	Path string `json:"path"`
 }
 
 type Sidebar struct {
@@ -41,29 +40,62 @@ type Sidebar struct {
 
 type sidebarItem struct {
 	kind     SidebarItemKind
-	prefix   string
-	entityID acmelib.EntityID
+	id       string
+	path     string
 	name     string
 	parent   *sidebarItem
 	children []*sidebarItem
+}
 
-	path string
+func newNodeIntSidebarItemID(nodeInt *acmelib.NodeInterface) string {
+	return fmt.Sprintf("%s:%d", nodeInt.Node().EntityID(), nodeInt.Number())
+}
+
+func newNodeIntSidebarItemName(nodeInt *acmelib.NodeInterface) string {
+	return fmt.Sprintf("%s:%d", nodeInt.Node().Name(), nodeInt.Number())
+}
+
+func newSidebarItem(kind SidebarItemKind, id, name string) *sidebarItem {
+	return &sidebarItem{
+		kind:     kind,
+		id:       id,
+		path:     id,
+		name:     name,
+		children: []*sidebarItem{},
+	}
+}
+
+func (si *sidebarItem) getKey() string {
+	splPath := strings.Split(si.path, "/")
+	return splPath[len(splPath)-1]
 }
 
 func (si *sidebarItem) addChild(child *sidebarItem) {
 	si.children = append(si.children, child)
 	child.parent = si
+	child.path = fmt.Sprintf("%s/%s", si.path, child.getKey())
 }
 
 func (si *sidebarItem) removeChild(child *sidebarItem) {
 	si.children = slices.DeleteFunc(si.children, func(c *sidebarItem) bool {
-		return c.kind == child.kind && c.entityID == child.entityID && c.name == child.name
+		return c.kind == child.kind && c.id == child.id && c.name == child.name
 	})
 	child.parent = nil
+	child.path = child.getKey()
+}
+
+func (si *sidebarItem) convertBase() SidebarItem {
+	return SidebarItem{
+		Kind:     si.kind,
+		ID:       si.id,
+		Path:     si.path,
+		Name:     si.name,
+		Children: []SidebarItem{},
+	}
 }
 
 func (si *sidebarItem) convert() SidebarItem {
-	base := si.convertBase()
+	res := si.convertBase()
 
 	if si.kind != SidebarItemKindNetwork {
 		slices.SortFunc(si.children, func(a, b *sidebarItem) int {
@@ -72,153 +104,10 @@ func (si *sidebarItem) convert() SidebarItem {
 	}
 
 	for _, child := range si.children {
-		base.Children = append(base.Children, child.convert())
+		res.Children = append(res.Children, child.convert())
 	}
 
-	return base
-}
-
-func (si *sidebarItem) convertBase() SidebarItem {
-	id := ""
-	if si.kind == SidebarItemKindGroup {
-		id = fmt.Sprintf("%s/%s", SidebarGroupPrefix, si.entityID)
-	} else {
-		id = si.entityID.String()
-	}
-
-	return SidebarItem{
-		Kind:     si.kind,
-		Prefix:   si.prefix,
-		ID:       id,
-		Name:     si.name,
-		Children: []SidebarItem{},
-
-		Path: si.path,
-	}
-}
-
-func (s *sidebarItem) prependPath(entityID acmelib.EntityID) {
-	s.path = fmt.Sprintf("%s/%s", entityID, s.path)
-}
-
-type sidebarItemFactory struct{}
-
-func (f *sidebarItemFactory) newItem(kind SidebarItemKind, entityID acmelib.EntityID, prefix, name string) *sidebarItem {
-	return &sidebarItem{
-		kind:     kind,
-		entityID: entityID,
-		prefix:   prefix,
-		name:     name,
-		children: []*sidebarItem{},
-
-		path: entityID.String(),
-	}
-}
-
-func (f *sidebarItemFactory) newGroup(prefix, name string) (string, *sidebarItem) {
-	return prefix, f.newItem(SidebarItemKindGroup, acmelib.EntityID(prefix), "", name)
-}
-
-func (f *sidebarItemFactory) newNetwork(net entity) (string, *sidebarItem) {
-	return net.EntityID().String(), f.newItem(SidebarItemKindNetwork, net.EntityID(), "", net.Name())
-}
-
-func (f *sidebarItemFactory) newBus(bus *acmelib.Bus) (string, *sidebarItem) {
-	entID := bus.EntityID()
-	item := f.newItem(SidebarItemKindBus, entID, SidebarBusesPrefix, bus.Name())
-
-	parNet := bus.ParentNetwork()
-	if parNet != nil {
-		item.prependPath(parNet.EntityID())
-	}
-
-	return entID.String(), item
-}
-
-func (f *sidebarItemFactory) newMessageBus(bus entity) (string, *sidebarItem) {
-	key := f.getMessageBusKey(bus)
-	item := f.newItem(SidebarItemKindGroup, bus.EntityID(), SidebarMessagesPrefix, bus.Name())
-	return key, item
-}
-
-func (f *sidebarItemFactory) newNode(node entity) (string, *sidebarItem) {
-	return node.EntityID().String(), f.newItem(SidebarItemKindNode, node.EntityID(), SidebarNodesPrefix, node.Name())
-}
-
-func (f *sidebarItemFactory) newMessageNode(nodeInt *acmelib.NodeInterface) (string, *sidebarItem) {
-	parBus := nodeInt.ParentBus()
-	prefix := ""
-	if parBus != nil {
-		prefix = fmt.Sprintf("%s/%s", SidebarMessagesPrefix, parBus.EntityID())
-	}
-
-	name := f.getMessageNodeName(nodeInt)
-
-	key := f.getMessageNodeKey(nodeInt)
-	item := f.newItem(SidebarItemKindGroup, nodeInt.Node().EntityID(), prefix, name)
-
-	return key, item
-}
-
-func (f *sidebarItemFactory) newMessage(msg *acmelib.Message) (string, *sidebarItem) {
-	path := SidebarMessagesPrefix
-
-	parNodeInt := msg.SenderNodeInterface()
-	if parNodeInt != nil {
-		parBus := parNodeInt.ParentBus()
-		if parBus != nil {
-			path += fmt.Sprintf("/%s/%s/%d", parBus.EntityID(), parNodeInt.Node().EntityID(), parNodeInt.Number())
-		}
-	}
-
-	item := f.newItem(SidebarItemKindMessage, msg.EntityID(), path, msg.Name())
-	item.path = path
-
-	return msg.EntityID().String(), item
-}
-
-func (f *sidebarItemFactory) newSignal(sig acmelib.Signal) (string, *sidebarItem) {
-	path := SidebarMessagesPrefix
-
-	parMsg := sig.ParentMessage()
-	if parMsg != nil {
-		parNodeInt := parMsg.SenderNodeInterface()
-		if parNodeInt != nil {
-			parBus := parNodeInt.ParentBus()
-			if parBus != nil {
-				path += fmt.Sprintf("/%s/%s/%s", parBus.EntityID(), parNodeInt.Node().EntityID(), parMsg.EntityID())
-			}
-		}
-	}
-
-	item := f.newItem(SidebarItemKindSignal, sig.EntityID(), path, sig.Name())
-	item.path = path
-
-	return sig.EntityID().String(), item
-}
-
-func (f *sidebarItemFactory) newSignalType(sigType entity) (string, *sidebarItem) {
-	return sigType.EntityID().String(), f.newItem(SidebarItemKindSignalType, sigType.EntityID(), SidebarSignalTypesPrefix, sigType.Name())
-}
-
-func (f *sidebarItemFactory) newSignalUnit(sigUnit entity) (string, *sidebarItem) {
-	return sigUnit.EntityID().String(), f.newItem(SidebarItemKindSignalUnit, sigUnit.EntityID(), SidebarSignalUnitsPrefix, sigUnit.Name())
-}
-
-func (f *sidebarItemFactory) newSignalEnum(sigEnum entity) (string, *sidebarItem) {
-	return sigEnum.EntityID().String(), f.newItem(SidebarItemKindSignalEnum, sigEnum.EntityID(), SidebarSignalEnumsPrefix, sigEnum.Name())
-}
-
-func (f *sidebarItemFactory) getMessageBusKey(bus entity) string {
-	return fmt.Sprintf("%s/%s", bus.EntityID(), SidebarMessagesPrefix)
-}
-
-func (f *sidebarItemFactory) getMessageNodeKey(nodeInt *acmelib.NodeInterface) string {
-	return fmt.Sprintf("%s/%d/%s", nodeInt.Node().EntityID(), nodeInt.Number(), SidebarMessagesPrefix)
-}
-
-func (f *sidebarItemFactory) getMessageNodeName(nodeInt *acmelib.NodeInterface) string {
-	return fmt.Sprintf("%s:%d", nodeInt.Node().Name(), nodeInt.Number())
+	return res
 }
 
 type sidebarLoadReq struct {
@@ -240,14 +129,12 @@ func newSidebarUpdateNameReq(itemKey string, name string) *sidebarUpdateNameReq 
 
 type sidebarAddReq struct {
 	item          *sidebarItem
-	itemKey       string
 	parentItemKey string
 }
 
-func newSidebarAddReq(item *sidebarItem, itemKey, parentItemKey string) *sidebarAddReq {
+func newSidebarAddReq(item *sidebarItem, parentItemKey string) *sidebarAddReq {
 	return &sidebarAddReq{
 		item:          item,
-		itemKey:       itemKey,
 		parentItemKey: parentItemKey,
 	}
 }
@@ -261,8 +148,6 @@ func newSidebarDeleteReq(itemKey string) *sidebarDeleteReq {
 }
 
 type SidebarService struct {
-	f *sidebarItemFactory
-
 	items map[string]*sidebarItem
 	root  *sidebarItem
 
@@ -276,8 +161,6 @@ type SidebarService struct {
 
 func newSidebarService() *SidebarService {
 	return &SidebarService{
-		f: &sidebarItemFactory{},
-
 		items: make(map[string]*sidebarItem),
 
 		loadCh:       make(chan *sidebarLoadReq),
@@ -291,16 +174,16 @@ func (s *SidebarService) run(ctx context.Context) {
 	for {
 		select {
 		case req := <-s.loadCh:
-			s.load(req)
+			s.handleLoad(req)
 
 		case req := <-s.updateNameCh:
-			s.updateName(req)
+			s.handleUpdateName(req)
 
 		case req := <-s.addCh:
-			s.add(req)
+			s.handleAdd(req)
 
 		case req := <-s.deleteCh:
-			s.delete(req)
+			s.handleDelete(req)
 
 		case <-ctx.Done():
 			return
@@ -323,108 +206,77 @@ func (s *SidebarService) OnStartup(ctx context.Context, _ application.ServiceOpt
 
 func (s *SidebarService) OnShutdown() {}
 
-func (s *SidebarService) addItem(itemKey string, item *sidebarItem) {
-	s.items[itemKey] = item
+func (s *SidebarService) addItem(item *sidebarItem) {
+	s.items[item.getKey()] = item
 }
 
 func (s *SidebarService) sendLoad(req *sidebarLoadReq) {
 	s.loadCh <- req
 }
 
-func (s *SidebarService) load(req *sidebarLoadReq) {
+func (s *SidebarService) handleLoad(req *sidebarLoadReq) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
 	clear(s.items)
-
-	net := req.network
 
 	nodes := make(map[acmelib.EntityID]*acmelib.Node)
 	sigTypes := make(map[acmelib.EntityID]*acmelib.SignalType)
 	sigUnits := make(map[acmelib.EntityID]*acmelib.SignalUnit)
 	sigEnums := make(map[acmelib.EntityID]*acmelib.SignalEnum)
 
+	net := req.network
+
 	// the network is the root item
-	netKey, netItem := s.f.newNetwork(net)
-	s.addItem(netKey, netItem)
+	netItem := newSidebarItem(SidebarItemKindNetwork, net.EntityID().String(), net.Name())
+	s.addItem(netItem)
 	s.root = netItem
 
-	// it groups all the buses
-	busGroupKey, busGroupItem := s.f.newGroup(SidebarBusesPrefix, "Buses")
-	s.addItem(busGroupKey, busGroupItem)
-	netItem.addChild(busGroupItem)
-
 	// it groups all the nodes
-	nodeGroupKey, nodeGroupItem := s.f.newGroup(SidebarNodesPrefix, "Nodes")
-	s.addItem(nodeGroupKey, nodeGroupItem)
+	nodeGroupItem := newSidebarItem(SidebarItemKindGroup, SidebarNodeGroupID, "Nodes")
+	s.addItem(nodeGroupItem)
 	netItem.addChild(nodeGroupItem)
 
-	// it groups all the messages
-	msgGroupKey, msgGroupItem := s.f.newGroup(SidebarMessagesPrefix, "Messages")
-	s.addItem(msgGroupKey, msgGroupItem)
-	netItem.addChild(msgGroupItem)
-
 	// it groups all the signal types
-	sigTypeGroupKey, sigTypeGroupItem := s.f.newGroup(SidebarSignalTypesPrefix, "Signal Types")
-	s.addItem(sigTypeGroupKey, sigTypeGroupItem)
+	sigTypeGroupItem := newSidebarItem(SidebarItemKindGroup, SidebarSignalTypeGroupID, "Signal Types")
+	s.addItem(sigTypeGroupItem)
 	netItem.addChild(sigTypeGroupItem)
 
 	// it groups all the signal units
-	sigUnitGroupKey, sigUnitGroupItem := s.f.newGroup(SidebarSignalUnitsPrefix, "Signal Units")
-	s.addItem(sigUnitGroupKey, sigUnitGroupItem)
+	sigUnitGroupItem := newSidebarItem(SidebarItemKindGroup, SidebarSignalUnitGroupID, "Signal Units")
+	s.addItem(sigUnitGroupItem)
 	netItem.addChild(sigUnitGroupItem)
 
 	// it groups all the signal enums
-	sigEnumGroupKey, sigEnumGroupItem := s.f.newGroup(SidebarSignalEnumsPrefix, "Signal Enums")
-	s.addItem(sigEnumGroupKey, sigEnumGroupItem)
+	sigEnumGroupItem := newSidebarItem(SidebarItemKindGroup, SidebarSignalEnumGroupID, "Signal Enums")
+	s.addItem(sigEnumGroupItem)
 	netItem.addChild(sigEnumGroupItem)
 
-	// add buses and nodes
 	for _, bus := range net.Buses() {
-		busKey, busItem := s.f.newBus(bus)
-		s.addItem(busKey, busItem)
-		busGroupItem.addChild(busItem)
+		// add the bus
+		busItem := newSidebarItem(SidebarItemKindBus, bus.EntityID().String(), bus.Name())
+		s.addItem(busItem)
+		netItem.addChild(busItem)
 
 		for _, nodeInt := range bus.NodeInterfaces() {
 			node := nodeInt.Node()
-			nodeKey, nodeItem := s.f.newNode(node)
-			s.addItem(nodeKey, nodeItem)
-			nodeGroupItem.addChild(nodeItem)
-
 			nodes[node.EntityID()] = node
-		}
 
-		// add bus group for messages
-		msgBusKey, msgBusItem := s.f.newMessageBus(bus)
-		s.addItem(msgBusKey, msgBusItem)
-		msgGroupItem.addChild(msgBusItem)
-	}
-
-	// add messages
-	for _, node := range nodes {
-		for _, nodeInt := range node.Interfaces() {
-			parBus := nodeInt.ParentBus()
-			if parBus == nil {
-				continue
-			}
-
-			// add node group for messages
-			msgNodeKey, msgNodeItem := s.f.newMessageNode(nodeInt)
-			s.addItem(msgNodeKey, msgNodeItem)
-
-			// add node group into bus group for messages
-			msgBusItem := s.items[s.f.getMessageBusKey(parBus)]
-			msgBusItem.addChild(msgNodeItem)
+			// add the node interface to the bus
+			nodeIntItem := newSidebarItem(SidebarItemKindNodeInterface, newNodeIntSidebarItemID(nodeInt), newNodeIntSidebarItemName(nodeInt))
+			s.addItem(nodeIntItem)
+			busItem.addChild(nodeIntItem)
 
 			for _, msg := range nodeInt.SentMessages() {
-				msgKey, msgItem := s.f.newMessage(msg)
-				s.addItem(msgKey, msgItem)
-				msgNodeItem.addChild(msgItem)
+				// add the message to the node interface
+				msgItem := newSidebarItem(SidebarItemKindMessage, msg.EntityID().String(), msg.Name())
+				s.addItem(msgItem)
+				nodeIntItem.addChild(msgItem)
 
-				// selecting signal types/units/enums
 				for _, sig := range msg.Signals() {
-					sigKey, sigItem := s.f.newSignal(sig)
-					s.addItem(sigKey, sigItem)
+					// add the signal to the message
+					sigItem := newSidebarItem(SidebarItemKindSignal, sig.EntityID().String(), sig.Name())
+					s.addItem(sigItem)
 					msgItem.addChild(sigItem)
 
 					switch sig.Kind() {
@@ -453,31 +305,38 @@ func (s *SidebarService) load(req *sidebarLoadReq) {
 		}
 	}
 
+	// add nodes
+	for _, node := range nodes {
+		nodeItem := newSidebarItem(SidebarItemKindNode, node.EntityID().String(), node.Name())
+		s.addItem(nodeItem)
+		nodeGroupItem.addChild(nodeItem)
+	}
+
 	// add signal types
 	for _, sigType := range sigTypes {
-		sigTypeKey, sigTypeItem := s.f.newSignalType(sigType)
-		s.addItem(sigTypeKey, sigTypeItem)
+		sigTypeItem := newSidebarItem(SidebarItemKindSignalType, sigType.EntityID().String(), sigType.Name())
+		s.addItem(sigTypeItem)
 		sigTypeGroupItem.addChild(sigTypeItem)
 	}
 
 	// add signal units
 	for _, sigUnit := range sigUnits {
-		sigUnitKey, sigUnitItem := s.f.newSignalUnit(sigUnit)
-		s.addItem(sigUnitKey, sigUnitItem)
+		sigUnitItem := newSidebarItem(SidebarItemKindSignalUnit, sigUnit.EntityID().String(), sigUnit.Name())
+		s.addItem(sigUnitItem)
 		sigUnitGroupItem.addChild(sigUnitItem)
 	}
 
 	// add signal enums
 	for _, sigEnum := range sigEnums {
-		sigEnumKey, sigEnumItem := s.f.newSignalEnum(sigEnum)
-		s.addItem(sigEnumKey, sigEnumItem)
+		sigEnumItem := newSidebarItem(SidebarItemKindSignalEnum, sigEnum.EntityID().String(), sigEnum.Name())
+		s.addItem(sigEnumItem)
 		sigEnumGroupItem.addChild(sigEnumItem)
 	}
 
 	app.EmitEvent(SidebarLoad)
 }
 
-func (s *SidebarService) updateName(req *sidebarUpdateNameReq) {
+func (s *SidebarService) handleUpdateName(req *sidebarUpdateNameReq) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
@@ -491,7 +350,7 @@ func (s *SidebarService) updateName(req *sidebarUpdateNameReq) {
 	app.EmitEvent(SidebarUpdateName, item.convertBase())
 }
 
-func (s *SidebarService) add(req *sidebarAddReq) {
+func (s *SidebarService) handleAdd(req *sidebarAddReq) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
@@ -500,13 +359,13 @@ func (s *SidebarService) add(req *sidebarAddReq) {
 		return
 	}
 
-	s.addItem(req.item.entityID.String(), req.item)
+	s.addItem(req.item)
 	parent.addChild(req.item)
 
 	app.EmitEvent(SidebarAdd, parent.convert())
 }
 
-func (s *SidebarService) delete(req *sidebarDeleteReq) {
+func (s *SidebarService) handleDelete(req *sidebarDeleteReq) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
@@ -543,8 +402,6 @@ func (s *SidebarService) Get() Sidebar {
 }
 
 type sidebarController struct {
-	f *sidebarItemFactory
-
 	updateNameCh chan<- *sidebarUpdateNameReq
 	addCh        chan<- *sidebarAddReq
 	deleteCh     chan<- *sidebarDeleteReq
@@ -557,9 +414,6 @@ func (s *sidebarController) sendUpdateName(ent entity) {
 	s.updateNameCh <- newSidebarUpdateNameReq(itemKey, name)
 
 	switch ent.EntityKind() {
-	case acmelib.EntityKindBus:
-		s.updateNameCh <- newSidebarUpdateNameReq(s.f.getMessageBusKey(ent), name)
-
 	case acmelib.EntityKindNode:
 		node, ok := ent.(*acmelib.Node)
 		if !ok {
@@ -571,7 +425,7 @@ func (s *sidebarController) sendUpdateName(ent entity) {
 				continue
 			}
 
-			s.updateNameCh <- newSidebarUpdateNameReq(s.f.getMessageNodeKey(nodeInt), s.f.getMessageNodeName(nodeInt))
+			s.updateNameCh <- newSidebarUpdateNameReq(newNodeIntSidebarItemID(nodeInt), newNodeIntSidebarItemName(nodeInt))
 		}
 	}
 }
@@ -584,20 +438,22 @@ func (s *sidebarController) sendAdd(ent entity) {
 			panic("entity is not an acmelib.Bus")
 		}
 
-		busKey, busItem := s.f.newBus(bus)
-		s.addCh <- newSidebarAddReq(busItem, busKey, SidebarBusesPrefix)
+		parNet := bus.ParentNetwork()
+		if parNet == nil {
+			return
+		}
 
-		msgBusKey, msgBusItem := s.f.newMessageBus(ent)
-		s.addCh <- newSidebarAddReq(msgBusItem, msgBusKey, SidebarMessagesPrefix)
+		busItem := newSidebarItem(SidebarItemKindBus, bus.EntityID().String(), bus.Name())
+		s.addCh <- newSidebarAddReq(busItem, parNet.EntityID().String())
 
 	case acmelib.EntityKindNode:
-		nodeKey, nodeItem := s.f.newNode(ent)
-		s.addCh <- newSidebarAddReq(nodeItem, nodeKey, SidebarNodesPrefix)
-
 		node, ok := ent.(*acmelib.Node)
 		if !ok {
 			panic("entity is not an acmelib.Node")
 		}
+
+		nodeItem := newSidebarItem(SidebarItemKindNode, node.EntityID().String(), node.Name())
+		s.addCh <- newSidebarAddReq(nodeItem, node.EntityID().String())
 
 		for _, nodeInt := range node.Interfaces() {
 			parBus := nodeInt.ParentBus()
@@ -605,8 +461,8 @@ func (s *sidebarController) sendAdd(ent entity) {
 				continue
 			}
 
-			msgNodeKey, msgGroupItem := s.f.newMessageNode(nodeInt)
-			s.addCh <- newSidebarAddReq(msgGroupItem, msgNodeKey, s.f.getMessageBusKey(parBus))
+			nodeIntItem := newSidebarItem(SidebarItemKindNodeInterface, newNodeIntSidebarItemID(nodeInt), newNodeIntSidebarItemName(nodeInt))
+			s.addCh <- newSidebarAddReq(nodeIntItem, parBus.EntityID().String())
 		}
 
 	case acmelib.EntityKindMessage:
@@ -615,11 +471,13 @@ func (s *sidebarController) sendAdd(ent entity) {
 			panic("entity is not an acmelib.Message")
 		}
 
-		msgKey, msgItem := s.f.newMessage(msg)
+		parNodeInt := msg.SenderNodeInterface()
+		if parNodeInt == nil {
+			return
+		}
 
-		parent := s.f.getMessageNodeKey(msg.SenderNodeInterface())
-
-		s.addCh <- newSidebarAddReq(msgItem, msgKey, parent)
+		msgItem := newSidebarItem(SidebarItemKindMessage, msg.EntityID().String(), msg.Name())
+		s.addCh <- newSidebarAddReq(msgItem, newNodeIntSidebarItemID(parNodeInt))
 
 	case acmelib.EntityKindSignal:
 		sig, ok := ent.(acmelib.Signal)
@@ -627,24 +485,25 @@ func (s *sidebarController) sendAdd(ent entity) {
 			panic("entity is not an acmelib.Signal")
 		}
 
-		sigKey, sigItem := s.f.newSignal(sig)
+		parMsg := sig.ParentMessage()
+		if parMsg == nil {
+			return
+		}
 
-		splPath := strings.Split(sigItem.path, "/")
-		parent := splPath[len(splPath)-1]
-
-		s.addCh <- newSidebarAddReq(sigItem, sigKey, parent)
+		sigItem := newSidebarItem(SidebarItemKindSignal, sig.EntityID().String(), sig.Name())
+		s.addCh <- newSidebarAddReq(sigItem, parMsg.EntityID().String())
 
 	case acmelib.EntityKindSignalType:
-		sigTypeKey, sigTypeItem := s.f.newSignalType(ent)
-		s.addCh <- newSidebarAddReq(sigTypeItem, sigTypeKey, SidebarSignalTypesPrefix)
+		sigTypeItem := newSidebarItem(SidebarItemKindSignalType, ent.EntityID().String(), ent.Name())
+		s.addCh <- newSidebarAddReq(sigTypeItem, SidebarSignalTypeGroupID)
 
 	case acmelib.EntityKindSignalUnit:
-		sigUnitKey, sigUnitItem := s.f.newSignalUnit(ent)
-		s.addCh <- newSidebarAddReq(sigUnitItem, sigUnitKey, SidebarSignalUnitsPrefix)
+		sigUnitItem := newSidebarItem(SidebarItemKindSignalUnit, ent.EntityID().String(), ent.Name())
+		s.addCh <- newSidebarAddReq(sigUnitItem, SidebarSignalUnitGroupID)
 
 	case acmelib.EntityKindSignalEnum:
-		sigEnumKey, sigEnumItem := s.f.newSignalEnum(ent)
-		s.addCh <- newSidebarAddReq(sigEnumItem, sigEnumKey, SidebarSignalEnumsPrefix)
+		sigEnumItem := newSidebarItem(SidebarItemKindSignalEnum, ent.EntityID().String(), ent.Name())
+		s.addCh <- newSidebarAddReq(sigEnumItem, SidebarSignalEnumGroupID)
 	}
 }
 
@@ -652,9 +511,6 @@ func (s *sidebarController) sendDelete(ent entity) {
 	s.deleteCh <- newSidebarDeleteReq(ent.EntityID().String())
 
 	switch ent.EntityKind() {
-	case acmelib.EntityKindBus:
-		s.deleteCh <- newSidebarDeleteReq(s.f.getMessageBusKey(ent))
-
 	case acmelib.EntityKindNode:
 		node, ok := ent.(*acmelib.Node)
 		if !ok {
@@ -666,7 +522,7 @@ func (s *sidebarController) sendDelete(ent entity) {
 				continue
 			}
 
-			s.deleteCh <- newSidebarDeleteReq(s.f.getMessageNodeKey(nodeInt))
+			s.deleteCh <- newSidebarDeleteReq(newNodeIntSidebarItemID(nodeInt))
 		}
 	}
 }

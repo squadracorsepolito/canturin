@@ -6,15 +6,14 @@ import {
 	type SidebarItem
 } from '$lib/api/canturin';
 import {
-	SidebarBusesPrefix,
-	SidebarMessagesPrefix,
-	SidebarNodesPrefix,
-	SidebarSignalEnumsPrefix,
-	SidebarSignalTypesPrefix,
-	SidebarSignalUnitsPrefix
+	SidebarNodeGroupID,
+	SidebarSignalEnumGroupID,
+	SidebarSignalTypeGroupID,
+	SidebarSignalUnitGroupID
 } from '$lib/constants/constants';
 import { SidebarAdd, SidebarLoad, SidebarRemove, SidebarUpdateName } from '$lib/constants/events';
 import type { PanelType } from '$lib/state/layout-state.svelte';
+import layoutState from '$lib/state/layout-state.svelte';
 import { Events as wails } from '@wailsio/runtime';
 
 export class SidebarState {
@@ -37,6 +36,10 @@ export class SidebarState {
 	selectedItemId = $state('');
 
 	constructor() {
+		$effect(() => {
+			this.setSelectedItemId(layoutState.openPanelId);
+		});
+
 		wails.On(SidebarLoad, () => {
 			this.sidebar = undefined;
 			this.load();
@@ -59,9 +62,7 @@ export class SidebarState {
 	}
 
 	private flattenItems(item: SidebarItem, acc: SidebarItem[]) {
-		if (item.kind !== SidebarItemKind.SidebarItemKindGroup) {
-			acc.push(item);
-		}
+		acc.push(item);
 
 		for (const child of item.children || []) {
 			this.flattenItems(child, acc);
@@ -76,79 +77,40 @@ export class SidebarState {
 	private updateName(item: SidebarItem) {
 		if (!this.sidebar) return;
 
-		if (item.kind === SidebarItemKind.SidebarItemKindNetwork) {
-			this.sidebar.root.name = item.name;
+		const mappedItem = this.getItem(item.id);
+		if (!mappedItem) return;
 
-			const mappedItem = this.getItem(item.id);
-			if (mappedItem) {
-				mappedItem.name = item.name;
-			}
+		mappedItem.name = item.name;
 
-			return;
-		}
+		const splPath = item.path.split('/');
+		const splPtahLen = splPath.length;
+		if (splPtahLen < 2) return;
 
-		const prefixes = item.prefix.split('/');
+		const parentId = splPath[splPtahLen - 2];
+		const mappedParentItem = this.getItem(parentId);
+		if (!mappedParentItem || !mappedParentItem.children) return;
 
-		let parent = this.sidebar.root;
-		let remainingPrefix = prefixes.length;
-
-		while (remainingPrefix > 0) {
-			let foundParent = false;
-			const currPrefix = prefixes[prefixes.length - remainingPrefix];
-
-			for (const child of parent.children || []) {
-				if (child.id !== currPrefix && child.id !== 'group/' + currPrefix) {
-					continue;
-				}
-
-				parent = child;
-				foundParent = true;
-
-				break;
-			}
-
-			if (!foundParent) {
-				return;
-			}
-
-			remainingPrefix = remainingPrefix - 1;
-		}
-
-		if (!parent.children) {
-			return;
-		}
-
-		for (const child of parent.children) {
-			if (child.id === item.id) {
-				child.name = item.name;
-
-				const mappedItem = this.getItem(item.id);
-				if (mappedItem) {
-					mappedItem.name = item.name;
-				}
-
-				break;
-			}
-		}
-
-		parent.children.sort((a, b) => a.name.localeCompare(b.name));
+		mappedParentItem.children.sort((a, b) => a.name.localeCompare(b.name));
 	}
 
 	private update(item: SidebarItem) {
 		if (!this.sidebar) return;
 
 		let parentItem = this.sidebar.root;
-		for (const prefix of item.prefix.split('/')) {
-			for (const child of parentItem.children || []) {
-				const tmpSplitId = child.id.split('/');
-				if (tmpSplitId.length < 2) {
-					continue;
-				}
 
-				if (tmpSplitId[1] === prefix) {
-					parentItem = child;
-					break;
-				}
+		const splPath = item.path.split('/');
+		if (splPath[0] !== parentItem.id) {
+			return;
+		}
+
+		for (let i = 1; i < splPath.length - 1; i++) {
+			const pathId = splPath[i];
+
+			for (const child of parentItem.children || []) {
+				if (child.id !== pathId) continue;
+
+				parentItem = child;
+				break;
 			}
 		}
 
@@ -162,35 +124,28 @@ export class SidebarState {
 		}
 	}
 
-	getKindOfGroup(groupId: string) {
-		const splitId = groupId.split('/');
-		const id = splitId[splitId.length - 1];
+	getItem(id: string) {
+		return this.#items.get(id);
+	}
 
-		switch (id) {
-			case SidebarBusesPrefix:
-				return SidebarItemKind.SidebarItemKindBus;
-			case SidebarNodesPrefix:
+	getKindOfGroup(groupId: string) {
+		switch (groupId) {
+			case SidebarNodeGroupID:
 				return SidebarItemKind.SidebarItemKindNode;
-			case SidebarMessagesPrefix:
-				return SidebarItemKind.SidebarItemKindMessage;
-			case SidebarSignalTypesPrefix:
+			case SidebarSignalTypeGroupID:
 				return SidebarItemKind.SidebarItemKindSignalType;
-			case SidebarSignalUnitsPrefix:
+			case SidebarSignalUnitGroupID:
 				return SidebarItemKind.SidebarItemKindSignalUnit;
-			case SidebarSignalEnumsPrefix:
+			case SidebarSignalEnumGroupID:
 				return SidebarItemKind.SidebarItemKindSignalEnum;
 		}
 
-		const item = this.getItem(id);
+		const item = this.getItem(groupId);
 		if (item) {
 			return item.kind;
 		}
 
 		return SidebarItemKind.SidebarItemKindNetwork;
-	}
-
-	getItem(id: string) {
-		return this.#items.get(id);
 	}
 
 	getPanelType(itemKind: SidebarItemKind): PanelType {
@@ -200,6 +155,8 @@ export class SidebarState {
 			case SidebarItemKind.SidebarItemKindBus:
 				return 'bus';
 			case SidebarItemKind.SidebarItemKindNode:
+				return 'node';
+			case SidebarItemKind.SidebarItemKindNodeInterface:
 				return 'node';
 			case SidebarItemKind.SidebarItemKindMessage:
 				return 'message';
@@ -218,6 +175,22 @@ export class SidebarState {
 
 	setSelectedItemId(id: string) {
 		this.selectedItemId = id;
+	}
+
+	openPanel(id: string) {
+		const item = this.getItem(id);
+		if (!item) return;
+
+		if (item.kind === SidebarItemKind.SidebarItemKindGroup) return;
+
+		const panelType = this.getPanelType(item.kind);
+
+		let entityId = item.id;
+		if (item.kind === SidebarItemKind.SidebarItemKindNodeInterface) {
+			entityId = entityId.split(':')[0];
+		}
+
+		layoutState.openPanel(panelType, entityId);
 	}
 
 	async handleAdd(item: SidebarItem) {

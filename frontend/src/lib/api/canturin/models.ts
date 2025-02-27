@@ -258,11 +258,10 @@ export interface Sidebar {
 
 export interface SidebarItem {
     "kind": SidebarItemKind;
-    "prefix": string;
     "id": string;
+    "path": string;
     "name": string;
     "children": SidebarItem[] | null;
-    "path": string;
 }
 
 export enum SidebarItemKind {
@@ -275,6 +274,7 @@ export enum SidebarItemKind {
     SidebarItemKindNetwork = "network",
     SidebarItemKindBus = "bus",
     SidebarItemKindNode = "node",
+    SidebarItemKindNodeInterface = "node-interface",
     SidebarItemKindMessage = "message",
     SidebarItemKindSignal = "signal",
     SidebarItemKindSignalType = "signal-type",

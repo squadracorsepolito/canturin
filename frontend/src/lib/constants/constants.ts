@@ -1,7 +1,4 @@
-export const SidebarGroupPrefix = "group";
-export const SidebarBusesPrefix = "buses";
-export const SidebarNodesPrefix = "nodes";
-export const SidebarMessagesPrefix = "messages";
-export const SidebarSignalTypesPrefix = "signal-types";
-export const SidebarSignalUnitsPrefix = "signal-units";
-export const SidebarSignalEnumsPrefix = "signal-enums";
+export const SidebarNodeGroupID = "nodes";
+export const SidebarSignalTypeGroupID = "signal-types";
+export const SidebarSignalUnitGroupID = "signal-units";
+export const SidebarSignalEnumGroupID = "signal-enums";

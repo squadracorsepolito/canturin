@@ -36,6 +36,8 @@
 				return BusIcon;
 			case SidebarItemKind.SidebarItemKindNode:
 				return NodeIcon;
+			case SidebarItemKind.SidebarItemKindNodeInterface:
+				return NodeIcon;
 			case SidebarItemKind.SidebarItemKindMessage:
 				return MessageIcon;
 			case SidebarItemKind.SidebarItemKindSignal:
@@ -53,10 +55,7 @@
 	}
 
 	function handleSelect(id: string) {
-		const item = s.getItem(id);
-		if (!item) return;
-
-		layout.openPanel(s.getPanelType(item.kind), item.id);
+		s.openPanel(id);
 	}
 
 	function handleAdd(id: string) {
@@ -105,10 +104,6 @@
 				break;
 		}
 	}
-
-	$effect(() => {
-		s.setSelectedItemId(layout.openPanelId);
-	});
 </script>
 
 <div class="overflow-y-auto">

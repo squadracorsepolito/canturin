@@ -1,8 +1,4 @@
 <script lang="ts">
-	import Divider from '$lib/components/divider/divider.svelte';
-	import Select from '$lib/components/select/select.svelte';
-	import SortableList from '$lib/components/sortable/sortable-list.svelte';
-	import { reorder } from '@atlaskit/pragmatic-drag-and-drop/reorder';
 	import {
 		SignalEnumPanel,
 		SignalTypePanel,
@@ -13,68 +9,6 @@
 		SignalPanel
 	} from '$lib/panel';
 	import layout from '$lib/state/layout-state.svelte';
-	import Combobox from '$lib/components/combobox/combobox.svelte';
-	import { HoverPreview } from '$lib/components/hover-preview';
-	import { Modal } from '$lib/components/modal';
-	import { pushToast } from '$lib/components/toast/toast-provider.svelte';
-
-	let items = $state([
-		{
-			id: 'item-1',
-			label: 'Item 1'
-		},
-		{
-			id: 'item-2',
-			label: 'Item 2'
-		},
-		{
-			id: 'item-3',
-			label: 'Item 3'
-		},
-		{
-			id: 'item-4',
-			label: 'Item 4'
-		},
-		{
-			id: 'item-5',
-			label: 'Item 5'
-		}
-	]);
-
-	function reorderItems(_id: string, startIndex: number, finishIndex: number) {
-		console.log({ startIndex, finishIndex });
-
-		const updatedItems = reorder({
-			list: items,
-			startIndex,
-			finishIndex
-		});
-		items = updatedItems;
-	}
-
-	let selectData = [
-		{ label: 'Nigeria', value: 'NG' },
-		{ label: 'Japan', value: 'JP' },
-		{ label: 'Korea', value: 'KO' },
-		{ label: 'Kenya', value: 'KE' },
-		{ label: 'United Kingdom', value: 'UK' },
-		{ label: 'Ghana', value: 'GH' },
-		{ label: 'Uganda', value: 'UG' }
-	];
-
-	let selected = $state('NG');
-
-	let comboboxData = [
-		{ label: 'Nigeria', value: 'NG' },
-		{ label: 'Japan', value: 'JP' },
-		{ label: 'Korea', value: 'KO' },
-		{ label: 'Kenya', value: 'KE' },
-		{ label: 'United Kingdom', value: 'UK' },
-		{ label: 'Ghana', value: 'GH' },
-		{ label: 'Uganda', value: 'UG' }
-	];
-
-	let comboboxSelected = $state('GH');
 </script>
 
 {#if layout.openPanelType === 'bus'}
@@ -92,49 +26,5 @@
 {:else if layout.openPanelType === 'signal_enum'}
 	<SignalEnumPanel entityId={layout.openPanelId} />
 {:else}
-	<div>
-		<!-- <Select name="select-test" items={selectData} bind:selected labelKey="label" valueKey="value" />
-
-		<Divider></Divider>
-
-		<SortableList {items} instanceId="items" reorder={reorderItems}>
-			{#snippet itemBody({ item: { label } })}
-				<div class="p-3">{label}</div>
-			{/snippet}
-		</SortableList>
-
-		<Divider></Divider>
-
-		<Combobox
-			items={comboboxData}
-			bind:selected={comboboxSelected}
-			name="combobox-test"
-			labelKey="label"
-			valueKey="value"
-		/>
-
-		<Divider></Divider>
-
-		<Modal title="Modal title" desc="My desc" triggerLabel="Open Modal">
-			{#snippet content()}
-				<div>content</div>
-			{/snippet}
-
-			{#snippet actions()}
-				<button class="btn btn-primary">save</button>
-			{/snippet}
-		</Modal>
-
-		<Divider></Divider>
-
-		<HoverPreview>
-			{#snippet trigger()}
-				trigger
-			{/snippet}
-
-			{#snippet content()}
-				content
-			{/snippet}
-		</HoverPreview> -->
-	</div>
+	<div>home</div>
 {/if}
