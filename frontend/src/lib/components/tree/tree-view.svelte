@@ -2,10 +2,9 @@
 	import { uniqueId, type KeyOfString } from '$lib/utils';
 	import { mergeProps, normalizeProps, useMachine } from '@zag-js/svelte';
 	import * as tree from '@zag-js/tree-view';
-	import { AddIcon, AltArrowIcon, CollapseIcon } from '../icon';
-	import { untrack, type Component } from 'svelte';
+	import { AltArrowIcon } from '../icon';
+	import { type Component, type Snippet } from 'svelte';
 	import type { IconProps } from '../icon/types';
-	import { IconButton } from '../button';
 
 	type Props = {
 		root: T;
@@ -14,8 +13,8 @@
 		labelKey: KeyOfString<T>;
 		getIcon: (node: T) => Component<IconProps>;
 		onselect?: (value: string) => void;
-		onadd?: (value: string) => void;
 		ondelete?: (value: string) => void;
+		actions: Snippet<[{ collapse: () => void }]>;
 	};
 
 	let {
@@ -25,8 +24,8 @@
 		labelKey,
 		getIcon,
 		onselect,
-		onadd,
-		ondelete
+		ondelete,
+		actions
 	}: Props = $props();
 
 	const collection = tree.collection({
@@ -121,19 +120,7 @@
 			{root[labelKey]}
 		</div>
 
-		<IconButton
-			onclick={() => {
-				if (!selectedValue) return;
-
-				onadd?.(selectedValue);
-			}}
-		>
-			<AddIcon height="20" width="20" />
-		</IconButton>
-
-		<IconButton onclick={() => api.collapse()}>
-			<CollapseIcon height="20" width="20" />
-		</IconButton>
+		{@render actions({ collapse: api.collapse })}
 	</div>
 
 	<div {...treeProps}>

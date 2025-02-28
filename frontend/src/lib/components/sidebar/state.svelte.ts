@@ -1,7 +1,9 @@
 import {
+	MessageService,
 	NodeService,
 	SidebarItemKind,
 	SidebarService,
+	SignalKind,
 	type Sidebar,
 	type SidebarItem
 } from '$lib/api/canturin';
@@ -15,6 +17,7 @@ import { SidebarAdd, SidebarLoad, SidebarRemove, SidebarUpdateName } from '$lib/
 import type { PanelType } from '$lib/state/layout-state.svelte';
 import layoutState from '$lib/state/layout-state.svelte';
 import { Events as wails } from '@wailsio/runtime';
+import { pushToast } from '../toast/toast-provider.svelte';
 
 export class SidebarState {
 	#items = $derived.by(() => {
@@ -34,6 +37,16 @@ export class SidebarState {
 
 	sidebar = $state<Sidebar>();
 	selectedItemId = $state('');
+	selectedItemKind = $derived.by(() => {
+		const item = this.getItem(this.selectedItemId);
+		if (!item) return;
+
+		if (item.kind === SidebarItemKind.SidebarItemKindGroup) {
+			return this.getKindOfGroup(item.id);
+		}
+
+		return item.kind;
+	});
 
 	constructor() {
 		$effect(() => {
@@ -181,33 +194,68 @@ export class SidebarState {
 		const item = this.getItem(id);
 		if (!item) return;
 
-		if (item.kind === SidebarItemKind.SidebarItemKindGroup) return;
+		if (
+			item.kind === SidebarItemKind.SidebarItemKindGroup ||
+			item.kind === SidebarItemKind.SidebarItemKindNodeInterface
+		) {
+			return;
+		}
 
 		const panelType = this.getPanelType(item.kind);
-
-		let entityId = item.id;
-		if (item.kind === SidebarItemKind.SidebarItemKindNodeInterface) {
-			entityId = entityId.split(':')[0];
-		}
-
-		layoutState.openPanel(panelType, entityId);
+		layoutState.openPanel(panelType, item.id);
 	}
 
-	async handleAdd(item: SidebarItem) {
-		const splPath = item.path.split('/');
-		const pathLen = splPath.length;
+	async addMessage() {
+		const item = this.getItem(this.selectedItemId);
+		if (!item) return;
 
-		switch (item.kind) {
-			case SidebarItemKind.SidebarItemKindMessage:
-				try {
-					await NodeService.AddSentMessage(splPath[pathLen - 2], {
-						interfaceNumber: +splPath[pathLen - 1]
-					});
-				} catch (err) {
-					console.error(err);
-				}
-
-				break;
+		if (
+			item.kind !== SidebarItemKind.SidebarItemKindMessage &&
+			item.kind !== SidebarItemKind.SidebarItemKindNodeInterface
+		) {
+			return;
 		}
+
+		let nodeIntItemId = item.id;
+
+		if (item.kind === SidebarItemKind.SidebarItemKindMessage) {
+			const splPath = item.path.split('/');
+			nodeIntItemId = splPath[splPath.length - 2];
+		}
+
+		const splParentId = nodeIntItemId.split(':');
+		const nodeEntId = splParentId[0];
+		const interfaceNumber = parseInt(splParentId[1]);
+
+		try {
+			await NodeService.AddSentMessage(nodeEntId, { interfaceNumber });
+		} catch (err) {
+			console.error(err);
+			pushToast('error', 'Error', 'Operation failed');
+		}
+	}
+
+	async addSignal(signalKind: SignalKind) {
+		const item = this.getItem(this.selectedItemId);
+		if (!item) return;
+
+		if (item.kind !== SidebarItemKind.SidebarItemKindSignal) return;
+
+		const splPath = item.path.split('/');
+		const messageEntId = splPath[splPath.length - 2];
+
+		try {
+			await MessageService.AddSignal(messageEntId, { signalKind });
+		} catch (err) {
+			console.error(err);
+			pushToast('error', 'Error', 'Operation failed');
+		}
+	}
+
+	async addBus() {
+		const item = this.getItem(this.selectedItemId);
+		if (!item) return;
+
+		if (item.kind !== SidebarItemKind.SidebarItemKindBus) return;
 	}
 }

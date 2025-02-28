@@ -5,7 +5,7 @@ go 1.24
 toolchain go1.24.0
 
 require (
-	github.com/squadracorsepolito/acmelib v1.8.1
+	github.com/squadracorsepolito/acmelib v1.9.0
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.9
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
 )

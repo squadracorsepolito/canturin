@@ -2,6 +2,7 @@ package main
 
 import (
 	"strings"
+	"sync"
 
 	"github.com/squadracorsepolito/acmelib"
 )
@@ -48,9 +49,9 @@ type NodeService struct {
 	*service[*acmelib.Node, Node, *nodeHandler]
 }
 
-func newNodeService(sidebar *sidebarController, bus *BusService, messageCtr *messageController) *NodeService {
+func newNodeService(mux *sync.RWMutex, sidebar *sidebarController, bus *BusService, messageCtr *messageController) *NodeService {
 	return &NodeService{
-		service: newService(serviceKindNode, newNodeHandler(sidebar, bus, messageCtr), sidebar),
+		service: newService(serviceKindNode, newNodeHandler(sidebar, bus, messageCtr), mux, sidebar),
 	}
 }
 

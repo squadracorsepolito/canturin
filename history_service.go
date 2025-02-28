@@ -12,24 +12,12 @@ type History struct {
 	CurrentIndex   int `json:"currentIndex"`
 }
 
-type operationDomain int
-
-const (
-	operationDomainBus operationDomain = iota
-	operationDomainNode
-	operationDomainMessage
-	operationDomainSignal
-	operationDomainSignalType
-	operationDomainSignalUnit
-	operationDomainSignalEnum
-)
-
 type operationFunc func() (any, error)
 
 type operation struct {
-	domain operationDomain
-	undo   operationFunc
-	redo   operationFunc
+	serviceKind serviceKind
+	undo        operationFunc
+	redo        operationFunc
 }
 
 type HistoryService struct {
@@ -66,7 +54,7 @@ func (s *HistoryService) run() {
 	for {
 		select {
 		case op := <-s.operationCh:
-			s.addOperation(op)
+			s.handleOperation(op)
 
 		case <-s.stopCh:
 			return
@@ -85,7 +73,7 @@ func (s *HistoryService) emitHistoryChange() {
 	app.EmitEvent(HistoryChange, s.getState())
 }
 
-func (s *HistoryService) addOperation(op *operation) {
+func (s *HistoryService) handleOperation(op *operation) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
@@ -119,7 +107,7 @@ func (s *HistoryService) Undo() (History, error) {
 	if err != nil {
 		return s.getState(), err
 	}
-	s.sendModifyEvent(op.domain, res)
+	s.sendModifyEvent(op.serviceKind, res)
 
 	s.currOpIdx--
 
@@ -141,37 +129,47 @@ func (s *HistoryService) Redo() (History, error) {
 	if err != nil {
 		return s.getState(), err
 	}
-	s.sendModifyEvent(op.domain, res)
+	s.sendModifyEvent(op.serviceKind, res)
 
 	return s.getState(), nil
 }
 
-func (s *HistoryService) sendModifyEvent(opDomain operationDomain, res any) {
+func (s *HistoryService) sendModifyEvent(opDomain serviceKind, res any) {
 	eventName := ""
 	switch opDomain {
-	case operationDomainBus:
+	case serviceKindBus:
 		eventName = HistoryBusModify
-	case operationDomainNode:
+	case serviceKindNode:
 		eventName = HistoryNodeModify
-	case operationDomainMessage:
+	case serviceKindMessage:
 		eventName = HistoryMessageModify
-	case operationDomainSignal:
+	case serviceKindSignal:
 		eventName = HistorySignalModify
-	case operationDomainSignalType:
+	case serviceKindSignalType:
 		eventName = HistorySignalTypeModify
-	case operationDomainSignalUnit:
+	case serviceKindSignalUnit:
 		eventName = HistorySignalUnitModify
-	case operationDomainSignalEnum:
+	case serviceKindSignalEnum:
 		eventName = HistorySignalEnumModify
 	}
 
-	app.EmitEvent(eventName, res)
+	application.Get().EmitEvent(eventName, res)
 }
 
-func (s *HistoryService) pushOperation(domain operationDomain, undo, redo operationFunc) {
-	s.operationCh <- &operation{
-		domain: domain,
-		undo:   undo,
-		redo:   redo,
+func (s *HistoryService) getController() *historyController {
+	return &historyController{
+		operationCh: s.operationCh,
+	}
+}
+
+type historyController struct {
+	operationCh chan<- *operation
+}
+
+func (hc *historyController) sendOperation(serviceKind serviceKind, undo, redo operationFunc) {
+	hc.operationCh <- &operation{
+		serviceKind: serviceKind,
+		undo:        undo,
+		redo:        redo,
 	}
 }

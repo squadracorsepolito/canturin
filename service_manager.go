@@ -1,6 +1,8 @@
 package main
 
 import (
+	"sync"
+
 	"github.com/squadracorsepolito/acmelib"
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"golang.org/x/exp/maps"
@@ -9,9 +11,8 @@ import (
 type serviceManager struct {
 	network *acmelib.Network
 
-	sidebar           *SidebarService
-	sidebarController *sidebarController
-	history           *HistoryService
+	sidebarSrv *SidebarService
+	historySrv *HistoryService
 
 	busSrv *BusService
 	busCtr *busController
@@ -36,36 +37,47 @@ type serviceManager struct {
 }
 
 func newServiceManager() *serviceManager {
-	sidebar := newSidebarService()
-	sidebarCtr := sidebar.getController()
+	mux := &sync.RWMutex{}
 
-	signalTypeSrv := newSignalTypeService(sidebarCtr)
+	sidebarSrv := newSidebarService()
+	sidebarCtr := sidebarSrv.getController()
+
+	historySrv := newHistoryService()
+	historyCtr := historySrv.getController()
+
+	signalTypeSrv := newSignalTypeService(mux, sidebarCtr)
+	signalTypeSrv.setHistoryController(historyCtr)
 	signalTypeCtr := signalTypeSrv.getController()
 
-	signalUnitSrv := newSignalUnitService(sidebarCtr)
+	signalUnitSrv := newSignalUnitService(mux, sidebarCtr)
+	signalUnitSrv.setHistoryController(historyCtr)
 	signalUnitCtr := signalUnitSrv.getController()
 
-	signalEnumSrv := newSignalEnumService(sidebarCtr)
+	signalEnumSrv := newSignalEnumService(mux, sidebarCtr)
+	signalEnumSrv.setHistoryController(historyCtr)
 	signalEnumCtr := signalEnumSrv.getController()
 
-	signalSrv := newSignalService(sidebarCtr, signalTypeCtr, signalUnitCtr, signalEnumCtr)
+	signalSrv := newSignalService(mux, sidebarCtr, signalTypeCtr, signalUnitCtr, signalEnumCtr)
+	signalSrv.setHistoryController(historyCtr)
 	signalCtr := signalSrv.getController()
 
-	messageSrv := newMessageService(sidebarCtr, signalCtr)
+	messageSrv := newMessageService(mux, sidebarCtr, signalCtr)
+	messageSrv.setHistoryController(historyCtr)
 	messageCtr := messageSrv.getController()
 
-	busSrv := newBusService(sidebarCtr)
+	busSrv := newBusService(mux, sidebarCtr)
+	busSrv.setHistoryController(historyCtr)
 	busCtr := busSrv.getController()
 
-	nodeSrv := newNodeService(sidebarCtr, busSrv, messageCtr)
+	nodeSrv := newNodeService(mux, sidebarCtr, busSrv, messageCtr)
+	nodeSrv.setHistoryController(historyCtr)
 	nodeCtr := nodeSrv.getController()
 
 	return &serviceManager{
 		network: acmelib.NewNetwork("Unnamed Network"),
 
-		sidebar:           sidebar,
-		sidebarController: sidebarCtr,
-		history:           newHistoryService(),
+		sidebarSrv: sidebarSrv,
+		historySrv: historySrv,
 
 		busSrv: busSrv,
 		busCtr: busCtr,
@@ -92,8 +104,8 @@ func newServiceManager() *serviceManager {
 
 func (m *serviceManager) getServices() []application.Service {
 	return []application.Service{
-		application.NewService(m.sidebar),
-		application.NewService(manager.history),
+		application.NewService(m.sidebarSrv),
+		application.NewService(manager.historySrv),
 
 		application.NewService(manager.busSrv),
 		application.NewService(manager.nodeSrv),
@@ -108,7 +120,7 @@ func (m *serviceManager) getServices() []application.Service {
 func (m *serviceManager) initNetwork(net *acmelib.Network) {
 	m.network = net
 
-	m.sidebar.sendLoad(newSidebarLoadReq(net))
+	m.sidebarSrv.sendLoad(newSidebarLoadReq(net))
 
 	buses := net.Buses()
 	nodes := make(map[acmelib.EntityID]*acmelib.Node)
@@ -175,7 +187,7 @@ func (m *serviceManager) reloadNetwork() {
 }
 
 func (m *serviceManager) clearServices() {
-	m.sidebar.clear()
+	m.sidebarSrv.clear()
 
 	m.busCtr.sendClear()
 	m.nodeCtr.sendClear()

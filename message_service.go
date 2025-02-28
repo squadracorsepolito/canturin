@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"slices"
 	"strings"
+	"sync"
 
 	"github.com/squadracorsepolito/acmelib"
 )
@@ -177,9 +179,9 @@ type MessageService struct {
 	*service[*acmelib.Message, Message, *messageHandler]
 }
 
-func newMessageService(sidebarCtr *sidebarController, signalCtr *signalController) *MessageService {
+func newMessageService(mux *sync.RWMutex, sidebarCtr *sidebarController, signalCtr *signalController) *MessageService {
 	return &MessageService{
-		service: newService(serviceKindMessage, newMessageHandler(sidebarCtr, signalCtr), sidebarCtr),
+		service: newService(serviceKindMessage, newMessageHandler(sidebarCtr, signalCtr), mux, sidebarCtr),
 	}
 }
 
@@ -692,7 +694,7 @@ func (h *messageHandler) addSignal(msg *acmelib.Message, req *request, res *mess
 	}
 
 	if len(payloadHoles) == 0 {
-		return nil
+		return errors.New("payload is full")
 	}
 
 	startPos := slices.MaxFunc(payloadHoles, func(a, b payloadHole) int {

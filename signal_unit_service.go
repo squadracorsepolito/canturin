@@ -5,6 +5,7 @@ import (
 	"log"
 	"slices"
 	"strings"
+	"sync"
 
 	"github.com/squadracorsepolito/acmelib"
 )
@@ -134,9 +135,9 @@ type SignalUnitService struct {
 	*service[*acmelib.SignalUnit, SignalUnit, *signalUnitHandler]
 }
 
-func newSignalUnitService(sidebar *sidebarController) *SignalUnitService {
+func newSignalUnitService(mux *sync.RWMutex, sidebar *sidebarController) *SignalUnitService {
 	return &SignalUnitService{
-		service: newService(serviceKindSignalUnit, newSignalUnitHandler(sidebar), sidebar),
+		service: newService(serviceKindSignalUnit, newSignalUnitHandler(sidebar), mux, sidebar),
 	}
 }
 

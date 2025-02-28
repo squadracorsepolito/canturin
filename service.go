@@ -46,9 +46,9 @@ type commonServiceHandler struct {
 	sidebarCtr *sidebarController
 }
 
-func newCommonServiceHandler(sidebar *sidebarController) *commonServiceHandler {
+func newCommonServiceHandler(sidebarCtr *sidebarController) *commonServiceHandler {
 	return &commonServiceHandler{
-		sidebarCtr: sidebar,
+		sidebarCtr: sidebarCtr,
 	}
 }
 
@@ -57,7 +57,7 @@ type service[E entity, R any, H serviceHandler[E, R]] struct {
 
 	handler H
 
-	mux      sync.RWMutex
+	mux      *sync.RWMutex
 	entities map[acmelib.EntityID]E
 
 	loadCh   chan []E
@@ -66,14 +66,16 @@ type service[E entity, R any, H serviceHandler[E, R]] struct {
 	clearCh  chan struct{}
 
 	sidebarCtr *sidebarController
+	historyCtr *historyController
 }
 
-func newService[E entity, R any, H serviceHandler[E, R]](kind serviceKind, handlers H, sidebarCtr *sidebarController) *service[E, R, H] {
+func newService[E entity, R any, H serviceHandler[E, R]](kind serviceKind, handlers H, mux *sync.RWMutex, sidebarCtr *sidebarController) *service[E, R, H] {
 	return &service[E, R, H]{
 		kind: kind,
 
 		handler: handlers,
 
+		mux:      mux,
 		entities: make(map[acmelib.EntityID]E),
 
 		loadCh:   make(chan []E),
@@ -83,6 +85,10 @@ func newService[E entity, R any, H serviceHandler[E, R]](kind serviceKind, handl
 
 		sidebarCtr: sidebarCtr,
 	}
+}
+
+func (s *service[E, R, H]) setHistoryController(historyCtr *historyController) {
+	s.historyCtr = historyCtr
 }
 
 func (s *service[E, R, H]) OnStartup(ctx context.Context, _ application.ServiceOptions) error {
@@ -128,6 +134,28 @@ func (s *service[E, R, H]) handleAdd(ent E) {
 
 	s.addEntity(ent)
 	s.sidebarCtr.sendAdd(ent)
+
+	addEventName := ""
+	switch s.kind {
+	case serviceKindBus:
+		addEventName = BusAdded
+	case serviceKindNode:
+		addEventName = NodeAdded
+	case serviceKindMessage:
+		addEventName = MessageAdded
+	case serviceKindSignal:
+		addEventName = SignalAdded
+	case serviceKindSignalType:
+		addEventName = SignalTypeAdded
+	case serviceKindSignalUnit:
+		addEventName = SignalUnitAdded
+	case serviceKindSignalEnum:
+		addEventName = SignalEnumAdded
+	}
+
+	if len(addEventName) > 0 {
+		application.Get().EmitEvent(addEventName, s.handler.toResponse(ent))
+	}
 }
 
 func (s *service[E, R, H]) handleDelete(ent E) {
@@ -146,32 +174,8 @@ func (s *service[E, R, H]) handleClear() {
 }
 
 func (s *service[E, R, H]) sendHistoryOp(undo, redo func() (E, error)) {
-	var opDomain operationDomain
-
-	switch s.kind {
-	case serviceKindBus:
-		opDomain = operationDomainBus
-
-	case serviceKindNode:
-		opDomain = operationDomainNode
-
-	case serviceKindMessage:
-		opDomain = operationDomainMessage
-
-	case serviceKindSignal:
-		opDomain = operationDomainSignal
-
-	case serviceKindSignalType:
-		opDomain = operationDomainSignalType
-
-	case serviceKindSignalUnit:
-		opDomain = operationDomainSignalUnit
-
-	case serviceKindSignalEnum:
-		opDomain = operationDomainSignalEnum
-	}
-
-	manager.history.pushOperation(opDomain,
+	s.historyCtr.sendOperation(
+		s.kind,
 		func() (any, error) {
 			s.mux.Lock()
 			defer s.mux.Unlock()

@@ -7,8 +7,6 @@
 	let { entityId }: PanelSectionProps = $props();
 
 	const ses = getSignalEnumState(entityId);
-
-	$inspect(ses.entity.references);
 </script>
 
 {#snippet section(signalEnum: SignalEnum)}

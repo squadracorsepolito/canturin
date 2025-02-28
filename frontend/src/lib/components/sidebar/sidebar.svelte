@@ -2,11 +2,12 @@
 	import { SidebarItemKind, type SidebarItem } from '$lib/api/canturin';
 	import { deleteBus } from '$lib/panel/bus/state.svelte';
 	import { deleteSignalEnum } from '$lib/panel/signal-enum/state.svelte';
-	import layout from '$lib/state/layout-state.svelte';
 	import { deleteSignalType } from '$lib/panel/signal-type/state.svelte';
 	import {
+		AddIcon,
 		AltArrowIcon,
 		BusIcon,
+		CollapseIcon,
 		MessageIcon,
 		NetworkIcon,
 		NodeIcon,
@@ -19,6 +20,8 @@
 	import { SidebarState } from './state.svelte';
 	import { deleteNode } from '$lib/panel/node/state.svelte';
 	import { deleteSignalUnit } from '$lib/panel/signal-unit/state.svelte';
+	import { AddSignalModal } from '../modal';
+	import { IconButton } from '../button';
 
 	const s = new SidebarState();
 
@@ -58,25 +61,6 @@
 		s.openPanel(id);
 	}
 
-	function handleAdd(id: string) {
-		const leafItem = s.getItem(id);
-
-		if (leafItem) {
-			switch (leafItem.kind) {
-				case SidebarItemKind.SidebarItemKindMessage:
-					s.handleAdd(leafItem);
-					return;
-			}
-
-			layout.openPanel(s.getPanelType(leafItem.kind), 'draft');
-			return;
-		}
-
-		// a group is selected
-		const itemKind = s.getKindOfGroup(id);
-		layout.openPanel(s.getPanelType(itemKind), 'draft');
-	}
-
 	function handleDelete(id: string) {
 		const item = s.getItem(id);
 		// it happens when a group is selected
@@ -104,6 +88,32 @@
 				break;
 		}
 	}
+
+	function handleAdd() {
+		if (!s.selectedItemKind) return;
+
+		switch (s.selectedItemKind) {
+			case SidebarItemKind.SidebarItemKindGroup:
+			case SidebarItemKind.SidebarItemKindNetwork:
+				return;
+			case SidebarItemKind.SidebarItemKindBus:
+				s.addBus();
+				return;
+
+			case SidebarItemKind.SidebarItemKindNode:
+			case SidebarItemKind.SidebarItemKindNodeInterface:
+				s.addMessage();
+				return;
+
+			case SidebarItemKind.SidebarItemKindMessage:
+				s.addMessage();
+				return;
+
+			case SidebarItemKind.SidebarItemKindSignalType:
+			case SidebarItemKind.SidebarItemKindSignalUnit:
+			case SidebarItemKind.SidebarItemKindSignalEnum:
+		}
+	}
 </script>
 
 <div class="overflow-y-auto">
@@ -115,8 +125,29 @@
 			labelKey="name"
 			getIcon={getTreeViewIcon}
 			onselect={handleSelect}
-			onadd={handleAdd}
 			ondelete={handleDelete}
-		/>
+		>
+			{#snippet actions({ collapse })}
+				{#if s.selectedItemKind}
+					{#if s.selectedItemKind === SidebarItemKind.SidebarItemKindSignal}
+						<AddSignalModal onsubmit={(signalKind) => s.addSignal(signalKind)}>
+							{#snippet trigger({ getProps })}
+								<IconButton {...getProps()}>
+									<AddIcon height="20" width="20" />
+								</IconButton>
+							{/snippet}
+						</AddSignalModal>
+					{:else}
+						<IconButton onclick={handleAdd}>
+							<AddIcon height="20" width="20" />
+						</IconButton>
+					{/if}
+				{/if}
+
+				<IconButton onclick={() => collapse()}>
+					<CollapseIcon height="20" width="20" />
+				</IconButton>
+			{/snippet}
+		</TreeView>
 	{/if}
 </div>

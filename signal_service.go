@@ -2,6 +2,7 @@ package main
 
 import (
 	"strings"
+	"sync"
 
 	"github.com/squadracorsepolito/acmelib"
 )
@@ -121,9 +122,9 @@ type SignalService struct {
 	*service[acmelib.Signal, Signal, *signalHandler]
 }
 
-func newSignalService(sidebar *sidebarController, sigTypeCtr *signalTypeController, sigUnitCtr *signalUnitController, sigEnumCtr *signalEnumController) *SignalService {
+func newSignalService(mux *sync.RWMutex, sidebar *sidebarController, sigTypeCtr *signalTypeController, sigUnitCtr *signalUnitController, sigEnumCtr *signalEnumController) *SignalService {
 	return &SignalService{
-		service: newService(serviceKindSignal, newSignalHandler(sidebar, sigTypeCtr, sigUnitCtr, sigEnumCtr), sidebar),
+		service: newService(serviceKindSignal, newSignalHandler(sidebar, sigTypeCtr, sigUnitCtr, sigEnumCtr), mux, sidebar),
 	}
 }
 

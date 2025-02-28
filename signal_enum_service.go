@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"sync"
 
 	"github.com/squadracorsepolito/acmelib"
 )
@@ -112,9 +113,9 @@ type SignalEnumService struct {
 	*service[*acmelib.SignalEnum, SignalEnum, *signalEnumHandler]
 }
 
-func newSignalEnumService(sidebar *sidebarController) *SignalEnumService {
+func newSignalEnumService(mux *sync.RWMutex, sidebar *sidebarController) *SignalEnumService {
 	return &SignalEnumService{
-		service: newService(serviceKindSignalEnum, newSignalEnumHandler(sidebar), sidebar),
+		service: newService(serviceKindSignalEnum, newSignalEnumHandler(sidebar), mux, sidebar),
 	}
 }
 

@@ -14,4 +14,12 @@ const (
 	HistorySignalTypeModify = "history-signal-type-modify"
 	HistorySignalUnitModify = "history-signal-unit-modify"
 	HistorySignalEnumModify = "history-signal-enum-modify"
+
+	BusAdded        = "bus-added"
+	NodeAdded       = "node-added"
+	MessageAdded    = "message-added"
+	SignalAdded     = "signal-added"
+	SignalTypeAdded = "signal-type-added"
+	SignalUnitAdded = "signal-unit-added"
+	SignalEnumAdded = "signal-enum-added"
 )

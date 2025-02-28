@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"sync"
 
 	"github.com/squadracorsepolito/acmelib"
 )
@@ -81,9 +82,9 @@ type SignalTypeService struct {
 	*service[*acmelib.SignalType, SignalType, *signalTypeHandler]
 }
 
-func newSignalTypeService(sidebar *sidebarController) *SignalTypeService {
+func newSignalTypeService(mux *sync.RWMutex, sidebar *sidebarController) *SignalTypeService {
 	return &SignalTypeService{
-		service: newService(serviceKindSignalType, newSignalTypeHandler(sidebar), sidebar),
+		service: newService(serviceKindSignalType, newSignalTypeHandler(sidebar), mux, sidebar),
 	}
 }
 
