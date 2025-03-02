@@ -84,18 +84,14 @@ func (si *sidebarItem) removeChild(child *sidebarItem) {
 	child.path = child.getKey()
 }
 
-func (si *sidebarItem) convertBase() SidebarItem {
-	return SidebarItem{
+func (si *sidebarItem) convert() SidebarItem {
+	res := SidebarItem{
 		Kind:     si.kind,
 		ID:       si.id,
 		Path:     si.path,
 		Name:     si.name,
 		Children: []SidebarItem{},
 	}
-}
-
-func (si *sidebarItem) convert() SidebarItem {
-	res := si.convertBase()
 
 	if si.kind != SidebarItemKindNetwork {
 		slices.SortFunc(si.children, func(a, b *sidebarItem) int {
@@ -208,10 +204,6 @@ func (s *SidebarService) OnShutdown() {}
 
 func (s *SidebarService) addItem(item *sidebarItem) {
 	s.items[item.getKey()] = item
-}
-
-func (s *SidebarService) sendLoad(req *sidebarLoadReq) {
-	s.loadCh <- req
 }
 
 func (s *SidebarService) handleLoad(req *sidebarLoadReq) {
@@ -347,7 +339,10 @@ func (s *SidebarService) handleUpdateName(req *sidebarUpdateNameReq) {
 
 	item.name = req.name
 
-	app.EmitEvent(SidebarUpdateName, item.convertBase())
+	app.EmitEvent(SidebarUpdateName, SidebarUpdateNameEvent{
+		UpdatedID: item.id,
+		Name:      item.name,
+	})
 }
 
 func (s *SidebarService) handleAdd(req *sidebarAddReq) {
@@ -362,7 +357,13 @@ func (s *SidebarService) handleAdd(req *sidebarAddReq) {
 	s.addItem(req.item)
 	parent.addChild(req.item)
 
-	app.EmitEvent(SidebarAdd, parent.convert())
+	for _, child := range req.item.children {
+		s.addItem(child)
+	}
+
+	app.EmitEvent(SidebarAdd, SidebarAddEvent{
+		AddedItem: req.item.convert(),
+	})
 }
 
 func (s *SidebarService) handleDelete(req *sidebarDeleteReq) {
@@ -377,13 +378,19 @@ func (s *SidebarService) handleDelete(req *sidebarDeleteReq) {
 	parent := item.parent
 	parent.removeChild(item)
 
+	for _, child := range item.children {
+		delete(s.items, child.getKey())
+	}
 	delete(s.items, req.itemKey)
 
-	app.EmitEvent(SidebarRemove, parent.convert())
+	app.EmitEvent(SidebarDelete, SidebarDeleteEvent{
+		DeletedID: item.id,
+	})
 }
 
 func (s *SidebarService) getController() *sidebarController {
 	return &sidebarController{
+		loadCh:       s.loadCh,
 		updateNameCh: s.updateNameCh,
 		addCh:        s.addCh,
 		deleteCh:     s.deleteCh,
@@ -402,9 +409,14 @@ func (s *SidebarService) Get() Sidebar {
 }
 
 type sidebarController struct {
+	loadCh       chan<- *sidebarLoadReq
 	updateNameCh chan<- *sidebarUpdateNameReq
 	addCh        chan<- *sidebarAddReq
 	deleteCh     chan<- *sidebarDeleteReq
+}
+
+func (s *sidebarController) sendLoad(net *acmelib.Network) {
+	s.loadCh <- newSidebarLoadReq(net)
 }
 
 func (s *sidebarController) sendUpdateName(ent entity) {
@@ -444,6 +456,22 @@ func (s *sidebarController) sendAdd(ent entity) {
 		}
 
 		busItem := newSidebarItem(SidebarItemKindBus, bus.EntityID().String(), bus.Name())
+
+		for _, nodeInt := range bus.NodeInterfaces() {
+			nodeIntItem := newSidebarItem(SidebarItemKindNodeInterface, newNodeIntSidebarItemID(nodeInt), newNodeIntSidebarItemName(nodeInt))
+			busItem.addChild(nodeIntItem)
+
+			for _, sentMsg := range nodeInt.SentMessages() {
+				msgItem := newSidebarItem(SidebarItemKindMessage, sentMsg.EntityID().String(), sentMsg.Name())
+				nodeIntItem.addChild(msgItem)
+
+				for _, sig := range sentMsg.Signals() {
+					sigItem := newSidebarItem(SidebarItemKindSignal, sig.EntityID().String(), sig.Name())
+					msgItem.addChild(sigItem)
+				}
+			}
+		}
+
 		s.addCh <- newSidebarAddReq(busItem, parNet.EntityID().String())
 
 	case acmelib.EntityKindNode:
@@ -462,6 +490,17 @@ func (s *sidebarController) sendAdd(ent entity) {
 			}
 
 			nodeIntItem := newSidebarItem(SidebarItemKindNodeInterface, newNodeIntSidebarItemID(nodeInt), newNodeIntSidebarItemName(nodeInt))
+
+			for _, sentMsg := range nodeInt.SentMessages() {
+				msgItem := newSidebarItem(SidebarItemKindMessage, sentMsg.EntityID().String(), sentMsg.Name())
+				nodeIntItem.addChild(msgItem)
+
+				for _, sig := range sentMsg.Signals() {
+					sigItem := newSidebarItem(SidebarItemKindSignal, sig.EntityID().String(), sig.Name())
+					msgItem.addChild(sigItem)
+				}
+			}
+
 			s.addCh <- newSidebarAddReq(nodeIntItem, parBus.EntityID().String())
 		}
 
@@ -477,6 +516,12 @@ func (s *sidebarController) sendAdd(ent entity) {
 		}
 
 		msgItem := newSidebarItem(SidebarItemKindMessage, msg.EntityID().String(), msg.Name())
+
+		for _, sig := range msg.Signals() {
+			sigItem := newSidebarItem(SidebarItemKindSignal, sig.EntityID().String(), sig.Name())
+			msgItem.addChild(sigItem)
+		}
+
 		s.addCh <- newSidebarAddReq(msgItem, newNodeIntSidebarItemID(parNodeInt))
 
 	case acmelib.EntityKindSignal:

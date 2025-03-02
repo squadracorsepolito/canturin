@@ -14,6 +14,8 @@ type serviceManager struct {
 	sidebarSrv *SidebarService
 	historySrv *HistoryService
 
+	networkSrv *NetworkService
+
 	busSrv *BusService
 	busCtr *busController
 
@@ -73,11 +75,15 @@ func newServiceManager() *serviceManager {
 	nodeSrv.setHistoryController(historyCtr)
 	nodeCtr := nodeSrv.getController()
 
+	networkSrv := newNetworkService(newNetworkHandler(busCtr), mux, sidebarCtr, historyCtr)
+
 	return &serviceManager{
 		network: acmelib.NewNetwork("Unnamed Network"),
 
 		sidebarSrv: sidebarSrv,
 		historySrv: historySrv,
+
+		networkSrv: networkSrv,
 
 		busSrv: busSrv,
 		busCtr: busCtr,
@@ -107,6 +113,7 @@ func (m *serviceManager) getServices() []application.Service {
 		application.NewService(m.sidebarSrv),
 		application.NewService(manager.historySrv),
 
+		application.NewService(manager.networkSrv),
 		application.NewService(manager.busSrv),
 		application.NewService(manager.nodeSrv),
 		application.NewService(manager.messageSrv),
@@ -119,8 +126,6 @@ func (m *serviceManager) getServices() []application.Service {
 
 func (m *serviceManager) initNetwork(net *acmelib.Network) {
 	m.network = net
-
-	m.sidebarSrv.sendLoad(newSidebarLoadReq(net))
 
 	buses := net.Buses()
 	nodes := make(map[acmelib.EntityID]*acmelib.Node)
@@ -168,6 +173,7 @@ func (m *serviceManager) initNetwork(net *acmelib.Network) {
 		}
 	}
 
+	m.networkSrv.load(net)
 	m.busCtr.sendLoad(buses)
 	m.nodeCtr.sendLoad(maps.Values(nodes))
 	m.messageCtr.sendLoad(messages)
@@ -189,6 +195,7 @@ func (m *serviceManager) reloadNetwork() {
 func (m *serviceManager) clearServices() {
 	m.sidebarSrv.clear()
 
+	m.networkSrv.clear()
 	m.busCtr.sendClear()
 	m.nodeCtr.sendClear()
 	m.messageCtr.sendClear()

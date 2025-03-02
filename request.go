@@ -44,6 +44,22 @@ func (r *request) toUpdateDesc() *UpdateDescReq {
 	return req
 }
 
+//////////////////////
+// NETWORK REQUESTS //
+//////////////////////
+
+type DeleteBusReq struct {
+	BusEntityID string `json:"busEntityID"`
+}
+
+func (r *request) toDeleteBus() *DeleteBusReq {
+	req, ok := r.data.(*DeleteBusReq)
+	if !ok {
+		panic("cannot convert to DeleteBusReq")
+	}
+	return req
+}
+
 //////////////////
 // BUS REQUESTS //
 //////////////////

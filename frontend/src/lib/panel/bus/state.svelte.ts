@@ -1,4 +1,4 @@
-import { BusService, BusType, type Bus } from '$lib/api/canturin';
+import { BusService, BusType, NetworkService, type Bus } from '$lib/api/canturin';
 import { HistoryBusModify } from '$lib/constants/events';
 import { pushToast } from '$lib/components/toast/toast-provider.svelte';
 import { EntityState } from '$lib/state/entity-state.svelte';
@@ -16,14 +16,23 @@ export async function loadBus(entityId: string) {
 	provider.add(bus);
 }
 
+export async function createBus() {
+	try {
+		await NetworkService.AddBus();
+	} catch (err) {
+		pushToast('error', 'Error', 'Operation failed');
+		console.error(err);
+	}
+}
+
 export async function deleteBus(entityId: string) {
 	try {
-		await BusService.Delete(entityId);
+		await NetworkService.DeleteBus({ busEntityID: entityId });
 		provider.remove(entityId);
 		layout.closeIfOpen(entityId);
-	} catch (error) {
+	} catch (err) {
 		pushToast('error', 'Error', 'Operation failed');
-		console.error(error);
+		console.error(err);
 	}
 }
 

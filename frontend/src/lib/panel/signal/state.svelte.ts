@@ -1,4 +1,5 @@
-import { SignalService, type Signal } from '$lib/api/canturin';
+import { MessageService, SignalKind, SignalService, type Signal } from '$lib/api/canturin';
+import { pushToast } from '$lib/components/toast/toast-provider.svelte';
 import { HistorySignalModify } from '$lib/constants/events';
 import { EntityState } from '$lib/state/entity-state.svelte';
 import { StateProvider } from '$lib/state/state-provider.svelte';
@@ -17,9 +18,22 @@ export async function loadSignal(entityId: string) {
 	provider.add(signal);
 }
 
-export async function deleteSignal(entityId: string) {
-	// TODO! implement
-	console.log(entityId);
+export async function createSignal(msgEntityId: string, signalKind: SignalKind) {
+	try {
+		await MessageService.AddSignal(msgEntityId, { signalKind });
+	} catch (err) {
+		console.error(err);
+		pushToast('error', 'Error', 'Operation failed');
+	}
+}
+
+export async function deleteSignal(msgEntityId: string, sigEntityId: string) {
+	try {
+		await MessageService.DeleteSignals(msgEntityId, { signalEntityIds: [sigEntityId] });
+	} catch (err) {
+		console.error(err);
+		pushToast('error', 'Error', 'Operation failed');
+	}
 }
 
 class SignalState extends EntityState<Signal> {

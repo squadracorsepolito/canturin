@@ -19,3 +19,23 @@ func (r *response[T]) setRedo(redo func() (T, error)) {
 	r.redo = redo
 	r.changed = true
 }
+
+type networkRes struct {
+	changed bool
+	undo    func() error
+	redo    func() error
+}
+
+func newNetworkResponse() *networkRes {
+	return &networkRes{changed: false}
+}
+
+func (r *networkRes) setUndo(undo func() error) {
+	r.undo = undo
+	r.changed = true
+}
+
+func (r *networkRes) setRedo(redo func() error) {
+	r.redo = redo
+	r.changed = true
+}

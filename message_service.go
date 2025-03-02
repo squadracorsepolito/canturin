@@ -668,8 +668,6 @@ func (h *messageHandler) addSignal(msg *acmelib.Message, req *request, res *mess
 
 	sigKind := parsedReq.SignalKind.parse()
 
-	otherSignals := []entity{}
-
 	type payloadHole struct {
 		startPos int
 		size     int
@@ -678,8 +676,9 @@ func (h *messageHandler) addSignal(msg *acmelib.Message, req *request, res *mess
 	payloadHoles := []payloadHole{}
 	currPos := 0
 
+	tankenNames := map[string]struct{}{}
 	for _, sig := range msg.Signals() {
-		otherSignals = append(otherSignals, sig)
+		tankenNames[sig.Name()] = struct{}{}
 
 		if currPos < sig.GetStartBit() {
 			payloadHoles = append(payloadHoles, payloadHole{startPos: currPos, size: sig.GetStartBit() - currPos})
@@ -687,7 +686,7 @@ func (h *messageHandler) addSignal(msg *acmelib.Message, req *request, res *mess
 
 		currPos = sig.GetStartBit() + sig.GetSize()
 	}
-	sigName := getNextNewName("signal", otherSignals)
+	sigName := getNewName("signal", tankenNames)
 
 	if currPos < msg.SizeByte()*8 {
 		payloadHoles = append(payloadHoles, payloadHole{startPos: currPos, size: msg.SizeByte()*8 - currPos})

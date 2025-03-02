@@ -137,6 +137,8 @@ func (s *HistoryService) Redo() (History, error) {
 func (s *HistoryService) sendModifyEvent(opDomain serviceKind, res any) {
 	eventName := ""
 	switch opDomain {
+	case serviceKindNetwork:
+		eventName = HistoryNetworkModify
 	case serviceKindBus:
 		eventName = HistoryBusModify
 	case serviceKindNode:

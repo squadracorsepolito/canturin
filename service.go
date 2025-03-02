@@ -29,7 +29,8 @@ func newBaseEntity(e entity) BaseEntity {
 type serviceKind int
 
 const (
-	serviceKindBus serviceKind = iota
+	serviceKindNetwork serviceKind = iota
+	serviceKindBus
 	serviceKindNode
 	serviceKindMessage
 	serviceKindSignal

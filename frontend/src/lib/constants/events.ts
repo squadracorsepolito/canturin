@@ -1,8 +1,9 @@
 export const SidebarLoad = "sidebar-load";
 export const SidebarUpdateName = "sidebar-update-name";
 export const SidebarAdd = "sidebar-add";
-export const SidebarRemove = "sidebar-remove";
+export const SidebarDelete = "sidebar-delete";
 export const HistoryChange = "history-change";
+export const HistoryNetworkModify = "history-network-modify";
 export const HistoryBusModify = "history-bus-modify";
 export const HistoryNodeModify = "history-node-modify";
 export const HistoryMessageModify = "history-message-modify";

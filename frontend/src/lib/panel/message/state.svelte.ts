@@ -2,9 +2,11 @@ import {
 	MessageByteOrder,
 	MessageSendType,
 	MessageService,
+	NodeService,
 	SignalKind,
 	type Message
 } from '$lib/api/canturin';
+import { pushToast } from '$lib/components/toast/toast-provider.svelte';
 import { HistoryMessageModify } from '$lib/constants/events';
 import { EntityState } from '$lib/state/entity-state.svelte';
 import { StateProvider } from '$lib/state/state-provider.svelte';
@@ -23,9 +25,29 @@ export async function loadMessage(entityId: string) {
 	provider.add(message);
 }
 
-export async function deleteMessage(entityId: string) {
-	// TODO! implement
-	console.log(entityId);
+export async function createMessage(nodeEntityId: string, interfaceNumber: number) {
+	try {
+		await NodeService.AddSentMessage(nodeEntityId, { interfaceNumber });
+	} catch (err) {
+		console.error(err);
+		pushToast('error', 'Error', 'Operation failed');
+	}
+}
+
+export async function deleteMessage(
+	nodeEntityId: string,
+	interfaceNumber: number,
+	messageEntityId: string
+) {
+	try {
+		await NodeService.RemoveSentMessages(nodeEntityId, {
+			interfaceNumber,
+			messageEntityIds: [messageEntityId]
+		});
+	} catch (err) {
+		console.error(err);
+		pushToast('error', 'Error', 'Operation failed');
+	}
 }
 
 class MessageState extends EntityState<Message> {

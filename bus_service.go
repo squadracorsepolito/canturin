@@ -27,17 +27,17 @@ func getBusType(typ acmelib.BusType) BusType {
 }
 
 type AttachedNode struct {
-	base
+	BaseEntity
 
 	ID              uint `json:"id"`
 	InterfaceNumber int  `json:"interfaceNumber"`
 }
 
-func getAttachedNode(nodeInt *acmelib.NodeInterface) AttachedNode {
+func newAttachedNode(nodeInt *acmelib.NodeInterface) AttachedNode {
 	node := nodeInt.Node()
 
 	return AttachedNode{
-		base: getBase(node),
+		BaseEntity: newBaseEntity(node),
 
 		ID:              uint(node.ID()),
 		InterfaceNumber: nodeInt.Number(),
@@ -45,12 +45,29 @@ func getAttachedNode(nodeInt *acmelib.NodeInterface) AttachedNode {
 }
 
 type Bus struct {
-	base
+	BaseEntity
 
 	Type     BusType `json:"type"`
 	Baudrate int     `json:"baudrate"`
 
 	AttachedNodes []AttachedNode `json:"attachedNodes"`
+}
+
+func newBus(bus *acmelib.Bus) Bus {
+	attNodes := []AttachedNode{}
+
+	for _, nodeInt := range bus.NodeInterfaces() {
+		attNodes = append(attNodes, newAttachedNode(nodeInt))
+	}
+
+	return Bus{
+		BaseEntity: newBaseEntity(bus),
+
+		Type:     getBusType(bus.Type()),
+		Baudrate: bus.Baudrate(),
+
+		AttachedNodes: attNodes,
+	}
 }
 
 type BusLoadMessage struct {
@@ -142,46 +159,46 @@ func (s *BusService) Create(req CreateBusReq) (Bus, error) {
 	return s.handler.toResponse(bus), nil
 }
 
-func (s *BusService) Delete(entityID string) error {
-	s.mux.Lock()
-	defer s.mux.Unlock()
+// func (s *BusService) Delete(entityID string) error {
+// 	s.mux.Lock()
+// 	defer s.mux.Unlock()
 
-	bus, err := s.getEntity(entityID)
-	if err != nil {
-		return err
-	}
+// 	bus, err := s.getEntity(entityID)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	nodeInts := bus.NodeInterfaces()
-	bus.RemoveAllNodeInterfaces()
+// 	nodeInts := bus.NodeInterfaces()
+// 	bus.RemoveAllNodeInterfaces()
 
-	s.removeEntity(entityID)
-	s.sidebarCtr.sendDelete(bus)
+// 	s.removeEntity(entityID)
+// 	s.sidebarCtr.sendDelete(bus)
 
-	s.sendHistoryOp(
-		func() (*acmelib.Bus, error) {
-			for _, nodeInt := range nodeInts {
-				if err := bus.AddNodeInterface(nodeInt); err != nil {
-					return nil, err
-				}
-			}
+// 	s.sendHistoryOp(
+// 		func() (*acmelib.Bus, error) {
+// 			for _, nodeInt := range nodeInts {
+// 				if err := bus.AddNodeInterface(nodeInt); err != nil {
+// 					return nil, err
+// 				}
+// 			}
 
-			s.addEntity(bus)
-			s.sidebarCtr.sendAdd(bus)
+// 			s.addEntity(bus)
+// 			s.sidebarCtr.sendAdd(bus)
 
-			return bus, nil
-		},
-		func() (*acmelib.Bus, error) {
-			bus.RemoveAllNodeInterfaces()
+// 			return bus, nil
+// 		},
+// 		func() (*acmelib.Bus, error) {
+// 			bus.RemoveAllNodeInterfaces()
 
-			s.removeEntity(entityID)
-			s.sidebarCtr.sendDelete(bus)
+// 			s.removeEntity(entityID)
+// 			s.sidebarCtr.sendDelete(bus)
 
-			return bus, nil
-		},
-	)
+// 			return bus, nil
+// 		},
+// 	)
 
-	return nil
-}
+// 	return nil
+// }
 
 func (s *BusService) UpdateName(entityID string, req UpdateNameReq) (Bus, error) {
 	return s.handle(entityID, &req, s.handler.updateName)
@@ -212,20 +229,7 @@ func newBusHandler(sidebar *sidebarController) *busHandler {
 }
 
 func (h *busHandler) toResponse(bus *acmelib.Bus) Bus {
-	attNodes := []AttachedNode{}
-
-	for _, nodeInt := range bus.NodeInterfaces() {
-		attNodes = append(attNodes, getAttachedNode(nodeInt))
-	}
-
-	return Bus{
-		base: getBase(bus),
-
-		Type:     getBusType(bus.Type()),
-		Baudrate: bus.Baudrate(),
-
-		AttachedNodes: attNodes,
-	}
+	return newBus(bus)
 }
 
 func (h *busHandler) updateName(bus *acmelib.Bus, req *request, res *busRes) error {

@@ -421,18 +421,16 @@ func (h *nodeHandler) addSentMessage(node *acmelib.Node, req *request, res *node
 
 	msgID := acmelib.MessageID(1)
 	sentMessages := nodeInt.SentMessages()
-	sentMsgEntities := []entity{}
+	takenNames := make(map[string]struct{})
 	for idx, tmpSentMsg := range sentMessages {
-		sentMsgEntities = append(sentMsgEntities, tmpSentMsg)
+		takenNames[tmpSentMsg.Name()] = struct{}{}
 
 		if idx == len(sentMessages)-1 {
 			msgID = acmelib.MessageID(tmpSentMsg.ID() + 1)
 		}
 	}
 
-	msgName := getNextNewName("message", sentMsgEntities)
-
-	msg := acmelib.NewMessage(msgName, msgID, 8)
+	msg := acmelib.NewMessage(getNewName("message", takenNames), msgID, 8)
 
 	if err := nodeInt.AddSentMessage(msg); err != nil {
 		return err

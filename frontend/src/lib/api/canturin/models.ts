@@ -102,6 +102,10 @@ export interface CreateSignalUnitReq {
     "symbol": string;
 }
 
+export interface DeleteBusReq {
+    "busEntityID": string;
+}
+
 export interface DeleteSignalsReq {
     "signalEntityIds": string[] | null;
 }
@@ -182,6 +186,13 @@ export enum MessageSendType {
     MessageSendTypeCyclicAndTriggered = "cyclic_and_triggered",
     MessageSendTypeCyclicIfActiveAndTriggered = "cyclic_if_active_and_triggered",
 };
+
+export interface Network {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+}
 
 export interface Node {
     "entityId": string;

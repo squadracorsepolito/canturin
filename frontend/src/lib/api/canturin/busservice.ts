@@ -14,11 +14,6 @@ export function Create(req: $models.CreateBusReq): Promise<$models.Bus> & { canc
     return $resultPromise;
 }
 
-export function Delete(entityID: string): Promise<void> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(1317798280, entityID) as any;
-    return $resultPromise;
-}
-
 export function Get(entityID: string): Promise<$models.Bus> & { cancel(): void } {
     let $resultPromise = $Call.ByID(920363765, entityID) as any;
     return $resultPromise;
