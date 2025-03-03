@@ -284,9 +284,7 @@ func (s *service[E, R, H]) ListBase() []BaseEntity {
 
 func (s *service[E, R, H]) getController() *serviceController[E] {
 	return &serviceController[E]{
-		lockFn:   s.mux.Lock,
-		unlockFn: s.mux.Unlock,
-		getFn:    s.getEntity,
+		getFn: s.getEntity,
 
 		loadCh:   s.loadCh,
 		addCh:    s.addCh,
@@ -296,22 +294,12 @@ func (s *service[E, R, H]) getController() *serviceController[E] {
 }
 
 type serviceController[E entity] struct {
-	lockFn   func()
-	unlockFn func()
-	getFn    func(entityID string) (E, error)
+	getFn func(entityID string) (E, error)
 
 	loadCh   chan<- []E
 	addCh    chan<- E
 	deleteCh chan<- E
 	clearCh  chan<- struct{}
-}
-
-func (sc *serviceController[E]) lock() {
-	sc.lockFn()
-}
-
-func (sc *serviceController[E]) unlock() {
-	sc.unlockFn()
 }
 
 func (sc *serviceController[E]) get(entityID string) (E, error) {

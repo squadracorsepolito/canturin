@@ -133,11 +133,6 @@ export class SidebarState {
 	private handleAddEvent(e: SidebarAddEvent) {
 		const item = e.addedItem;
 
-		this.#items.set(item.id, item);
-		for (const child of item.children || []) {
-			this.#items.set(child.id, child);
-		}
-
 		const parentId = this.getParentId(item.path);
 		if (!parentId) return;
 
@@ -147,6 +142,16 @@ export class SidebarState {
 		const newChildren: SidebarItem[] = [item, ...(parent.children || [])];
 		this.sortChildren(newChildren);
 		parent.children = newChildren;
+
+		for (const proxyItem of parent.children) {
+			if (proxyItem.id === item.id) {
+				this.#items.set(item.id, proxyItem);
+				for (const child of item.children || []) {
+					this.#items.set(child.id, child);
+				}
+				break;
+			}
+		}
 	}
 
 	private handleDeleteEvent(e: SidebarDeleteEvent) {

@@ -281,9 +281,6 @@ func (h *signalHandler) updateSignalType(sig acmelib.Signal, req *request, res *
 		return nil
 	}
 
-	h.sigTypeCtr.lock()
-	defer h.sigTypeCtr.unlock()
-
 	sigType, err := h.sigTypeCtr.get(sigTypeEntID)
 	if err != nil {
 		return err
@@ -295,9 +292,6 @@ func (h *signalHandler) updateSignalType(sig acmelib.Signal, req *request, res *
 
 	res.setUndo(
 		func() (acmelib.Signal, error) {
-			h.sigTypeCtr.lock()
-			defer h.sigTypeCtr.unlock()
-
 			if err := stdSig.SetType(oldSigType); err != nil {
 				return nil, err
 			}
@@ -307,9 +301,6 @@ func (h *signalHandler) updateSignalType(sig acmelib.Signal, req *request, res *
 
 	res.setRedo(
 		func() (acmelib.Signal, error) {
-			h.sigTypeCtr.lock()
-			defer h.sigTypeCtr.unlock()
-
 			if err := stdSig.SetType(sigType); err != nil {
 				return nil, err
 			}
@@ -341,9 +332,6 @@ func (h *signalHandler) updateSignalUnit(sig acmelib.Signal, req *request, res *
 		return nil
 	}
 
-	h.sigUnitCtr.lock()
-	defer h.sigUnitCtr.unlock()
-
 	var sigUnit *acmelib.SignalUnit
 	sigUnit = nil
 
@@ -358,9 +346,6 @@ func (h *signalHandler) updateSignalUnit(sig acmelib.Signal, req *request, res *
 
 	res.setUndo(
 		func() (acmelib.Signal, error) {
-			h.sigUnitCtr.lock()
-			defer h.sigUnitCtr.unlock()
-
 			stdSig.SetUnit(oldSigUnit)
 			return sig, nil
 		},
@@ -368,9 +353,6 @@ func (h *signalHandler) updateSignalUnit(sig acmelib.Signal, req *request, res *
 
 	res.setRedo(
 		func() (acmelib.Signal, error) {
-			h.sigUnitCtr.lock()
-			defer h.sigUnitCtr.unlock()
-
 			stdSig.SetUnit(sigUnit)
 			return sig, nil
 		},
@@ -393,9 +375,6 @@ func (h *signalHandler) updateSignalEnum(sig acmelib.Signal, req *request, res *
 		return nil
 	}
 
-	h.sigEnumCtr.lock()
-	defer h.sigEnumCtr.unlock()
-
 	sigEnum, err := h.sigEnumCtr.get(sigEnumEntID)
 	if err != nil {
 		return err
@@ -407,9 +386,6 @@ func (h *signalHandler) updateSignalEnum(sig acmelib.Signal, req *request, res *
 
 	res.setUndo(
 		func() (acmelib.Signal, error) {
-			h.sigEnumCtr.lock()
-			defer h.sigEnumCtr.unlock()
-
 			if err := enumSig.SetEnum(oldSigEnum); err != nil {
 				return nil, err
 			}
@@ -419,9 +395,6 @@ func (h *signalHandler) updateSignalEnum(sig acmelib.Signal, req *request, res *
 
 	res.setRedo(
 		func() (acmelib.Signal, error) {
-			h.sigEnumCtr.lock()
-			defer h.sigEnumCtr.unlock()
-
 			if err := enumSig.SetEnum(sigEnum); err != nil {
 				return nil, err
 			}
