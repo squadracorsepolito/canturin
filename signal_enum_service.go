@@ -119,19 +119,16 @@ func newSignalEnumService(mux *sync.RWMutex, sidebar *sidebarController) *Signal
 	}
 }
 
-func (s *SignalEnumService) Create(req CreateSignalEnumReq) (SignalEnum, error) {
-	sigEnum := acmelib.NewSignalEnum(req.Name)
-
-	if len(req.Desc) > 0 {
-		sigEnum.SetDesc(req.Desc)
-	}
-
-	if req.MinSize > 0 {
-		sigEnum.SetMinSize(req.MinSize)
-	}
-
+func (s *SignalEnumService) Create() (SignalEnum, error) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
+
+	takenNames := make(map[string]struct{})
+	for _, sigEnum := range s.entities {
+		takenNames[sigEnum.Name()] = struct{}{}
+	}
+
+	sigEnum := acmelib.NewSignalEnum(getNewName("signal_enum", takenNames))
 
 	s.addEntity(sigEnum)
 	s.sidebarCtr.sendAdd(sigEnum)

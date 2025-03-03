@@ -141,12 +141,16 @@ func newSignalUnitService(mux *sync.RWMutex, sidebar *sidebarController) *Signal
 	}
 }
 
-func (s *SignalUnitService) Create(req CreateSignalUnitReq) (SignalUnit, error) {
-	sigUnit := acmelib.NewSignalUnit(req.Name, req.Kind.parse(), req.Symbol)
-	sigUnit.SetDesc(req.Desc)
-
+func (s *SignalUnitService) Create() (SignalUnit, error) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
+
+	takenNames := make(map[string]struct{})
+	for _, sigUnit := range s.entities {
+		takenNames[sigUnit.Name()] = struct{}{}
+	}
+
+	sigUnit := acmelib.NewSignalUnit(getNewName("signal_unit", takenNames), acmelib.SignalUnitKindCustom, "")
 
 	s.addEntity(sigUnit)
 	s.sidebarCtr.sendAdd(sigUnit)

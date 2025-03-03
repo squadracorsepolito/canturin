@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { getSignalEnumState } from '$lib/panel/signal-enum/state.svelte';
-	import { z } from 'zod';
 	import type { PanelSectionProps } from '../types';
 	import { type SignalEnum } from '$lib/api/canturin';
 	import { SignalEnumIcon } from '$lib/components/icon';
 	import { TextEditable } from '$lib/components/editable';
 	import { TextareaEditable } from '$lib/components/editable';
+	import { onMount } from 'svelte';
+	import { nameSchema, Validator } from '$lib/utils/validator.svelte';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -13,29 +14,15 @@
 
 	let invalidNames = $state<string[]>([]);
 
-	async function loadInvalidNames() {
+	onMount(async () => {
 		const res = await ses.getInvalidNames();
 		invalidNames = res;
-	}
-
-	$effect(() => {
-		loadInvalidNames();
 	});
 
-	const nameSchema = z.object({
-		name: z
-			.string()
-			.min(1)
-			.refine((n) => !invalidNames.includes(n), { message: 'Duplicated' })
-	});
-
-	let nameErrors = $derived.by(() => {
-		const res = nameSchema.safeParse({ name: ses.entity.name });
-		if (res.success) {
-			return undefined;
-		}
-		return res.error.flatten().fieldErrors.name;
-	});
+	const nameValidator = new Validator(
+		nameSchema(() => invalidNames),
+		() => ses.entity.name
+	);
 
 	function handleName(name: string) {
 		ses.updateName(name);
@@ -54,7 +41,7 @@
 			bind:value={signalEnum.name}
 			name="signal-enum-name"
 			oncommit={handleName}
-			errors={nameErrors}
+			errors={nameValidator.errors}
 			fontWeight="semibold"
 			textSize="lg"
 			border="transparent"

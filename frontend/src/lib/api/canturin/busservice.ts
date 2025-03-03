@@ -9,11 +9,6 @@ import {Call as $Call} from "@wailsio/runtime";
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
-export function Create(req: $models.CreateBusReq): Promise<$models.Bus> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(3897245259, req) as any;
-    return $resultPromise;
-}
-
 export function Get(entityID: string): Promise<$models.Bus> & { cancel(): void } {
     let $resultPromise = $Call.ByID(920363765, entityID) as any;
     return $resultPromise;

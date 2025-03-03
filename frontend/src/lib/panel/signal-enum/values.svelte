@@ -30,7 +30,7 @@
 </script>
 
 {#snippet section(signalEnum: SignalEnum)}
-	{#if signalEnum.values && signalEnum.values.length > 0}
+	{#if signalEnum.values}
 		<Table items={signalEnum.values} idKey="entityId" reorder={handleReorderValue}>
 			{#snippet bulkActions({ selectedCount, selectedItems, deselectAll })}
 				<div class="flex justify-end gap-5">

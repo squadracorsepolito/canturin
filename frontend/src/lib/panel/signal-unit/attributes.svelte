@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { SignalUnitKind, type SignalUnit } from '$lib/api/canturin';
+	import { type SignalUnit } from '$lib/api/canturin';
 	import { Attribute } from '$lib/components/attribute';
 	import Divider from '$lib/components/divider/divider.svelte';
 	import { TextEditable } from '$lib/components/editable';
-	import { Readonly } from '$lib/components/readonly';
 	import { SegmentedControl } from '$lib/components/segmented-control';
 	import type { PanelSectionProps } from '../types';
 	import { getSignalUnitState } from './state.svelte';

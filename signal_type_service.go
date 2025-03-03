@@ -89,67 +89,54 @@ func newSignalTypeService(mux *sync.RWMutex, sidebar *sidebarController) *Signal
 }
 
 func (s *SignalTypeService) Create(req CreateSignalTypeReq) (SignalType, error) {
-	name := req.Name
-	desc := req.Desc
-	size := req.Size
-	kind := req.Kind
-	signed := req.Signed
-	min := req.Min
-	max := req.Max
-	scale := req.Scale
-	offset := req.Offset
+	s.mux.Lock()
+	defer s.mux.Unlock()
 
-	sigType := &acmelib.SignalType{}
-	switch kind {
-	case SignalTypeKindCustom:
-		tmpSigType, err := acmelib.NewCustomSignalType(name, size, signed, min, max, scale, offset)
-		if err != nil {
-			return SignalType{}, err
-		}
-		sigType = tmpSigType
+	takenNames := make(map[string]struct{})
+	for _, sigType := range s.entities {
+		takenNames[sigType.Name()] = struct{}{}
+	}
+	name := getNewName("signal_type", takenNames)
 
+	var sigType *acmelib.SignalType
+	switch req.SignalTypeKind {
 	case SignalTypeKindFlag:
 		sigType = acmelib.NewFlagSignalType(name)
 
 	case SignalTypeKindInteger:
-		tmpSigType, err := acmelib.NewIntegerSignalType(name, size, signed)
+		tmpSigType, err := acmelib.NewIntegerSignalType(name, req.Size, false)
 		if err != nil {
 			return SignalType{}, err
 		}
 		sigType = tmpSigType
 
 	case SignalTypeKindDecimal:
-		tmpSigType, err := acmelib.NewDecimalSignalType(name, size, signed)
+		tmpSigType, err := acmelib.NewDecimalSignalType(name, req.Size, false)
+		if err != nil {
+			return SignalType{}, err
+		}
+		sigType = tmpSigType
+
+	case SignalTypeKindCustom:
+		tmpSigType, err := acmelib.NewCustomSignalType(name, req.Size, false, 0, 1, 1, 0)
 		if err != nil {
 			return SignalType{}, err
 		}
 		sigType = tmpSigType
 	}
 
-	if len(desc) > 0 {
-		sigType.SetDesc(desc)
-	}
-
-	sigType.SetMin(min)
-	sigType.SetMax(max)
-	sigType.SetScale(scale)
-	sigType.SetOffset(offset)
-
-	s.mux.Lock()
-	defer s.mux.Unlock()
-
 	s.addEntity(sigType)
 	s.sidebarCtr.sendAdd(sigType)
 
 	s.sendHistoryOp(
 		func() (*acmelib.SignalType, error) {
-			s.removeEntity(sigType.EntityID().String())
-			s.sidebarCtr.sendDelete(sigType)
+			s.addEntity(sigType)
+			s.sidebarCtr.sendAdd(sigType)
 			return sigType, nil
 		},
 		func() (*acmelib.SignalType, error) {
-			s.addEntity(sigType)
-			s.sidebarCtr.sendAdd(sigType)
+			s.removeEntity(sigType.EntityID().String())
+			s.sidebarCtr.sendDelete(sigType)
 			return sigType, nil
 		},
 	)
@@ -219,6 +206,10 @@ func (s *SignalTypeService) UpdateName(entityID string, req UpdateNameReq) (Sign
 
 func (s *SignalTypeService) UpdateDesc(entityID string, req UpdateDescReq) (SignalType, error) {
 	return s.handle(entityID, &req, s.handler.updateDesc)
+}
+
+func (s *SignalTypeService) UpdateSigned(entityID string, req UpdateSignedReq) (SignalType, error) {
+	return s.handle(entityID, &req, s.handler.updateSigned)
 }
 
 func (s *SignalTypeService) UpdateMin(entityID string, req UpdateMinReq) (SignalType, error) {
@@ -366,6 +357,35 @@ func (h *signalTypeHandler) updateDesc(sigType *acmelib.SignalType, req *request
 	res.setRedo(
 		func() (*acmelib.SignalType, error) {
 			sigType.SetDesc(desc)
+			return sigType, nil
+		},
+	)
+
+	return nil
+}
+
+func (h *signalTypeHandler) updateSigned(sigType *acmelib.SignalType, req *request, res *signalTypeRes) error {
+	parsedReq := req.toUpdateSigned()
+
+	signed := parsedReq.Signed
+
+	oldSigned := sigType.Signed()
+	if oldSigned == signed {
+		return nil
+	}
+
+	sigType.UpdateSigned(signed)
+
+	res.setUndo(
+		func() (*acmelib.SignalType, error) {
+			sigType.UpdateSigned(oldSigned)
+			return sigType, nil
+		},
+	)
+
+	res.setRedo(
+		func() (*acmelib.SignalType, error) {
+			sigType.UpdateSigned(signed)
 			return sigType, nil
 		},
 	)

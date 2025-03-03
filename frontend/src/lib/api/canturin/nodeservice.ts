@@ -14,8 +14,8 @@ export function AddSentMessage(entityID: string, req: $models.AddSentMessageReq)
     return $resultPromise;
 }
 
-export function Create(req: $models.CreateNodeReq): Promise<$models.Node> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(3044972449, req) as any;
+export function Create(): Promise<$models.Node> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3044972449) as any;
     return $resultPromise;
 }
 

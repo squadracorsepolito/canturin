@@ -2,6 +2,7 @@ import {
 	SidebarItemKind,
 	SidebarService,
 	SignalKind,
+	SignalTypeKind,
 	type Sidebar,
 	type SidebarItem
 } from '$lib/api/canturin';
@@ -18,6 +19,10 @@ import { Events as wails } from '@wailsio/runtime';
 import { createBus, deleteBus } from '$lib/panel/bus/state.svelte';
 import { createMessage, deleteMessage } from '$lib/panel/message/state.svelte';
 import { createSignal, deleteSignal } from '$lib/panel/signal/state.svelte';
+import { createSignalType, deleteSignalType } from '$lib/panel/signal-type/state.svelte';
+import { createSignalUnit, deleteSignalUnit } from '$lib/panel/signal-unit/state.svelte';
+import { createSignalEnum, deleteSignalEnum } from '$lib/panel/signal-enum/state.svelte';
+import { createNode, deleteNode } from '$lib/panel/node/state.svelte';
 
 type SidebarUpdateNameEvent = {
 	updatedId: string;
@@ -64,6 +69,7 @@ export class SidebarState {
 		});
 
 		wails.On(SidebarAdd, (e: wails.WailsEvent) => {
+			console.log(e.data[0]);
 			this.handleAddEvent(e.data[0] as SidebarAddEvent);
 		});
 
@@ -259,6 +265,10 @@ export class SidebarState {
 		};
 	}
 
+	async addNode() {
+		await createNode();
+	}
+
 	async addMessage() {
 		const item = this.getItem(this.selectedItemId);
 		if (!item) return;
@@ -297,6 +307,18 @@ export class SidebarState {
 		await createBus();
 	}
 
+	async addSignalType(signalTypeKind: SignalTypeKind, size: number) {
+		await createSignalType(signalTypeKind, size);
+	}
+
+	async addSignalUnit() {
+		await createSignalUnit();
+	}
+
+	async addSignalEnum() {
+		await createSignalEnum();
+	}
+
 	async deleteItem(id: string) {
 		const item = this.getItem(id);
 		if (!item) return;
@@ -311,6 +333,7 @@ export class SidebarState {
 				return;
 
 			case SidebarItemKind.SidebarItemKindNode:
+				await deleteNode(item.id);
 				return;
 
 			case SidebarItemKind.SidebarItemKindNodeInterface:
@@ -327,8 +350,16 @@ export class SidebarState {
 				return;
 
 			case SidebarItemKind.SidebarItemKindSignalType:
+				await deleteSignalType(item.id);
+				return;
+
 			case SidebarItemKind.SidebarItemKindSignalUnit:
+				await deleteSignalUnit(item.id);
+				return;
+
 			case SidebarItemKind.SidebarItemKindSignalEnum:
+				await deleteSignalEnum(item.id);
+				return;
 		}
 	}
 }

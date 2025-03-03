@@ -129,77 +129,6 @@ func (s *BusService) GetLoad(entityID string) (BusLoad, error) {
 	return newBusLoad(load, msgLoads), nil
 }
 
-func (s *BusService) Create(req CreateBusReq) (Bus, error) {
-	s.mux.Lock()
-	defer s.mux.Unlock()
-
-	bus := acmelib.NewBus(req.Name)
-	bus.SetDesc(req.Desc)
-	bus.SetType(req.BusType.parse())
-	bus.SetBaudrate(req.Baudrate)
-
-	s.addEntity(bus)
-	s.sidebarCtr.sendAdd(bus)
-
-	s.sendHistoryOp(
-		func() (*acmelib.Bus, error) {
-			s.removeEntity(bus.EntityID().String())
-			s.sidebarCtr.sendDelete(bus)
-
-			return bus, nil
-		},
-		func() (*acmelib.Bus, error) {
-			s.addEntity(bus)
-			s.sidebarCtr.sendAdd(bus)
-
-			return bus, nil
-		},
-	)
-
-	return s.handler.toResponse(bus), nil
-}
-
-// func (s *BusService) Delete(entityID string) error {
-// 	s.mux.Lock()
-// 	defer s.mux.Unlock()
-
-// 	bus, err := s.getEntity(entityID)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	nodeInts := bus.NodeInterfaces()
-// 	bus.RemoveAllNodeInterfaces()
-
-// 	s.removeEntity(entityID)
-// 	s.sidebarCtr.sendDelete(bus)
-
-// 	s.sendHistoryOp(
-// 		func() (*acmelib.Bus, error) {
-// 			for _, nodeInt := range nodeInts {
-// 				if err := bus.AddNodeInterface(nodeInt); err != nil {
-// 					return nil, err
-// 				}
-// 			}
-
-// 			s.addEntity(bus)
-// 			s.sidebarCtr.sendAdd(bus)
-
-// 			return bus, nil
-// 		},
-// 		func() (*acmelib.Bus, error) {
-// 			bus.RemoveAllNodeInterfaces()
-
-// 			s.removeEntity(entityID)
-// 			s.sidebarCtr.sendDelete(bus)
-
-// 			return bus, nil
-// 		},
-// 	)
-
-// 	return nil
-// }
-
 func (s *BusService) UpdateName(entityID string, req UpdateNameReq) (Bus, error) {
 	return s.handle(entityID, &req, s.handler.updateName)
 }
@@ -365,5 +294,9 @@ func (h *busHandler) updateBaudrate(bus *acmelib.Bus, req *request, res *busRes)
 		},
 	)
 
+	return nil
+}
+
+func (h *busHandler) addNodeInterface(bus *acmelib.Bus, req *request, res *busRes) error {
 	return nil
 }

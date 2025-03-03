@@ -6,74 +6,39 @@
 	import { Readonly } from '$lib/components/readonly';
 	import SegmentedControl from '$lib/components/segmented-control/segmented-control.svelte';
 	import { getSignalTypeState } from '$lib/panel/signal-type/state.svelte';
-	import { z } from 'zod';
 	import type { PanelSectionProps } from '../types';
 	import { Switch } from '$lib/components/switch';
 	import { signalTypeKindOptions } from './utils';
+	import { Validator } from '$lib/utils/validator.svelte';
+	import * as v from 'valibot';
 
 	let { entityId }: PanelSectionProps = $props();
 
 	const sts = getSignalTypeState(entityId);
 
-	const minSchema = z.object({
-		min: z.number()
-	});
+	const minValidator = new Validator(v.number(), () => sts.entity.min);
 
-	let minErrors = $derived.by(() => {
-		const res = minSchema.safeParse({ min: sts.entity.min });
-		if (res.success) {
-			return undefined;
-		}
-		return res.error.flatten().fieldErrors.min;
-	});
+	const maxValidator = new Validator(v.number(), () => sts.entity.max);
+
+	const scaleValidator = new Validator(v.number(), () => sts.entity.scale);
+
+	const offsetValidator = new Validator(v.number(), () => sts.entity.offset);
+
+	function handleSigned(signed: boolean) {
+		sts.updateSigned(signed);
+	}
 
 	function handleMin(min: number) {
 		sts.updateMin(min);
 	}
 
-	const maxSchema = z.object({
-		max: z.number()
-	});
-
-	let maxErrors = $derived.by(() => {
-		const res = maxSchema.safeParse({ max: sts.entity.max });
-		if (res.success) {
-			return undefined;
-		}
-		return res.error.flatten().fieldErrors.max;
-	});
-
 	function handleMax(max: number) {
 		sts.updateMax(max);
 	}
 
-	const scaleSchema = z.object({
-		scale: z.number()
-	});
-
-	let scaleErrors = $derived.by(() => {
-		const res = scaleSchema.safeParse({ scale: sts.entity.scale });
-		if (res.success) {
-			return undefined;
-		}
-		return res.error.flatten().fieldErrors.scale;
-	});
-
 	function handleScale(scale: number) {
 		sts.updateScale(scale);
 	}
-
-	const offsetSchema = z.object({
-		offset: z.number()
-	});
-
-	let offsetErrors = $derived.by(() => {
-		const res = offsetSchema.safeParse({ offset: sts.entity.offset });
-		if (res.success) {
-			return undefined;
-		}
-		return res.error.flatten().fieldErrors.offset;
-	});
 
 	function handleOffset(offset: number) {
 		sts.updateOffset(offset);
@@ -102,7 +67,7 @@
 		</Attribute>
 
 		<Attribute label="Signed" desc="Whether the value is signed">
-			<Switch checked={signalType.signed} readOnly />
+			<Switch checked={signalType.signed} oncheckedchange={handleSigned} />
 		</Attribute>
 	</div>
 
@@ -114,7 +79,7 @@
 				bind:value={signalType.min}
 				name="signal-type-min"
 				oncommit={handleMin}
-				errors={minErrors}
+				errors={minValidator.errors}
 			/>
 		</Attribute>
 
@@ -123,7 +88,7 @@
 				bind:value={signalType.max}
 				name="signal-type-max"
 				oncommit={handleMax}
-				errors={maxErrors}
+				errors={maxValidator.errors}
 			/>
 		</Attribute>
 	</div>
@@ -136,7 +101,7 @@
 				bind:value={signalType.scale}
 				name="signal-type-scale"
 				oncommit={handleScale}
-				errors={scaleErrors}
+				errors={scaleValidator.errors}
 			/>
 		</Attribute>
 
@@ -145,7 +110,7 @@
 				bind:value={signalType.offset}
 				name="signal-type-offset"
 				oncommit={handleOffset}
-				errors={offsetErrors}
+				errors={offsetValidator.errors}
 			/>
 		</Attribute>
 	</div>

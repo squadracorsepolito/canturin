@@ -5,6 +5,8 @@
 	import { getNodeState } from './state.svelte';
 	import { NodeIcon } from '$lib/components/icon';
 	import { TextareaEditable, TextEditable } from '$lib/components/editable';
+	import { onMount } from 'svelte';
+	import { nameSchema, Validator } from '$lib/utils/validator.svelte';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -12,29 +14,15 @@
 
 	let invalidNames = $state<string[]>([]);
 
-	async function loadInvalidNames() {
+	onMount(async () => {
 		const res = await ns.getInvalidNames();
 		invalidNames = res;
-	}
-
-	$effect(() => {
-		loadInvalidNames();
 	});
 
-	const nameSchema = z.object({
-		name: z
-			.string()
-			.min(1)
-			.refine((n) => !invalidNames.includes(n), { message: 'Duplicated' })
-	});
-
-	let nameErrors = $derived.by(() => {
-		const res = nameSchema.safeParse({ name: ns.entity.name });
-		if (res.success) {
-			return undefined;
-		}
-		return res.error.flatten().fieldErrors.name;
-	});
+	const nameValidator = new Validator(
+		nameSchema(() => invalidNames),
+		() => ns.entity.name
+	);
 
 	function handleName(name: string) {
 		ns.updateName(name);
@@ -51,7 +39,7 @@
 
 		<TextEditable
 			bind:value={node.name}
-			errors={nameErrors}
+			errors={nameValidator.errors}
 			oncommit={handleName}
 			name="node-name"
 			fontWeight="semibold"

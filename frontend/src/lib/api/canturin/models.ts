@@ -63,43 +63,9 @@ export enum BusType {
     BusTypeCAN2A = "CAN_2.0A",
 };
 
-export interface CreateBusReq {
-    "name": string;
-    "desc": string;
-    "busType": BusType;
-    "baudrate": number;
-}
-
-export interface CreateNodeReq {
-    "name": string;
-    "desc": string;
-    "nodeId": number;
-    "interfaceCount": number;
-}
-
-export interface CreateSignalEnumReq {
-    "name": string;
-    "desc": string;
-    "minSize": number;
-}
-
 export interface CreateSignalTypeReq {
-    "name": string;
-    "desc": string;
-    "kind": SignalTypeKind;
+    "signalTypeKind": SignalTypeKind;
     "size": number;
-    "signed": boolean;
-    "min": number;
-    "max": number;
-    "scale": number;
-    "offset": number;
-}
-
-export interface CreateSignalUnitReq {
-    "name": string;
-    "desc": string;
-    "kind": SignalUnitKind;
-    "symbol": string;
 }
 
 export interface DeleteBusReq {
@@ -494,6 +460,10 @@ export interface UpdateSignalUnitKindReq {
 
 export interface UpdateSignalUnitReq {
     "signalUnitEntityId": string;
+}
+
+export interface UpdateSignedReq {
+    "signed": boolean;
 }
 
 export interface UpdateSizeByteReq {

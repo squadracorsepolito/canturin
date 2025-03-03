@@ -72,12 +72,26 @@ func (s *NodeService) GetInvalidNodeIDs(entityID string) []uint {
 	return nodeIDs
 }
 
-func (s *NodeService) Create(req CreateNodeReq) (Node, error) {
-	node := acmelib.NewNode(req.Name, acmelib.NodeID(req.NodeID), int(req.InterfaceCount))
-	node.SetDesc(req.Desc)
-
+func (s *NodeService) Create() (Node, error) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
+
+	takenNames := make(map[string]struct{})
+	takenNodeIDs := make(map[acmelib.NodeID]struct{})
+	for _, tmpNode := range s.entities {
+		takenNames[tmpNode.Name()] = struct{}{}
+		takenNodeIDs[tmpNode.ID()] = struct{}{}
+	}
+
+	nodeID := acmelib.NodeID(1)
+	for {
+		if _, ok := takenNodeIDs[nodeID]; !ok {
+			break
+		}
+		nodeID++
+	}
+
+	node := acmelib.NewNode(getNewName("node", takenNames), nodeID, 1)
 
 	s.addEntity(node)
 	s.sidebarCtr.sendAdd(node)

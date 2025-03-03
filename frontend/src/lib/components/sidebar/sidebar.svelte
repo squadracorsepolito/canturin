@@ -15,7 +15,7 @@
 	} from '../icon';
 	import { TreeView } from '../tree';
 	import { SidebarState } from './state.svelte';
-	import { AddSignalModal } from '../modal';
+	import { AddSignalModal, AddSignalTypeModal, AddSignalUnitModal } from '../modal';
 	import { IconButton } from '../button';
 
 	const s = new SidebarState();
@@ -73,6 +73,7 @@
 				return;
 
 			case SidebarItemKind.SidebarItemKindNode:
+				s.addNode();
 				return;
 
 			case SidebarItemKind.SidebarItemKindNodeInterface:
@@ -80,9 +81,13 @@
 				s.addMessage();
 				return;
 
-			case SidebarItemKind.SidebarItemKindSignalType:
 			case SidebarItemKind.SidebarItemKindSignalUnit:
+				s.addSignalUnit();
+				return;
+
 			case SidebarItemKind.SidebarItemKindSignalEnum:
+				s.addSignalEnum();
+				return;
 		}
 	}
 
@@ -110,6 +115,16 @@
 								</IconButton>
 							{/snippet}
 						</AddSignalModal>
+					{:else if s.selectedItemKind === SidebarItemKind.SidebarItemKindSignalType}
+						<AddSignalTypeModal
+							onsubmit={(signalTypeKind, size) => s.addSignalType(signalTypeKind, size)}
+						>
+							{#snippet trigger({ getProps })}
+								<IconButton {...getProps()}>
+									<AddIcon height="20" width="20" />
+								</IconButton>
+							{/snippet}
+						</AddSignalTypeModal>
 					{:else}
 						<IconButton onclick={handleAdd}>
 							<AddIcon height="20" width="20" />

@@ -19,14 +19,23 @@ export async function loadSignalUnit(entityId: string) {
 	provider.add(signalUnit);
 }
 
+export async function createSignalUnit() {
+	try {
+		await SignalUnitService.Create();
+	} catch (err) {
+		console.error(err);
+		pushToast('error', 'Error', 'Operation failed');
+	}
+}
+
 export async function deleteSignalUnit(entityId: string) {
 	try {
 		await SignalUnitService.Delete(entityId);
 		provider.remove(entityId);
 		layout.closeIfOpen(entityId);
-	} catch (error) {
+	} catch (err) {
+		console.error(err);
 		pushToast('error', 'Error', 'Operation failed');
-		console.error(error);
 	}
 }
 

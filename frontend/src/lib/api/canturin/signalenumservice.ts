@@ -14,8 +14,8 @@ export function AddValue(entityID: string): Promise<$models.SignalEnum> & { canc
     return $resultPromise;
 }
 
-export function Create(req: $models.CreateSignalEnumReq): Promise<$models.SignalEnum> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(4055206348, req) as any;
+export function Create(): Promise<$models.SignalEnum> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(4055206348) as any;
     return $resultPromise;
 }
 

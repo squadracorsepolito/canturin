@@ -16,6 +16,15 @@ export async function loadNode(entityId: string) {
 	provider.add(node);
 }
 
+export async function createNode() {
+	try {
+		await NodeService.Create();
+	} catch (err) {
+		pushToast('error', 'Error', 'Operation failed');
+		console.error(err);
+	}
+}
+
 export async function deleteNode(entityId: string) {
 	try {
 		await NodeService.Delete(entityId);

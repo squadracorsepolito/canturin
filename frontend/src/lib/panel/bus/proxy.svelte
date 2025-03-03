@@ -3,7 +3,6 @@
 	import type { PanelSectionProps } from '../types';
 	import AttachedNodes from './attached-nodes.svelte';
 	import Attributes from './attributes.svelte';
-	import Draft from './draft.svelte';
 	import Heading from './heading.svelte';
 	import Load from './load.svelte';
 	import { loadBus } from './state.svelte';
@@ -14,17 +13,13 @@
 </script>
 
 <Panel>
-	{#if entityId === 'draft'}
-		<Draft />
-	{:else}
-		{#await promise then}
-			<Heading {entityId} />
+	{#await promise then}
+		<Heading {entityId} />
 
-			<Attributes {entityId} />
+		<Attributes {entityId} />
 
-			<Load {entityId} />
+		<Load {entityId} />
 
-			<AttachedNodes {entityId} />
-		{/await}
-	{/if}
+		<AttachedNodes {entityId} />
+	{/await}
 </Panel>

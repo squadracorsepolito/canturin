@@ -4,8 +4,9 @@
 	import { getSignalTypeState } from './state.svelte';
 	import { type SignalType } from '$lib/api/canturin';
 	import { TextEditable } from '$lib/components/editable';
-	import { z } from 'zod';
 	import TextareaEditable from '$lib/components/editable/textarea-editable.svelte';
+	import { onMount } from 'svelte';
+	import { nameSchema, Validator } from '$lib/utils/validator.svelte';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -13,29 +14,15 @@
 
 	let invalidNames = $state<string[]>([]);
 
-	async function loadInvalidNames() {
+	onMount(async () => {
 		const res = await sts.getInvalidNames();
 		invalidNames = res;
-	}
-
-	$effect(() => {
-		loadInvalidNames();
 	});
 
-	const nameSchema = z.object({
-		name: z
-			.string()
-			.min(1)
-			.refine((n) => !invalidNames.includes(n), { message: 'Duplicated' })
-	});
-
-	let nameErrors = $derived.by(() => {
-		const res = nameSchema.safeParse({ name: sts.entity.name });
-		if (res.success) {
-			return undefined;
-		}
-		return res.error.flatten().fieldErrors.name;
-	});
+	const nameValidator = new Validator(
+		nameSchema(() => invalidNames),
+		() => sts.entity.name
+	);
 
 	function handleName(name: string) {
 		sts.updateName(name);
@@ -54,7 +41,7 @@
 			bind:value={signalType.name}
 			name="signal-type-name"
 			oncommit={handleName}
-			errors={nameErrors}
+			errors={nameValidator.errors}
 			fontWeight="semibold"
 			textSize="lg"
 			border="transparent"

@@ -19,14 +19,23 @@ export async function loadSignalEnum(entityId: string) {
 	provider.add(signalEnum);
 }
 
+export async function createSignalEnum() {
+	try {
+		await SignalEnumService.Create();
+	} catch (err) {
+		console.error(err);
+		pushToast('error', 'Error', 'Operation failed');
+	}
+}
+
 export async function deleteSignalEnum(entityId: string) {
 	try {
 		await SignalEnumService.Delete(entityId);
 		provider.remove(entityId);
 		layout.closeIfOpen(entityId);
-	} catch (error) {
+	} catch (err) {
+		console.error(err);
 		pushToast('error', 'Error', 'Operation failed');
-		console.error(error);
 	}
 }
 

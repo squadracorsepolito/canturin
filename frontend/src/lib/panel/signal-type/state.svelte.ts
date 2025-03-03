@@ -1,4 +1,4 @@
-import { SignalTypeService, type SignalType } from '$lib/api/canturin';
+import { SignalTypeKind, SignalTypeService, type SignalType } from '$lib/api/canturin';
 import { HistorySignalTypeModify } from '$lib/constants/events';
 import { pushToast } from '$lib/components/toast/toast-provider.svelte';
 import { EntityState } from '../../state/entity-state.svelte';
@@ -19,14 +19,23 @@ export async function loadSignalType(entityId: string) {
 	provider.add(signalType);
 }
 
+export async function createSignalType(signalTypeKind: SignalTypeKind, size: number) {
+	try {
+		await SignalTypeService.Create({ signalTypeKind, size });
+	} catch (err) {
+		console.error(err);
+		pushToast('error', 'Error', 'Operation failed');
+	}
+}
+
 export async function deleteSignalType(entityId: string) {
 	try {
 		await SignalTypeService.Delete(entityId);
 		provider.remove(entityId);
 		layout.closeIfOpen(entityId);
-	} catch (error) {
+	} catch (err) {
+		console.error(err);
 		pushToast('error', 'Error', 'Operation failed');
-		console.error(error);
 	}
 }
 
@@ -51,6 +60,10 @@ class SignalTypeState extends EntityState<SignalType> {
 
 	updateDesc(desc: string) {
 		this.update(SignalTypeService.UpdateDesc(this.entity.entityId, { desc }));
+	}
+
+	updateSigned(signed: boolean) {
+		this.update(SignalTypeService.UpdateSigned(this.entity.entityId, { signed }));
 	}
 
 	updateMin(min: number) {

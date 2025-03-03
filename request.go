@@ -15,11 +15,6 @@ func newRequest(data any) *request {
 // COMMON REQUESTS //
 /////////////////////
 
-type commonCreateReq struct {
-	Name string `json:"name"`
-	Desc string `json:"desc"`
-}
-
 type UpdateNameReq struct {
 	Name string `json:"name"`
 }
@@ -64,21 +59,6 @@ func (r *request) toDeleteBus() *DeleteBusReq {
 // BUS REQUESTS //
 //////////////////
 
-type CreateBusReq struct {
-	commonCreateReq
-
-	BusType  BusType `json:"busType"`
-	Baudrate int     `json:"baudrate"`
-}
-
-func (r *request) toCreateBus() *CreateBusReq {
-	req, ok := r.data.(*CreateBusReq)
-	if !ok {
-		panic("cannot convert to CreateBusReq")
-	}
-	return req
-}
-
 type UpdateBaudrateReq struct {
 	Baudrate int `json:"baudrate"`
 }
@@ -106,21 +86,6 @@ func (r *request) toUpdateBusType() *UpdateBusTypeReq {
 ///////////////////
 // NODE REQUESTS //
 ///////////////////
-
-type CreateNodeReq struct {
-	commonCreateReq
-
-	NodeID         uint `json:"nodeId"`
-	InterfaceCount int  `json:"interfaceCount"`
-}
-
-func (r *request) toCreateNode() *CreateNodeReq {
-	req, ok := r.data.(*CreateNodeReq)
-	if !ok {
-		panic("cannot convert to CreateNodeReq")
-	}
-	return req
-}
 
 type UpdateNodeIDReq struct {
 	NodeID uint `json:"nodeId"`
@@ -373,21 +338,18 @@ func (r *request) toUpdateSignalEnum() *UpdateSignalEnumReq {
 //////////////////////////
 
 type CreateSignalTypeReq struct {
-	commonCreateReq
-
-	Kind   SignalTypeKind `json:"kind"`
-	Size   int            `json:"size"`
-	Signed bool           `json:"signed"`
-	Min    float64        `json:"min"`
-	Max    float64        `json:"max"`
-	Scale  float64        `json:"scale"`
-	Offset float64        `json:"offset"`
+	SignalTypeKind SignalTypeKind `json:"signalTypeKind"`
+	Size           int            `json:"size"`
 }
 
-func (r *request) toCreateSignalType() *CreateSignalTypeReq {
-	req, ok := r.data.(*CreateSignalTypeReq)
+type UpdateSignedReq struct {
+	Signed bool `json:"signed"`
+}
+
+func (r *request) toUpdateSigned() *UpdateSignedReq {
+	req, ok := r.data.(*UpdateSignedReq)
 	if !ok {
-		panic("cannot convert to CreateSignalTypeReq")
+		panic("cannot convert to UpdateSignedReq")
 	}
 	return req
 }
@@ -444,21 +406,6 @@ func (r *request) toUpdateOffset() *UpdateOffsetReq {
 // SIGNAL UNIT REQUESTS //
 //////////////////////////
 
-type CreateSignalUnitReq struct {
-	commonCreateReq
-
-	Kind   SignalUnitKind `json:"kind"`
-	Symbol string         `json:"symbol"`
-}
-
-func (r *request) toCreateSignalUnit() *CreateSignalUnitReq {
-	req, ok := r.data.(*CreateSignalUnitReq)
-	if !ok {
-		panic("cannot convert to CreateSignalUnitReq")
-	}
-	return req
-}
-
 type UpdateSignalUnitKindReq struct {
 	Kind SignalUnitKind `json:"kind"`
 }
@@ -486,20 +433,6 @@ func (r *request) toUpdateSymbol() *UpdateSymbolReq {
 //////////////////////////
 // SIGNAL ENUM REQUESTS //
 //////////////////////////
-
-type CreateSignalEnumReq struct {
-	commonCreateReq
-
-	MinSize int `json:"minSize"`
-}
-
-func (r *request) toCreateSignalEnum() *CreateSignalEnumReq {
-	req, ok := r.data.(*CreateSignalEnumReq)
-	if !ok {
-		panic("cannot convert to CreateSignalEnumReq")
-	}
-	return req
-}
 
 type commonSignalEnumValueReq struct {
 	ValueEntityID string `json:"valueEntityId"`

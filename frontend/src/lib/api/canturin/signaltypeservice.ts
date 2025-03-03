@@ -68,3 +68,8 @@ export function UpdateScale(entityID: string, req: $models.UpdateScaleReq): Prom
     let $resultPromise = $Call.ByID(3856836030, entityID, req) as any;
     return $resultPromise;
 }
+
+export function UpdateSigned(entityID: string, req: $models.UpdateSignedReq): Promise<$models.SignalType> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(4062931212, entityID, req) as any;
+    return $resultPromise;
+}

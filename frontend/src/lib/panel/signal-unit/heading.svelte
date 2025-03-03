@@ -2,10 +2,10 @@
 	import type { SignalUnit } from '$lib/api/canturin';
 	import { TextareaEditable, TextEditable } from '$lib/components/editable';
 	import { SignalUnitIcon } from '$lib/components/icon';
-	import { z } from 'zod';
 	import type { PanelSectionProps } from '../types';
 	import { getSignalUnitState } from './state.svelte';
 	import { onMount } from 'svelte';
+	import { nameSchema, Validator } from '$lib/utils/validator.svelte';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -18,20 +18,10 @@
 		invalidNames = res;
 	});
 
-	const nameSchema = z.object({
-		name: z
-			.string()
-			.min(1)
-			.refine((n) => !invalidNames.includes(n), { message: 'Duplicated' })
-	});
-
-	let nameErrors = $derived.by(() => {
-		const res = nameSchema.safeParse({ name: sus.entity.name });
-		if (res.success) {
-			return undefined;
-		}
-		return res.error.flatten().fieldErrors.name;
-	});
+	const nameValidator = new Validator(
+		nameSchema(() => invalidNames),
+		() => sus.entity.name
+	);
 
 	function handleName(name: string) {
 		sus.updateName(name);
@@ -50,7 +40,7 @@
 			bind:value={sigUnit.name}
 			name="signal-unit-name"
 			oncommit={handleName}
-			errors={nameErrors}
+			errors={nameValidator.errors}
 			fontWeight="semibold"
 			textSize="lg"
 			border="transparent"

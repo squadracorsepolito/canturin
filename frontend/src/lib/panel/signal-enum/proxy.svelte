@@ -3,7 +3,6 @@
 	import Panel from '../panel.svelte';
 	import type { PanelSectionProps } from '../types';
 	import Attributes from './attributes.svelte';
-	import Draft from './draft.svelte';
 	import Heading from './heading.svelte';
 	import Refs from './refs.svelte';
 	import Values from './values.svelte';
@@ -14,17 +13,13 @@
 </script>
 
 <Panel>
-	{#if entityId === 'draft'}
-		<Draft />
-	{:else}
-		{#await promise then}
-			<Heading {entityId} />
+	{#await promise then}
+		<Heading {entityId} />
 
-			<Attributes {entityId} />
+		<Attributes {entityId} />
 
-			<Values {entityId} />
+		<Values {entityId} />
 
-			<Refs {entityId} />
-		{/await}
-	{/if}
+		<Refs {entityId} />
+	{/await}
 </Panel>

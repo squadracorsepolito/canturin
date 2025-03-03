@@ -481,7 +481,7 @@ func (s *sidebarController) sendAdd(ent entity) {
 		}
 
 		nodeItem := newSidebarItem(SidebarItemKindNode, node.EntityID().String(), node.Name())
-		s.addCh <- newSidebarAddReq(nodeItem, node.EntityID().String())
+		s.addCh <- newSidebarAddReq(nodeItem, SidebarNodeGroupID)
 
 		for _, nodeInt := range node.Interfaces() {
 			parBus := nodeInt.ParentBus()

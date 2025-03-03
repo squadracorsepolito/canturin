@@ -5,7 +5,6 @@
 	import Heading from './heading.svelte';
 	import Attributes from './attributes.svelte';
 	import Refs from './refs.svelte';
-	import Draft from './draft.svelte';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -13,15 +12,11 @@
 </script>
 
 <Panel>
-	{#if entityId === 'draft'}
-		<Draft />
-	{:else}
-		{#await promise then}
-			<Heading {entityId} />
+	{#await promise then}
+		<Heading {entityId} />
 
-			<Attributes {entityId} />
+		<Attributes {entityId} />
 
-			<Refs {entityId} />
-		{/await}
-	{/if}
+		<Refs {entityId} />
+	{/await}
 </Panel>

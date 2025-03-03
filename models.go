@@ -1,8 +1,6 @@
 package main
 
 import (
-	"slices"
-	"strings"
 	"time"
 
 	"github.com/squadracorsepolito/acmelib"
@@ -11,13 +9,6 @@ import (
 type entityStub struct {
 	EntityID string `json:"entityId"`
 	Name     string `json:"name"`
-}
-
-func getEntityStub(e entity) entityStub {
-	return entityStub{
-		EntityID: e.EntityID().String(),
-		Name:     e.Name(),
-	}
 }
 
 type NetworkStub struct {
@@ -99,44 +90,6 @@ type SignalReference struct {
 
 type entityWithRefs[T entity] interface {
 	References() []T
-}
-
-func getSignalReferences(refs entityWithRefs[*acmelib.StandardSignal]) []SignalReference {
-	res := []SignalReference{}
-
-	for _, tmpStdSig := range refs.References() {
-		tmpMsg := tmpStdSig.ParentMessage()
-		tmpNode := tmpMsg.SenderNodeInterface().Node()
-		tmpBus := tmpMsg.SenderNodeInterface().ParentBus()
-
-		res = append(res, SignalReference{
-			Bus:     getEntityStub(tmpBus),
-			Node:    getEntityStub(tmpNode),
-			Message: getEntityStub(tmpMsg),
-			Signal:  getEntityStub(tmpStdSig),
-		})
-	}
-
-	slices.SortFunc(res, func(a, b SignalReference) int {
-		busCmp := strings.Compare(a.Bus.Name, b.Bus.Name)
-		if busCmp != 0 {
-			return busCmp
-		}
-
-		nodeCmp := strings.Compare(a.Node.Name, b.Node.Name)
-		if nodeCmp != 0 {
-			return nodeCmp
-		}
-
-		msgCmp := strings.Compare(a.Message.Name, b.Message.Name)
-		if msgCmp != 0 {
-			return msgCmp
-		}
-
-		return strings.Compare(a.Signal.Name, b.Signal.Name)
-	})
-
-	return res
 }
 
 type EntityKind string
