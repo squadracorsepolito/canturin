@@ -2,6 +2,7 @@ import { EntityKind } from '$lib/api/canturin';
 
 export type PanelType =
 	| 'none'
+	| 'network'
 	| 'bus'
 	| 'node'
 	| 'message'

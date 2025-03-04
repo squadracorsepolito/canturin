@@ -27,7 +27,7 @@ export async function createBus() {
 
 export async function deleteBus(entityId: string) {
 	try {
-		await NetworkService.DeleteBus({ busEntityID: entityId });
+		await NetworkService.DeleteBuses({ busEntityIDs: [entityId] });
 		provider.remove(entityId);
 		layout.closeIfOpen(entityId);
 	} catch (err) {

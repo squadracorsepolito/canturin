@@ -6,12 +6,15 @@
 		NodePanel,
 		SignalUnitPanel,
 		MessagePanel,
-		SignalPanel
+		SignalPanel,
+		NetworkPanel
 	} from '$lib/panel';
 	import layout from '$lib/state/layout-state.svelte';
 </script>
 
-{#if layout.openPanelType === 'bus'}
+{#if layout.openPanelType === 'network'}
+	<NetworkPanel />
+{:else if layout.openPanelType === 'bus'}
 	<BusPanel entityId={layout.openPanelId} />
 {:else if layout.openPanelType === 'node'}
 	<NodePanel entityId={layout.openPanelId} />

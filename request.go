@@ -43,14 +43,14 @@ func (r *request) toUpdateDesc() *UpdateDescReq {
 // NETWORK REQUESTS //
 //////////////////////
 
-type DeleteBusReq struct {
-	BusEntityID string `json:"busEntityID"`
+type DeleteBusesReq struct {
+	BusEntityIDs []string `json:"busEntityIDs"`
 }
 
-func (r *request) toDeleteBus() *DeleteBusReq {
-	req, ok := r.data.(*DeleteBusReq)
+func (r *request) toDeleteBuses() *DeleteBusesReq {
+	req, ok := r.data.(*DeleteBusesReq)
 	if !ok {
-		panic("cannot convert to DeleteBusReq")
+		panic("cannot convert to DeleteBusesReq")
 	}
 	return req
 }
@@ -86,6 +86,10 @@ func (r *request) toUpdateBusType() *UpdateBusTypeReq {
 ///////////////////
 // NODE REQUESTS //
 ///////////////////
+
+type CreateNodeReq struct {
+	InterfaceCount int `json:"interfaceCount"`
+}
 
 type UpdateNodeIDReq struct {
 	NodeID uint `json:"nodeId"`

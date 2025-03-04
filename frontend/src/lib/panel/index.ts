@@ -1,3 +1,4 @@
+export { default as NetworkPanel } from './network/proxy.svelte';
 export { default as NodePanel } from './node/proxy.svelte';
 export { default as BusPanel } from './bus/proxy.svelte';
 export { default as MessagePanel } from './message/proxy.svelte';

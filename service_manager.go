@@ -75,7 +75,7 @@ func newServiceManager() *serviceManager {
 	nodeSrv.setHistoryController(historyCtr)
 	nodeCtr := nodeSrv.getController()
 
-	networkSrv := newNetworkService(newNetworkHandler(busCtr), mux, sidebarCtr, historyCtr)
+	networkSrv := newNetworkService(newNetworkHandler(sidebarCtr, busCtr), mux, sidebarCtr, historyCtr)
 
 	return &serviceManager{
 		network: acmelib.NewNetwork("Unnamed Network"),

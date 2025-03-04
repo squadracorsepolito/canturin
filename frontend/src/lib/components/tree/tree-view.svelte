@@ -12,6 +12,7 @@
 		valueKey: KeyOfString<T>;
 		labelKey: KeyOfString<T>;
 		getIcon: (node: T) => Component<IconProps>;
+		onrootclick: () => void;
 		onselect?: (value: string) => void;
 		ondelete?: (value: string) => void;
 		actions: Snippet<[{ collapse: () => void }]>;
@@ -23,6 +24,7 @@
 		valueKey,
 		labelKey,
 		getIcon,
+		onrootclick,
 		onselect,
 		ondelete,
 		actions
@@ -60,6 +62,14 @@
 					ondelete?.(selectedValue);
 					selectedValue = '';
 				}
+			}
+		})
+	);
+
+	const treeRootLableProps = $derived(
+		mergeProps(api.getLabelProps(), {
+			onclick: () => {
+				onrootclick();
 			}
 		})
 	);
@@ -116,9 +126,9 @@
 			<RootIcon height="20" width="20" />
 		</span>
 
-		<div {...api.getLabelProps()}>
+		<button {...treeRootLableProps}>
 			{root[labelKey]}
-		</div>
+		</button>
 
 		{@render actions({ collapse: api.collapse })}
 	</div>
@@ -134,7 +144,7 @@
 
 <style lang="postcss">
 	[data-scope='tree-view'] [data-part='label'] {
-		@apply font-medium text-sm truncate flex-1;
+		@apply font-medium text-sm truncate flex-1 text-left;
 	}
 
 	[data-scope='tree-view'] [data-part='branch-control'],

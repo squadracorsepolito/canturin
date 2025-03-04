@@ -22,7 +22,7 @@ func (bt BusType) parse() acmelib.BusType {
 	}
 }
 
-func getBusType(typ acmelib.BusType) BusType {
+func newBusType(typ acmelib.BusType) BusType {
 	return BusType(typ.String())
 }
 
@@ -41,6 +41,23 @@ func newAttachedNode(nodeInt *acmelib.NodeInterface) AttachedNode {
 
 		ID:              uint(node.ID()),
 		InterfaceNumber: nodeInt.Number(),
+	}
+}
+
+type BusBase struct {
+	BaseEntity
+
+	Baudrate int `json:"baudrate"`
+}
+
+func newBusBase(bus *acmelib.Bus) BusBase {
+	if bus == nil {
+		return BusBase{}
+	}
+
+	return BusBase{
+		BaseEntity: newBaseEntity(bus),
+		Baudrate:   bus.Baudrate(),
 	}
 }
 
@@ -63,7 +80,7 @@ func newBus(bus *acmelib.Bus) Bus {
 	return Bus{
 		BaseEntity: newBaseEntity(bus),
 
-		Type:     getBusType(bus.Type()),
+		Type:     newBusType(bus.Type()),
 		Baudrate: bus.Baudrate(),
 
 		AttachedNodes: attNodes,

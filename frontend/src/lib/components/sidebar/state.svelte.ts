@@ -265,8 +265,8 @@ export class SidebarState {
 		};
 	}
 
-	async addNode() {
-		await createNode();
+	async addNode(interfaceCount: number) {
+		await createNode(interfaceCount);
 	}
 
 	async addMessage() {

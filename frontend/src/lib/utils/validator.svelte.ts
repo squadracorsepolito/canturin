@@ -23,7 +23,15 @@ export function checkUnused<T>(getter: () => T[]) {
 	);
 }
 
-export function nameSchema(getInvalidNames: () => string[]) {
+export function nameSchema(getInvalidNames?: () => string[]) {
+	if (!getInvalidNames) {
+		return v.pipe(
+			v.string(),
+			v.minLength(1),
+			v.regex(/^[a-zA-Z_].*/, 'Invalid string: Must start with a letter or underscore')
+		);
+	}
+
 	return v.pipe(
 		v.string(),
 		v.minLength(1),

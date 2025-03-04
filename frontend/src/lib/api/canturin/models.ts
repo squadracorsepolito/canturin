@@ -40,6 +40,14 @@ export interface Bus {
     "attachedNodes": AttachedNode[] | null;
 }
 
+export interface BusBase {
+    "entityId": string;
+    "name": string;
+    "desc": string;
+    "createTime": time$0.Time;
+    "baudrate": number;
+}
+
 export interface BusLoad {
     "percentage": number;
     "messages": BusLoadMessage[] | null;
@@ -63,13 +71,17 @@ export enum BusType {
     BusTypeCAN2A = "CAN_2.0A",
 };
 
+export interface CreateNodeReq {
+    "interfaceCount": number;
+}
+
 export interface CreateSignalTypeReq {
     "signalTypeKind": SignalTypeKind;
     "size": number;
 }
 
-export interface DeleteBusReq {
-    "busEntityID": string;
+export interface DeleteBusesReq {
+    "busEntityIDs": string[] | null;
 }
 
 export interface DeleteSignalsReq {
@@ -158,6 +170,7 @@ export interface Network {
     "name": string;
     "desc": string;
     "createTime": time$0.Time;
+    "buses": BusBase[] | null;
 }
 
 export interface Node {

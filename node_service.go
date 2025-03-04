@@ -72,7 +72,7 @@ func (s *NodeService) GetInvalidNodeIDs(entityID string) []uint {
 	return nodeIDs
 }
 
-func (s *NodeService) Create() (Node, error) {
+func (s *NodeService) Create(req CreateNodeReq) (Node, error) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
@@ -91,7 +91,7 @@ func (s *NodeService) Create() (Node, error) {
 		nodeID++
 	}
 
-	node := acmelib.NewNode(getNewName("node", takenNames), nodeID, 1)
+	node := acmelib.NewNode(getNewName("node", takenNames), nodeID, req.InterfaceCount)
 
 	s.addEntity(node)
 	s.sidebarCtr.sendAdd(node)
@@ -346,9 +346,6 @@ func (h *nodeHandler) updateNodeID(node *acmelib.Node, req *request, res *nodeRe
 }
 
 func (h *nodeHandler) updateAttachedBus(node *acmelib.Node, req *request, res *nodeRes) error {
-	h.bus.mux.Lock()
-	defer h.bus.mux.Unlock()
-
 	parsedRes := req.toUpdateAttachedBus()
 
 	busEntID := parsedRes.BusEntityID
@@ -369,6 +366,7 @@ func (h *nodeHandler) updateAttachedBus(node *acmelib.Node, req *request, res *n
 		if err := oldBus.RemoveNodeInterface(nodeEntID); err != nil {
 			return err
 		}
+
 	}
 
 	bus, err := h.bus.getEntity(busEntID)
@@ -380,14 +378,18 @@ func (h *nodeHandler) updateAttachedBus(node *acmelib.Node, req *request, res *n
 		return err
 	}
 
+	if oldBus != nil {
+		h.sidebarCtr.sendDeleteNodeInterface(nodeInt)
+	}
+	h.sidebarCtr.sendAddNodeInterface(nodeInt)
+
 	res.setUndo(
 		func() (*acmelib.Node, error) {
-			h.bus.mux.Lock()
-			defer h.bus.mux.Unlock()
-
 			if err := bus.RemoveNodeInterface(nodeEntID); err != nil {
 				return nil, err
 			}
+
+			h.sidebarCtr.sendDeleteNodeInterface(nodeInt)
 
 			if oldBus == nil {
 				return node, nil
@@ -397,15 +399,14 @@ func (h *nodeHandler) updateAttachedBus(node *acmelib.Node, req *request, res *n
 				return nil, err
 			}
 
+			h.sidebarCtr.sendAddNodeInterface(nodeInt)
+
 			return node, nil
 		},
 	)
 
 	res.setRedo(
 		func() (*acmelib.Node, error) {
-			h.bus.mux.Lock()
-			defer h.bus.mux.Unlock()
-
 			if oldBus != nil {
 				if err := oldBus.RemoveNodeInterface(nodeInt.Node().EntityID()); err != nil {
 					return nil, err
@@ -415,6 +416,11 @@ func (h *nodeHandler) updateAttachedBus(node *acmelib.Node, req *request, res *n
 			if err := bus.AddNodeInterface(nodeInt); err != nil {
 				return nil, err
 			}
+
+			if oldBus != nil {
+				h.sidebarCtr.sendDeleteNodeInterface(nodeInt)
+			}
+			h.sidebarCtr.sendAddNodeInterface(nodeInt)
 
 			return node, nil
 		},

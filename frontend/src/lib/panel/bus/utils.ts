@@ -14,7 +14,7 @@ const baudrateValues = {
 	'125_000': 125_000
 };
 
-function getSelectItemFromBaudrate(baudrate: number): BaudrateSelectItem {
+export function getSelectItemFromBaudrate(baudrate: number): BaudrateSelectItem {
 	let bits = baudrateValues['1_000_000'];
 	if (baudrate <= baudrateValues['125_000']) {
 		bits = baudrateValues['125_000'];

@@ -571,3 +571,17 @@ func (s *sidebarController) sendDelete(ent entity) {
 		}
 	}
 }
+
+func (s *sidebarController) sendAddNodeInterface(nodeInt *acmelib.NodeInterface) {
+	parBus := nodeInt.ParentBus()
+	if parBus == nil {
+		return
+	}
+
+	nodeIntItem := newSidebarItem(SidebarItemKindNodeInterface, newNodeIntSidebarItemID(nodeInt), newNodeIntSidebarItemName(nodeInt))
+	s.addCh <- newSidebarAddReq(nodeIntItem, parBus.EntityID().String())
+}
+
+func (s *sidebarController) sendDeleteNodeInterface(nodeInt *acmelib.NodeInterface) {
+	s.deleteCh <- newSidebarDeleteReq(newNodeIntSidebarItemID(nodeInt))
+}

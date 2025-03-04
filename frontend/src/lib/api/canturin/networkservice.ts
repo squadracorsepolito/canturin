@@ -14,7 +14,22 @@ export function AddBus(): Promise<$models.Network> & { cancel(): void } {
     return $resultPromise;
 }
 
-export function DeleteBus(req: $models.DeleteBusReq): Promise<$models.Network> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(2074426818, req) as any;
+export function DeleteBuses(req: $models.DeleteBusesReq): Promise<$models.Network> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1819632418, req) as any;
+    return $resultPromise;
+}
+
+export function Get(): Promise<$models.Network> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(1942428257) as any;
+    return $resultPromise;
+}
+
+export function UpdateDesc(req: $models.UpdateDescReq): Promise<$models.Network> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(3963864903, req) as any;
+    return $resultPromise;
+}
+
+export function UpdateName(req: $models.UpdateNameReq): Promise<$models.Network> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(502949925, req) as any;
     return $resultPromise;
 }

@@ -16,9 +16,9 @@ export async function loadNode(entityId: string) {
 	provider.add(node);
 }
 
-export async function createNode() {
+export async function createNode(interfaceCount: number) {
 	try {
-		await NodeService.Create();
+		await NodeService.Create({ interfaceCount });
 	} catch (err) {
 		pushToast('error', 'Error', 'Operation failed');
 		console.error(err);

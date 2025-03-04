@@ -15,8 +15,9 @@
 	} from '../icon';
 	import { TreeView } from '../tree';
 	import { SidebarState } from './state.svelte';
-	import { AddSignalModal, AddSignalTypeModal, AddSignalUnitModal } from '../modal';
+	import { AddNodeModal, AddSignalModal, AddSignalTypeModal, AddSignalUnitModal } from '../modal';
 	import { IconButton } from '../button';
+	import layout from '$lib/state/layout-state.svelte';
 
 	const s = new SidebarState();
 
@@ -73,7 +74,6 @@
 				return;
 
 			case SidebarItemKind.SidebarItemKindNode:
-				s.addNode();
 				return;
 
 			case SidebarItemKind.SidebarItemKindNodeInterface:
@@ -102,12 +102,21 @@
 			valueKey="id"
 			labelKey="name"
 			getIcon={getTreeViewIcon}
+			onrootclick={() => layout.openPanel('network', '')}
 			onselect={handleSelect}
 			ondelete={handleDelete}
 		>
 			{#snippet actions({ collapse })}
 				{#if s.selectedItemKind}
-					{#if s.selectedItemKind === SidebarItemKind.SidebarItemKindSignal}
+					{#if s.selectedItemKind === SidebarItemKind.SidebarItemKindNode}
+						<AddNodeModal onsubmit={(nodeKind) => s.addNode(nodeKind)}>
+							{#snippet trigger({ getProps })}
+								<IconButton {...getProps()}>
+									<AddIcon height="20" width="20" />
+								</IconButton>
+							{/snippet}
+						</AddNodeModal>
+					{:else if s.selectedItemKind === SidebarItemKind.SidebarItemKindSignal}
 						<AddSignalModal onsubmit={(signalKind) => s.addSignal(signalKind)}>
 							{#snippet trigger({ getProps })}
 								<IconButton {...getProps()}>
