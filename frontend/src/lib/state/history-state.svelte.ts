@@ -5,7 +5,8 @@ import { Events as wails } from '@wailsio/runtime';
 class HistoryState {
 	history = $state({
 		operationCount: 0,
-		currentIndex: -1
+		currentIndex: -1,
+		saved: true
 	});
 
 	canUndo = $derived(this.history.operationCount > 0 && this.history.currentIndex > -1);

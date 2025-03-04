@@ -8,8 +8,9 @@ import (
 )
 
 type History struct {
-	OperationCount int `json:"operationCount"`
-	CurrentIndex   int `json:"currentIndex"`
+	OperationCount int  `json:"operationCount"`
+	CurrentIndex   int  `json:"currentIndex"`
+	Saved          bool `json:"saved"`
 }
 
 type operationFunc func() (any, error)
@@ -24,6 +25,8 @@ type HistoryService struct {
 	operations []*operation
 	currOpIdx  int
 
+	saved bool
+
 	mux sync.RWMutex
 
 	operationCh chan *operation
@@ -34,6 +37,8 @@ func newHistoryService() *HistoryService {
 	return &HistoryService{
 		operations: []*operation{},
 		currOpIdx:  -1,
+
+		saved: true,
 
 		operationCh: make(chan *operation),
 		stopCh:      make(chan struct{}),
@@ -66,6 +71,7 @@ func (s *HistoryService) getState() History {
 	return History{
 		OperationCount: len(s.operations),
 		CurrentIndex:   s.currOpIdx,
+		Saved:          s.saved,
 	}
 }
 
@@ -76,6 +82,8 @@ func (s *HistoryService) emitHistoryChange() {
 func (s *HistoryService) handleOperation(op *operation) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
+
+	s.saved = false
 
 	if s.currOpIdx == -1 {
 		s.operations = []*operation{}
@@ -107,6 +115,8 @@ func (s *HistoryService) Undo() (History, error) {
 	if err != nil {
 		return s.getState(), err
 	}
+
+	s.saved = false
 	s.sendModifyEvent(op.serviceKind, res)
 
 	s.currOpIdx--
@@ -129,6 +139,8 @@ func (s *HistoryService) Redo() (History, error) {
 	if err != nil {
 		return s.getState(), err
 	}
+
+	s.saved = false
 	s.sendModifyEvent(op.serviceKind, res)
 
 	return s.getState(), nil
@@ -156,6 +168,20 @@ func (s *HistoryService) sendModifyEvent(opDomain serviceKind, res any) {
 	}
 
 	application.Get().EmitEvent(eventName, res)
+}
+
+func (s *HistoryService) save() {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	s.saved = true
+}
+
+func (s *HistoryService) isSaved() bool {
+	s.mux.RLock()
+	defer s.mux.RUnlock()
+
+	return s.saved
 }
 
 func (s *HistoryService) getController() *historyController {

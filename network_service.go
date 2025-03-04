@@ -216,6 +216,7 @@ func (h *networkHandler) addBus(net *acmelib.Network, _ *request, res *networkRe
 	}
 
 	bus := acmelib.NewBus(getNewName("bus", takenName))
+	bus.SetBaudrate(1_000_000)
 
 	if err := net.AddBus(bus); err != nil {
 		return err

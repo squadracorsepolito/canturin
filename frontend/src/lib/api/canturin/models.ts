@@ -117,6 +117,7 @@ export interface EnumSignal {
 export interface History {
     "operationCount": number;
     "currentIndex": number;
+    "saved": boolean;
 }
 
 export interface Message {

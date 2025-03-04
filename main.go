@@ -4,9 +4,7 @@ import (
 	"embed"
 	"log"
 	"log/slog"
-	"os"
 
-	"github.com/squadracorsepolito/acmelib"
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
 )
@@ -46,15 +44,21 @@ func main() {
 
 		// Key bindings for undo/redo actions, triggering functions on specific key combinations.
 		KeyBindings: map[string]func(window *application.WebviewWindow){
-			"ctrl+z": func(w *application.WebviewWindow) {
-				// historyService.Undo()
-				// historyService.emitHistoryChange()
+			"ctrl+s": func(_ *application.WebviewWindow) {
+				if !manager.canSave() {
+					return
+				}
+
+				if err := manager.saveNetwork(); err != nil {
+					log.Print(err)
+				}
+			},
+
+			"ctrl+z": func(_ *application.WebviewWindow) {
 				manager.historySrv.Undo()
 				manager.historySrv.emitHistoryChange()
 			},
-			"ctrl+y": func(w *application.WebviewWindow) {
-				// historyService.Redo()
-				// historyService.emitHistoryChange()
+			"ctrl+y": func(_ *application.WebviewWindow) {
 				manager.historySrv.Redo()
 				manager.historySrv.emitHistoryChange()
 			},
@@ -91,18 +95,7 @@ func main() {
 
 	// TODO! remove this event in production
 	app.OnApplicationEvent(events.Common.ApplicationStarted, func(_ *application.ApplicationEvent) {
-		file, err := os.Open(testdataPath)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer file.Close()
-
-		net, err := acmelib.LoadNetwork(file, acmelib.SaveEncodingWire)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		manager.loadNetwork(net)
+		manager.openNetwork(testdataPath)
 	})
 
 	menuHandler.init()

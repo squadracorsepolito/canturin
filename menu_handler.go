@@ -24,7 +24,11 @@ func (h *menuHandler) init() {
 	fileMenu := menu.AddSubmenu("File")
 
 	h.register(fileMenu, "Open File", h.openFile)
+	h.register(fileMenu, "Save File", h.saveFile)
+	h.register(fileMenu, "Save As File", h.saveAsFile)
+
 	h.register(fileMenu, "Import DBC", h.importDBC)
+
 	h.register(fileMenu, "Reload", h.reload)
 
 	app.SetMenu(menu)
@@ -39,44 +43,41 @@ func (h *menuHandler) register(menu *application.Menu, name string, cb func(*app
 }
 
 func (h *menuHandler) openFile(_ *application.Context) error {
-	path, err := application.OpenFileDialog().
-		AddFilter("protobuf binary file", "*.binpb").
-		AddFilter("protobuf JSON file", "*.json").
-		AddFilter("protobuf text file", "*.txtpb").
-		PromptForSingleSelection()
+	dialog := application.OpenFileDialog()
 
+	dialog.AddFilter("protobuf binary file", "*.binpb")
+	dialog.AddFilter("protobuf JSON file", "*.json")
+	dialog.AddFilter("protobuf text file", "*.txtpb")
+
+	filename, err := dialog.PromptForSingleSelection()
 	if err != nil {
 		return err
 	}
 
-	if path == "" {
+	return manager.openNetwork(filename)
+}
+
+func (h *menuHandler) saveFile(_ *application.Context) error {
+	if !manager.canSave() {
 		return nil
 	}
 
-	fileEncoding := acmelib.SaveEncodingWire
-	switch filepath.Ext(path) {
-	case ".binpb":
-		fileEncoding = acmelib.SaveEncodingWire
-	case ".json":
-		fileEncoding = acmelib.SaveEncodingJSON
-	case ".txtpb":
-		fileEncoding = acmelib.SaveEncodingText
-	}
+	return manager.saveNetwork()
+}
 
-	file, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
+func (h *menuHandler) saveAsFile(_ *application.Context) error {
+	dialog := application.SaveFileDialog()
 
-	net, err := acmelib.LoadNetwork(file, fileEncoding)
+	dialog.AddFilter("protobuf binary file", "*.binpb")
+	dialog.AddFilter("protobuf JSON file", "*.json")
+	dialog.AddFilter("protobuf text file", "*.txtpb")
+
+	filename, err := dialog.PromptForSingleSelection()
 	if err != nil {
 		return err
 	}
 
-	manager.loadNetwork(net)
-
-	return nil
+	return manager.saveNetworkAs(filename)
 }
 
 func (h *menuHandler) importDBC(_ *application.Context) error {

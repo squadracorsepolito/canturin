@@ -59,6 +59,10 @@
 						<IconButton onclick={handleRedo} disabled={!history.canRedo}>
 							<RedoIcon />
 						</IconButton>
+
+						{#if !history.history.saved}
+							<span>&#42</span>
+						{/if}
 					</div>
 				</div>
 

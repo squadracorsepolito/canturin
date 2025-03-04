@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+	"os"
+	"path/filepath"
 	"sync"
 
 	"github.com/squadracorsepolito/acmelib"
@@ -9,7 +12,8 @@ import (
 )
 
 type serviceManager struct {
-	network *acmelib.Network
+	filename string
+	network  *acmelib.Network
 
 	sidebarSrv *SidebarService
 	historySrv *HistoryService
@@ -183,9 +187,83 @@ func (m *serviceManager) initNetwork(net *acmelib.Network) {
 	m.signalEnumCtr.sendLoad(maps.Values(sigEnums))
 }
 
-func (m *serviceManager) loadNetwork(net *acmelib.Network) {
+func (m *serviceManager) getEncoding(path string) acmelib.SaveEncoding {
+	switch filepath.Ext(path) {
+	case ".binpb":
+		return acmelib.SaveEncodingWire
+	case ".json":
+		return acmelib.SaveEncodingJSON
+	case ".txtpb":
+		return acmelib.SaveEncodingText
+	}
+	return acmelib.SaveEncodingWire
+}
+
+func (m *serviceManager) openNetwork(filename string) error {
+	if filename == "" {
+		return nil
+	}
+
+	file, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	net, err := acmelib.LoadNetwork(file, m.getEncoding(filename))
+	if err != nil {
+		return err
+	}
+
 	m.clearServices()
 	m.initNetwork(net)
+
+	m.filename = filename
+
+	return nil
+}
+
+func (m *serviceManager) canSave() bool {
+	return !m.historySrv.isSaved()
+}
+
+func (m *serviceManager) saveNetwork() error {
+	if m.filename == "" {
+		return nil
+	}
+
+	file, err := os.Create(m.filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	fileEnc := m.getEncoding(m.filename)
+	switch fileEnc {
+	case acmelib.SaveEncodingWire:
+		err = acmelib.SaveNetwork(m.network, fileEnc, file, nil, nil)
+
+	case acmelib.SaveEncodingJSON:
+		err = acmelib.SaveNetwork(m.network, fileEnc, nil, file, nil)
+
+	case acmelib.SaveEncodingText:
+		err = acmelib.SaveNetwork(m.network, fileEnc, nil, nil, file)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	m.historySrv.save()
+
+	log.Print("NETWORK SAVED")
+
+	return nil
+}
+
+func (m *serviceManager) saveNetworkAs(filename string) error {
+	m.filename = filename
+	return m.saveNetwork()
 }
 
 func (m *serviceManager) reloadNetwork() {
