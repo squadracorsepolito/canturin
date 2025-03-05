@@ -19,13 +19,12 @@ func (h *menuHandler) init() {
 
 	menu := app.NewMenu()
 	menu.AddRole(application.AppMenu)
-	menu.AddRole(application.EditMenu)
 
 	fileMenu := menu.AddSubmenu("File")
 
 	h.register(fileMenu, "Open File", h.openFile)
 	h.register(fileMenu, "Save File", h.saveFile)
-	h.register(fileMenu, "Save As File", h.saveAsFile)
+	h.register(fileMenu, "Save File As", h.saveFileAs)
 
 	h.register(fileMenu, "Import DBC", h.importDBC)
 
@@ -58,14 +57,10 @@ func (h *menuHandler) openFile(_ *application.Context) error {
 }
 
 func (h *menuHandler) saveFile(_ *application.Context) error {
-	if !manager.canSave() {
-		return nil
-	}
-
-	return manager.saveNetwork()
+	return manager.trySaveNetwork()
 }
 
-func (h *menuHandler) saveAsFile(_ *application.Context) error {
+func (h *menuHandler) saveFileAs(_ *application.Context) error {
 	dialog := application.SaveFileDialog()
 
 	dialog.AddFilter("protobuf binary file", "*.binpb")

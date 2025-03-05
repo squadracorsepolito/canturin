@@ -175,6 +175,7 @@ func (s *HistoryService) save() {
 	defer s.mux.Unlock()
 
 	s.saved = true
+	s.emitHistoryChange()
 }
 
 func (s *HistoryService) isSaved() bool {

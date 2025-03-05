@@ -223,10 +223,6 @@ func (m *serviceManager) openNetwork(filename string) error {
 	return nil
 }
 
-func (m *serviceManager) canSave() bool {
-	return !m.historySrv.isSaved()
-}
-
 func (m *serviceManager) saveNetwork() error {
 	if m.filename == "" {
 		return nil
@@ -259,6 +255,14 @@ func (m *serviceManager) saveNetwork() error {
 	log.Print("NETWORK SAVED")
 
 	return nil
+}
+
+func (m *serviceManager) trySaveNetwork() error {
+	if m.historySrv.isSaved() {
+		return nil
+	}
+
+	return m.saveNetwork()
 }
 
 func (m *serviceManager) saveNetworkAs(filename string) error {

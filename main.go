@@ -29,7 +29,10 @@ const testdataPath = "./testdata/SC24.binpb"
 // It subsequently runs the application and logs any error that might occur.
 func main() {
 	manager = newServiceManager()
+
 	menuHandler := newMenuHandler()
+	kbHandler := newKeybindingsHandler()
+	kbHandler.init()
 
 	// Create a new Wails application by providing the necesvar (sary options.
 	// Variables 'Name' and 'Description' are for application metadata.
@@ -43,26 +46,7 @@ func main() {
 		Services: manager.getServices(),
 
 		// Key bindings for undo/redo actions, triggering functions on specific key combinations.
-		KeyBindings: map[string]func(window *application.WebviewWindow){
-			"ctrl+s": func(_ *application.WebviewWindow) {
-				if !manager.canSave() {
-					return
-				}
-
-				if err := manager.saveNetwork(); err != nil {
-					log.Print(err)
-				}
-			},
-
-			"ctrl+z": func(_ *application.WebviewWindow) {
-				manager.historySrv.Undo()
-				manager.historySrv.emitHistoryChange()
-			},
-			"ctrl+y": func(_ *application.WebviewWindow) {
-				manager.historySrv.Redo()
-				manager.historySrv.emitHistoryChange()
-			},
-		},
+		KeyBindings: kbHandler.getWindowKeybindings(),
 
 		// Configure the asset handler to serve embedded frontend files.
 		Assets: application.AssetOptions{
