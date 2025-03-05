@@ -128,6 +128,14 @@ func (m *serviceManager) getServices() []application.Service {
 	}
 }
 
+func (m *serviceManager) createNetwork() {
+	net := acmelib.NewNetwork("new_network")
+
+	m.clearServices()
+	m.initNetwork(net)
+	m.historySrv.saved = false
+}
+
 func (m *serviceManager) initNetwork(net *acmelib.Network) {
 	m.network = net
 
@@ -225,7 +233,14 @@ func (m *serviceManager) openNetwork(filename string) error {
 
 func (m *serviceManager) saveNetwork() error {
 	if m.filename == "" {
-		return nil
+		dialog := newSaveNetworkDialog()
+		filename, err := dialog.PromptForSingleSelection()
+		if err != nil {
+			application.Get().Logger.Error(err.Error())
+			return nil
+		}
+
+		return m.saveNetworkAs(filename)
 	}
 
 	file, err := os.Create(m.filename)
@@ -271,11 +286,13 @@ func (m *serviceManager) saveNetworkAs(filename string) error {
 }
 
 func (m *serviceManager) reloadNetwork() {
+	m.clearServices()
 	m.initNetwork(m.network)
 }
 
 func (m *serviceManager) clearServices() {
 	m.sidebarSrv.clear()
+	m.historySrv.clear()
 
 	m.networkSrv.clear()
 	m.busCtr.sendClear()

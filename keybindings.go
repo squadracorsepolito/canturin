@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"runtime"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -53,7 +52,7 @@ func (kh *keybindingsHandler) metaKey() string {
 
 func (kh *keybindingsHandler) saveHandler(_ *application.WebviewWindow) {
 	if err := manager.trySaveNetwork(); err != nil {
-		log.Print(err)
+		application.Get().Logger.Error(err.Error())
 	}
 }
 

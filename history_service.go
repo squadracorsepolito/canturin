@@ -185,6 +185,17 @@ func (s *HistoryService) isSaved() bool {
 	return s.saved
 }
 
+func (s *HistoryService) clear() {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+
+	s.operations = []*operation{}
+	s.currOpIdx = -1
+	s.saved = true
+
+	s.emitHistoryChange()
+}
+
 func (s *HistoryService) getController() *historyController {
 	return &historyController{
 		operationCh: s.operationCh,

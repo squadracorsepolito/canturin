@@ -6,7 +6,6 @@ import (
 	"log/slog"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
-	"github.com/wailsapp/wails/v3/pkg/events"
 )
 
 // Wails uses Go's `embed` package to embed the frontend files into the binary.
@@ -78,9 +77,9 @@ func main() {
 	})
 
 	// TODO! remove this event in production
-	app.OnApplicationEvent(events.Common.ApplicationStarted, func(_ *application.ApplicationEvent) {
-		manager.openNetwork(testdataPath)
-	})
+	// app.OnApplicationEvent(events.Common.ApplicationStarted, func(_ *application.ApplicationEvent) {
+	// 	manager.openNetwork(testdataPath)
+	// })
 
 	menuHandler.init()
 
