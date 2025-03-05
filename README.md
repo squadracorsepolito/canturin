@@ -24,7 +24,7 @@
     ```
 
 > [!IMPORTANT]
-> Check wails3 is at version `v3.0.0-alpha.8.3` with the command `wails3 version`.
+> Check wails3 is at version `v3.0.0-alpha.9` with the command `wails3 version`.
 
 2. Clone this repo.
 
