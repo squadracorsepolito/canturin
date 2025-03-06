@@ -170,11 +170,11 @@ func (s *HistoryService) sendModifyEvent(opDomain serviceKind, res any) {
 	application.Get().EmitEvent(eventName, res)
 }
 
-func (s *HistoryService) save() {
+func (s *HistoryService) setSaved(saved bool) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
-	s.saved = true
+	s.saved = saved
 	s.emitHistoryChange()
 }
 

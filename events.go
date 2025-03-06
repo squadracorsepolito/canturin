@@ -1,6 +1,8 @@
 package main
 
 const (
+	NetworkLoaded = "network-loaded"
+
 	SidebarLoad       = "sidebar-load"
 	SidebarUpdateName = "sidebar-update-name"
 	SidebarAdd        = "sidebar-add"

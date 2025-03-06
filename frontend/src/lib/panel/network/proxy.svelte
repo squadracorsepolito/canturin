@@ -2,11 +2,11 @@
 	import Panel from '../panel.svelte';
 	import Buses from './buses.svelte';
 	import Heading from './heading.svelte';
-	import { loadNetwork } from './state.svelte';
+	import { getNetwork } from './state.svelte';
 </script>
 
 <Panel>
-	{#await loadNetwork() then}
+	{#await getNetwork() then}
 		<Heading />
 
 		<Buses />

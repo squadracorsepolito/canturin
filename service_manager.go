@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os"
 	"path/filepath"
 	"sync"
@@ -12,11 +11,17 @@ import (
 )
 
 type serviceManager struct {
-	filename string
-	network  *acmelib.Network
+	filePath string
+
+	configSrv *ConfigService
+
+	mux     *sync.RWMutex
+	network *acmelib.Network
 
 	sidebarSrv *SidebarService
+
 	historySrv *HistoryService
+	historyCtr *historyController
 
 	networkSrv *NetworkService
 
@@ -82,10 +87,17 @@ func newServiceManager() *serviceManager {
 	networkSrv := newNetworkService(newNetworkHandler(sidebarCtr, busCtr), mux, sidebarCtr, historyCtr)
 
 	return &serviceManager{
-		network: acmelib.NewNetwork("Unnamed Network"),
+		filePath: "",
+
+		configSrv: newConfigService(),
+
+		mux:     mux,
+		network: nil,
 
 		sidebarSrv: sidebarSrv,
+
 		historySrv: historySrv,
+		historyCtr: historyCtr,
 
 		networkSrv: networkSrv,
 
@@ -114,6 +126,8 @@ func newServiceManager() *serviceManager {
 
 func (m *serviceManager) getServices() []application.Service {
 	return []application.Service{
+		application.NewService(m.configSrv),
+
 		application.NewService(m.sidebarSrv),
 		application.NewService(manager.historySrv),
 
@@ -131,9 +145,10 @@ func (m *serviceManager) getServices() []application.Service {
 func (m *serviceManager) createNetwork() {
 	net := acmelib.NewNetwork("new_network")
 
+	m.filePath = ""
 	m.clearServices()
 	m.initNetwork(net)
-	m.historySrv.saved = false
+	m.historySrv.setSaved(false)
 }
 
 func (m *serviceManager) initNetwork(net *acmelib.Network) {
@@ -207,32 +222,35 @@ func (m *serviceManager) getEncoding(path string) acmelib.SaveEncoding {
 	return acmelib.SaveEncodingWire
 }
 
-func (m *serviceManager) openNetwork(filename string) error {
-	if filename == "" {
+func (m *serviceManager) openNetwork(path string) error {
+	if path == "" {
 		return nil
 	}
 
-	file, err := os.Open(filename)
+	file, err := os.Open(path)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	net, err := acmelib.LoadNetwork(file, m.getEncoding(filename))
+	net, err := acmelib.LoadNetwork(file, m.getEncoding(path))
 	if err != nil {
 		return err
 	}
 
 	m.clearServices()
 	m.initNetwork(net)
+	m.historySrv.setSaved(true)
 
-	m.filename = filename
+	m.filePath = path
+
+	m.configSrv.addOpenedNetwork(net.Name(), m.filePath)
 
 	return nil
 }
 
 func (m *serviceManager) saveNetwork() error {
-	if m.filename == "" {
+	if m.filePath == "" {
 		dialog := newSaveNetworkDialog()
 		filename, err := dialog.PromptForSingleSelection()
 		if err != nil {
@@ -243,13 +261,16 @@ func (m *serviceManager) saveNetwork() error {
 		return m.saveNetworkAs(filename)
 	}
 
-	file, err := os.Create(m.filename)
+	file, err := os.Create(m.filePath)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	fileEnc := m.getEncoding(m.filename)
+	m.mux.Lock()
+	defer m.mux.Unlock()
+
+	fileEnc := m.getEncoding(m.filePath)
 	switch fileEnc {
 	case acmelib.SaveEncodingWire:
 		err = acmelib.SaveNetwork(m.network, fileEnc, file, nil, nil)
@@ -265,9 +286,11 @@ func (m *serviceManager) saveNetwork() error {
 		return err
 	}
 
-	m.historySrv.save()
+	m.historySrv.setSaved(true)
 
-	log.Print("NETWORK SAVED")
+	m.configSrv.addOpenedNetwork(m.network.Name(), m.filePath)
+
+	printInfo("NETWORK SAVED")
 
 	return nil
 }
@@ -281,13 +304,85 @@ func (m *serviceManager) trySaveNetwork() error {
 }
 
 func (m *serviceManager) saveNetworkAs(filename string) error {
-	m.filename = filename
+	m.filePath = filename
 	return m.saveNetwork()
 }
 
 func (m *serviceManager) reloadNetwork() {
 	m.clearServices()
 	m.initNetwork(m.network)
+}
+
+func (m *serviceManager) importDBC(path string) error {
+	if path == "" {
+		return nil
+	}
+
+	dbcFile, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer dbcFile.Close()
+
+	fileName := filepath.Base(path)
+	busName := fileName[:len(fileName)-len(filepath.Ext(path))]
+
+	bus, err := acmelib.ImportDBCFile(busName, dbcFile)
+	if err != nil {
+		printError(err)
+		return err
+	}
+
+	m.mux.Lock()
+	if err := m.network.AddBus(bus); err != nil {
+		m.mux.Unlock()
+		printError(err)
+		return err
+	}
+	m.mux.Unlock()
+
+	m.initNetwork(m.network)
+
+	m.historyCtr.sendOperation(
+		serviceKindNetwork,
+		func() (any, error) {
+			m.mux.Lock()
+			defer m.mux.Unlock()
+
+			if err := m.network.RemoveBus(bus.EntityID()); err != nil {
+				return nil, err
+			}
+
+			m.busCtr.sendDelete(bus)
+
+			return newNetwork(m.network), nil
+		},
+		func() (any, error) {
+			m.mux.Lock()
+			defer m.mux.Unlock()
+
+			if err := m.network.AddBus(bus); err != nil {
+				return nil, err
+			}
+
+			m.busCtr.sendAdd(bus)
+
+			return newNetwork(m.network), nil
+		},
+	)
+
+	return nil
+}
+
+func (m *serviceManager) exportDBC(path string) error {
+	if path == "" {
+		return nil
+	}
+
+	m.mux.Lock()
+	defer m.mux.Unlock()
+
+	return acmelib.ExportNetwork(manager.network, path)
 }
 
 func (m *serviceManager) clearServices() {

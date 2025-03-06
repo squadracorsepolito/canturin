@@ -6,6 +6,10 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
+func printInfo(msg string, args ...any) {
+	application.Get().Logger.Info(msg, args...)
+}
+
 func printError(err error) {
 	application.Get().Logger.Error(err.Error())
 }

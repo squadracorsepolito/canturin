@@ -77,7 +77,6 @@ export class SidebarState {
 			this.handleDeleteEvent(e.data[0] as SidebarDeleteEvent);
 		});
 
-		// TODO!: remove this line in production
 		this.load();
 	}
 

@@ -1,3 +1,4 @@
+export const NetworkLoaded = "network-loaded";
 export const SidebarLoad = "sidebar-load";
 export const SidebarUpdateName = "sidebar-update-name";
 export const SidebarAdd = "sidebar-add";

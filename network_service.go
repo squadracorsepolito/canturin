@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/squadracorsepolito/acmelib"
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 type Network struct {
@@ -59,6 +60,8 @@ func (s *NetworkService) load(net *acmelib.Network) {
 
 	s.network = net
 	s.sidebarCtr.sendLoad(net)
+
+	application.Get().EmitEvent(NetworkLoaded)
 }
 
 func (s *NetworkService) clear() {
@@ -108,6 +111,14 @@ func (s *NetworkService) handle(reqDataPtr any, handlerFn func(*acmelib.Network,
 	)
 
 	return s.handler.toResponse(s.network), nil
+}
+
+func (s *NetworkService) Create() {
+	manager.createNetwork()
+}
+
+func (s *NetworkService) Load(path string) error {
+	return manager.openNetwork(path)
 }
 
 func (s *NetworkService) Get() Network {
@@ -162,10 +173,16 @@ func (h *networkHandler) updateName(net *acmelib.Network, req *request, res *net
 
 	h.sidebarCtr.sendUpdateName(net)
 
+	netPath := manager.filePath
+	manager.configSrv.renameOpenedNetwork(netPath, name)
+
 	res.setUndo(
 		func() error {
 			net.UpdateName(oldName)
+
 			h.sidebarCtr.sendUpdateName(net)
+			manager.configSrv.renameOpenedNetwork(netPath, oldName)
+
 			return nil
 		},
 	)
@@ -173,7 +190,10 @@ func (h *networkHandler) updateName(net *acmelib.Network, req *request, res *net
 	res.setRedo(
 		func() error {
 			net.UpdateName(name)
+
 			h.sidebarCtr.sendUpdateName(net)
+			manager.configSrv.renameOpenedNetwork(netPath, name)
+
 			return nil
 		},
 	)

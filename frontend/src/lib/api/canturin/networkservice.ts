@@ -14,6 +14,11 @@ export function AddBus(): Promise<$models.Network> & { cancel(): void } {
     return $resultPromise;
 }
 
+export function Create(): Promise<void> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(579752159) as any;
+    return $resultPromise;
+}
+
 export function DeleteBuses(req: $models.DeleteBusesReq): Promise<$models.Network> & { cancel(): void } {
     let $resultPromise = $Call.ByID(1819632418, req) as any;
     return $resultPromise;
@@ -21,6 +26,11 @@ export function DeleteBuses(req: $models.DeleteBusesReq): Promise<$models.Networ
 
 export function Get(): Promise<$models.Network> & { cancel(): void } {
     let $resultPromise = $Call.ByID(1942428257) as any;
+    return $resultPromise;
+}
+
+export function Load(path: string): Promise<void> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(146513583, path) as any;
     return $resultPromise;
 }
 

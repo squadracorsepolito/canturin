@@ -1,10 +1,6 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
-
-	"github.com/squadracorsepolito/acmelib"
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
@@ -95,34 +91,7 @@ func (h *menuHandler) importDBC(_ *application.Context) error {
 		return nil
 	}
 
-	if path == "" {
-		return nil
-	}
-
-	dbcFile, err := os.Open(path)
-	if err != nil {
-		printError(err)
-		return err
-	}
-	defer dbcFile.Close()
-
-	fileName := filepath.Base(path)
-	busName := fileName[:len(fileName)-len(filepath.Ext(path))]
-
-	bus, err := acmelib.ImportDBCFile(busName, dbcFile)
-	if err != nil {
-		printError(err)
-		return err
-	}
-
-	if err := manager.network.AddBus(bus); err != nil {
-		printError(err)
-		return err
-	}
-
-	manager.reloadNetwork()
-
-	return nil
+	return manager.importDBC(path)
 }
 
 func (h *menuHandler) exportDBC(_ *application.Context) error {
@@ -136,15 +105,10 @@ func (h *menuHandler) exportDBC(_ *application.Context) error {
 		return nil
 	}
 
-	if path == "" {
-		return nil
-	}
-
-	return acmelib.ExportNetwork(manager.network, path)
+	return manager.exportDBC(path)
 }
 
 func (h *menuHandler) reload(_ *application.Context) error {
 	manager.reloadNetwork()
-
 	return nil
 }

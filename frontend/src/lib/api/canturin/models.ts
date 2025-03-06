@@ -71,6 +71,16 @@ export enum BusType {
     BusTypeCAN2A = "CAN_2.0A",
 };
 
+export interface Config {
+    "version": number;
+    "openedNetworks": ConfigNetwork[] | null;
+}
+
+export interface ConfigNetwork {
+    "name": string;
+    "path": string;
+}
+
 export interface CreateNodeReq {
     "interfaceCount": number;
 }
