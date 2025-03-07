@@ -174,14 +174,14 @@ func (h *networkHandler) updateName(net *acmelib.Network, req *request, res *net
 	h.sidebarCtr.sendUpdateName(net)
 
 	netPath := manager.filePath
-	manager.configSrv.renameOpenedNetwork(netPath, name)
+	manager.settingsSrv.renameRecentNetwork(netPath, name)
 
 	res.setUndo(
 		func() error {
 			net.UpdateName(oldName)
 
 			h.sidebarCtr.sendUpdateName(net)
-			manager.configSrv.renameOpenedNetwork(netPath, oldName)
+			manager.settingsSrv.renameRecentNetwork(netPath, oldName)
 
 			return nil
 		},
@@ -192,7 +192,7 @@ func (h *networkHandler) updateName(net *acmelib.Network, req *request, res *net
 			net.UpdateName(name)
 
 			h.sidebarCtr.sendUpdateName(net)
-			manager.configSrv.renameOpenedNetwork(netPath, name)
+			manager.settingsSrv.renameRecentNetwork(netPath, name)
 
 			return nil
 		},

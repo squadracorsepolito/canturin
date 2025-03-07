@@ -2,12 +2,12 @@
 	import '../app.css';
 	import { EditorIcon, SettingIcon } from '$lib/components/icon';
 	import { ToastGroup } from '$lib/components/toast';
-	import { loadConfig } from '$lib/state/config-state.svelte';
+	import { loadSettings } from '$lib/state/settings-state.svelte';
 
 	let { children } = $props();
 </script>
 
-{#await loadConfig() then}
+{#await loadSettings() then}
 	<main class="bg-base-100 flex overflow-y-hidden">
 		<aside class="h-full w-12 flex flex-col justify-between bg-base-300">
 			<ul>

@@ -3,16 +3,16 @@
 
 	type Props = {
 		label: String;
-		onclick: () => void;
+		noPadding?: boolean;
 	} & HTMLButtonAttributes;
 
-	let { label, onclick, ...rest }: Props = $props();
+	let { label, noPadding, ...rest }: Props = $props();
 </script>
 
 <button
-	{onclick}
 	{...rest}
-	class="px-2 underline underline-offset-4 font-medium hover:text-secondary transition-colors"
+	class="underline underline-offset-4 font-medium hover:text-secondary transition-colors {!noPadding &&
+		'px-2'}"
 >
 	{label}
 </button>

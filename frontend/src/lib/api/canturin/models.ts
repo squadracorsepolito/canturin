@@ -71,16 +71,6 @@ export enum BusType {
     BusTypeCAN2A = "CAN_2.0A",
 };
 
-export interface Config {
-    "version": number;
-    "openedNetworks": ConfigNetwork[] | null;
-}
-
-export interface ConfigNetwork {
-    "name": string;
-    "path": string;
-}
-
 export interface CreateNodeReq {
     "interfaceCount": number;
 }
@@ -208,6 +198,11 @@ export interface NodeInterface {
     "receivedMessages": BaseEntity[] | null;
 }
 
+export interface RecentNetwork {
+    "name": string;
+    "path": string;
+}
+
 export interface Reference {
     "kind": ReferenceKind;
     "entityId": string;
@@ -251,6 +246,11 @@ export interface ReorderValueReq {
     "valueEntityId": string;
     "from": number;
     "to": number;
+}
+
+export interface Settings {
+    "version": number;
+    "recentNetworks": RecentNetwork[] | null;
 }
 
 export interface Sidebar {

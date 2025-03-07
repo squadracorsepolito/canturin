@@ -13,7 +13,7 @@ import (
 type serviceManager struct {
 	filePath string
 
-	configSrv *ConfigService
+	settingsSrv *SettingsService
 
 	mux     *sync.RWMutex
 	network *acmelib.Network
@@ -89,7 +89,7 @@ func newServiceManager() *serviceManager {
 	return &serviceManager{
 		filePath: "",
 
-		configSrv: newConfigService(),
+		settingsSrv: newConfigService(),
 
 		mux:     mux,
 		network: nil,
@@ -126,7 +126,7 @@ func newServiceManager() *serviceManager {
 
 func (m *serviceManager) getServices() []application.Service {
 	return []application.Service{
-		application.NewService(m.configSrv),
+		application.NewService(m.settingsSrv),
 
 		application.NewService(m.sidebarSrv),
 		application.NewService(manager.historySrv),
@@ -244,7 +244,7 @@ func (m *serviceManager) openNetwork(path string) error {
 
 	m.filePath = path
 
-	m.configSrv.addOpenedNetwork(net.Name(), m.filePath)
+	m.settingsSrv.addRecentNetwork(net.Name(), m.filePath)
 
 	return nil
 }
@@ -288,7 +288,7 @@ func (m *serviceManager) saveNetwork() error {
 
 	m.historySrv.setSaved(true)
 
-	m.configSrv.addOpenedNetwork(m.network.Name(), m.filePath)
+	m.settingsSrv.addRecentNetwork(m.network.Name(), m.filePath)
 
 	printInfo("NETWORK SAVED")
 

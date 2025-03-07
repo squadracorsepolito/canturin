@@ -9,7 +9,7 @@ import {Call as $Call} from "@wailsio/runtime";
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
-export function Get(): Promise<$models.Config> & { cancel(): void } {
-    let $resultPromise = $Call.ByID(143529565) as any;
+export function Get(): Promise<$models.Settings> & { cancel(): void } {
+    let $resultPromise = $Call.ByID(710695688) as any;
     return $resultPromise;
 }
