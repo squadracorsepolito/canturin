@@ -8,7 +8,7 @@
 </script>
 
 {#await loadSettings() then}
-	<main class="bg-base-100 flex overflow-y-hidden">
+	<main class="bg-base-100 flex overflow-hidden">
 		<aside class="h-full w-12 flex flex-col justify-between bg-base-300">
 			<ul>
 				<li>
@@ -27,7 +27,7 @@
 			</ul>
 		</aside>
 
-		<div class="flex-1">
+		<div class="flex-1 overflow-auto">
 			{@render children()}
 		</div>
 

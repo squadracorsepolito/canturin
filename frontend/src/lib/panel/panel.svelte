@@ -18,7 +18,7 @@
 	};
 </script>
 
-<article use:panelAction class="flex-1 overflow-y-auto p-5 max-w-none">
+<article use:panelAction class="overflow-y-auto p-5 max-w-none h-full">
 	<div class="container m-auto @container flex flex-col gap-8">
 		{@render children()}
 	</div>

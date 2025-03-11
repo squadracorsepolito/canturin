@@ -14,7 +14,7 @@ import {
 } from '$lib/constants/constants';
 import { SidebarAdd, SidebarLoad, SidebarDelete, SidebarUpdateName } from '$lib/constants/events';
 import type { PanelType } from '$lib/state/layout-state.svelte';
-import layoutState from '$lib/state/layout-state.svelte';
+// import layoutState from '$lib/state/layout-state.svelte';
 import { Events as wails } from '@wailsio/runtime';
 import { createBus, deleteBus } from '$lib/panel/bus/state.svelte';
 import { createMessage, deleteMessage } from '$lib/panel/message/state.svelte';
@@ -23,6 +23,7 @@ import { createSignalType, deleteSignalType } from '$lib/panel/signal-type/state
 import { createSignalUnit, deleteSignalUnit } from '$lib/panel/signal-unit/state.svelte';
 import { createSignalEnum, deleteSignalEnum } from '$lib/panel/signal-enum/state.svelte';
 import { createNode, deleteNode } from '$lib/panel/node/state.svelte';
+import { getPanelStackState, openPanel } from '$lib/panel/panel-stack-state.svelte';
 
 type SidebarUpdateNameEvent = {
 	updatedId: string;
@@ -55,8 +56,12 @@ export class SidebarState {
 	#items = new Map<string, SidebarItem>();
 
 	constructor() {
+		const s = getPanelStackState();
+
 		$effect(() => {
-			this.setSelectedItemId(layoutState.openPanelId);
+			// this.setSelectedItemId(layoutState.openPanelId);
+
+			this.setSelectedItemId(s.displayedPanel ? s.displayedPanel.id : '');
 		});
 
 		wails.On(SidebarLoad, () => {
@@ -233,7 +238,7 @@ export class SidebarState {
 		this.selectedItemId = id;
 	}
 
-	openPanel(id: string) {
+	handleOpenPanel(id: string) {
 		const item = this.getItem(id);
 		if (!item) return;
 
@@ -245,7 +250,8 @@ export class SidebarState {
 		}
 
 		const panelType = this.getPanelType(item.kind);
-		layoutState.openPanel(panelType, item.id);
+		// layoutState.openPanel(panelType, item.id);
+		openPanel(panelType, item.id, item.name);
 	}
 
 	private getParentId(path: string) {

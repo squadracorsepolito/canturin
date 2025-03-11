@@ -38,7 +38,7 @@ class LayoutState {
 		let panelType: PanelType;
 		switch (entKind) {
 			case EntityKind.EntityKindNetwork:
-				panelType = 'bus';
+				panelType = 'network';
 				break;
 			case EntityKind.EntityKindBus:
 				panelType = 'bus';
@@ -62,7 +62,7 @@ class LayoutState {
 				panelType = 'signal_enum';
 				break;
 			default:
-				panelType = 'bus';
+				panelType = 'network';
 		}
 
 		this.openPanel(panelType, entId);

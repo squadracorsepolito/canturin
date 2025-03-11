@@ -17,6 +17,7 @@
 	import layout from '$lib/state/layout-state.svelte';
 	import { Pane, PaneGroup, PaneResizer } from 'paneforge';
 	import history from '$lib/state/history-state.svelte';
+	import PanelStack from '$lib/panel/panel-stack.svelte';
 
 	function handleUndo() {
 		history.undo();
@@ -59,8 +60,13 @@
 
 {#snippet editor()}
 	<PaneGroup direction="horizontal" class="h-full w-full">
-		<Pane defaultSize={15} minSize={5} maxSize={25} class="h-full bg-base-200 flex flex-col">
-			<div class="h-12 block bg-base-300 sticky top-0"></div>
+		<Pane
+			defaultSize={15}
+			minSize={5}
+			maxSize={25}
+			class="h-full bg-base-200 flex flex-col overflow-hidden"
+		>
+			<div class="h-12 block bg-base-300"></div>
 
 			<Sidebar />
 		</Pane>
@@ -70,7 +76,7 @@
 		/>
 
 		<Pane class="flex-1 flex flex-col">
-			<div class="h-12 bg-base-200 sticky top-0 block">
+			<div class="h-12 bg-base-200 block">
 				<div class="flex items-center h-full px-5 gap-2">
 					<IconButton onclick={handleUndo} disabled={!history.canUndo}>
 						<UndoIcon />
@@ -86,7 +92,7 @@
 				</div>
 			</div>
 
-			{@render panel()}
+			<PanelStack />
 		</Pane>
 	</PaneGroup>
 {/snippet}

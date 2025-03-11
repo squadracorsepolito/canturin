@@ -15,9 +15,9 @@
 	} from '../icon';
 	import { TreeView } from '../tree';
 	import { SidebarState } from './state.svelte';
-	import { AddNodeModal, AddSignalModal, AddSignalTypeModal, AddSignalUnitModal } from '../modal';
+	import { AddNodeModal, AddSignalModal, AddSignalTypeModal } from '../modal';
 	import { IconButton } from '../button';
-	import layout from '$lib/state/layout-state.svelte';
+	import { openPanel } from '$lib/panel/panel-stack-state.svelte';
 
 	const s = new SidebarState();
 
@@ -54,7 +54,7 @@
 	}
 
 	function handleSelect(id: string) {
-		s.openPanel(id);
+		s.handleOpenPanel(id);
 	}
 
 	function handleDelete(id: string) {
@@ -96,13 +96,15 @@
 
 <div class="overflow-y-auto">
 	{#if s.sidebar}
+		{@const netName = s.sidebar.root ? s.sidebar.root.name : ''}
+
 		<TreeView
 			root={s.sidebar.root}
 			bind:selectedValue={s.selectedItemId}
 			valueKey="id"
 			labelKey="name"
 			getIcon={getTreeViewIcon}
-			onrootclick={() => layout.openPanel('network', '')}
+			onrootclick={() => openPanel('network', '', netName)}
 			onselect={handleSelect}
 			ondelete={handleDelete}
 		>
