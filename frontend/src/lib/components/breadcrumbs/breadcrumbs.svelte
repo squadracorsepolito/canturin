@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { EntityKind, type EntityPath } from '$lib/api/canturin';
-	import layout from '$lib/state/layout-state.svelte';
+	import { getPanelKind, openPanel } from '$lib/panel/panel-stack-state.svelte';
 	import {
 		BusIcon,
 		NetworkIcon,
@@ -50,9 +50,7 @@
 			{#if idx < paths.length - 1}
 				<li>
 					<button
-						onclick={() => {
-							layout.openPanel0(path.kind, path.entityId);
-						}}
+						onclick={() => openPanel(getPanelKind(path.kind), path.entityId, path.name)}
 						class="underline underline-offset-4 font-medium hover:text-secondary transition-colors
 							flex items-center gap-2 text-sm"
 					>

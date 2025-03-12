@@ -2,8 +2,8 @@ import { BusService, BusType, NetworkService, type Bus } from '$lib/api/canturin
 import { HistoryBusModify } from '$lib/constants/events';
 import { pushToast } from '$lib/components/toast/toast-provider.svelte';
 import { EntityState } from '$lib/state/entity-state.svelte';
-import layout from '$lib/state/layout-state.svelte';
 import { StateProvider } from '$lib/state/state-provider.svelte';
+import { closePanel } from '../panel-stack-state.svelte';
 
 const provider = new StateProvider((bus: Bus) => new BusState(bus), HistoryBusModify);
 
@@ -29,7 +29,7 @@ export async function deleteBus(entityId: string) {
 	try {
 		await NetworkService.DeleteBuses({ busEntityIDs: [entityId] });
 		provider.remove(entityId);
-		layout.closeIfOpen(entityId);
+		closePanel(entityId);
 	} catch (err) {
 		pushToast('error', 'Error', 'Operation failed');
 		console.error(err);

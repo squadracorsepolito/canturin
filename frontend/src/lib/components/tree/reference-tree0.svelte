@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { colorByName } from '$lib/actions/color-name.svelte';
 	import { ReferenceKind, type Reference } from '$lib/api/canturin';
-	import layoutStateSvelte, { type PanelType } from '$lib/state/layout-state.svelte';
+	import { openPanel, type PanelKind } from '$lib/panel/panel-stack-state.svelte';
 
 	type Props = {
 		nodes: Reference[];
@@ -11,7 +11,7 @@
 	let { nodes, depth }: Props = $props();
 
 	function handleClick(node: Reference) {
-		let panelType: PanelType = 'bus';
+		let panelType: PanelKind = 'bus';
 		let entityId = node.entityId;
 
 		switch (node.kind) {
@@ -32,7 +32,7 @@
 				break;
 		}
 
-		layoutStateSvelte.openPanel(panelType, entityId);
+		openPanel(panelType, entityId, node.name);
 	}
 </script>
 

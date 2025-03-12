@@ -1,32 +1,54 @@
-import type { PanelType } from '$lib/state/layout-state.svelte';
+import { EntityKind } from '$lib/api/canturin';
+import { SvelteMap } from 'svelte/reactivity';
 
-type Panel = {
-	kind: PanelType;
+export type PanelKind =
+	| 'none'
+	| 'network'
+	| 'bus'
+	| 'node'
+	| 'message'
+	| 'signal'
+	| 'signal_type'
+	| 'signal_unit'
+	| 'signal_enum';
+
+export type Panel = {
+	kind: PanelKind;
 	id: string;
 	name: string;
+	prevId: string;
 };
 
 class PanelStackState {
-	stack = $state<Panel[]>([]);
-	diplayedIdx = $state(-1);
+	panels = new SvelteMap<string, Panel>();
+	displayedPanel = $state<Panel>();
 
-	displayedPanel = $derived.by(() => {
-		if (this.diplayedIdx === -1) return undefined;
+	open(kind: PanelKind, id: string, name: string) {
+		let prevId = '';
+		if (this.displayedPanel) {
+			prevId = this.displayedPanel.id;
+		}
 
-		return this.stack[this.diplayedIdx];
-	});
+		if (prevId === id) return;
 
-	open(kind: PanelType, id: string, name: string) {
-		this.stack.push({ kind, id, name });
-		this.diplayedIdx = this.stack.length - 1;
+		const panel: Panel = { kind, id, name, prevId };
+
+		if (!this.panels.has(panel.id)) {
+			this.panels.set(id, panel);
+		}
+
+		this.displayedPanel = panel;
 	}
 
-	close(panelIdx: number) {
-		this.stack.splice(panelIdx, 1);
+	close(panelId: string) {
+		if (!this.panels.delete(panelId)) return;
 
-		if (panelIdx === this.diplayedIdx) {
-			this.diplayedIdx = this.stack.length - 1;
-		}
+		const dispPanel = this.displayedPanel;
+		if (!dispPanel) return;
+
+		if (dispPanel.id !== panelId) return;
+
+		this.displayedPanel = this.panels.get(dispPanel.prevId);
 	}
 }
 
@@ -36,10 +58,43 @@ export function getPanelStackState() {
 	return state;
 }
 
-export function openPanel(kind: PanelType, id: string, name: string) {
+export function openPanel(kind: PanelKind, id: string, name: string) {
 	state.open(kind, id, name);
 }
 
-export function closePanel(panelIdx: number) {
-	state.close(panelIdx);
+export function closePanel(panelId: string) {
+	state.close(panelId);
+}
+
+export function getPanelKind(entityKind: EntityKind) {
+	let kind: PanelKind;
+	switch (entityKind) {
+		case EntityKind.EntityKindNetwork:
+			kind = 'network';
+			break;
+		case EntityKind.EntityKindBus:
+			kind = 'bus';
+			break;
+		case EntityKind.EntityKindNode:
+			kind = 'node';
+			break;
+		case EntityKind.EntityKindMessage:
+			kind = 'message';
+			break;
+		case EntityKind.EntityKindSignal:
+			kind = 'signal';
+			break;
+		case EntityKind.EntityKindSignalType:
+			kind = 'signal_type';
+			break;
+		case EntityKind.EntityKindSignalUnit:
+			kind = 'signal_unit';
+			break;
+		case EntityKind.EntityKindSignalEnum:
+			kind = 'signal_enum';
+			break;
+		default:
+			kind = 'network';
+	}
+	return kind;
 }

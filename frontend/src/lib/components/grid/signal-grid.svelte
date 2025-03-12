@@ -18,7 +18,7 @@
 		signals: Signal[];
 		height: number;
 		width?: number;
-		onclick?: (id: string) => void;
+		onclick?: (id: string, name: string) => void;
 	};
 
 	let { signals, height, width = 8, onclick }: Props = $props();
@@ -158,7 +158,7 @@
 {#snippet item({ colStart, colEnd, id, rowStart, rowEnd, name, continues, follows }: Item)}
 	<button
 		use:colorByName={{ name }}
-		onclick={() => onclick?.(id)}
+		onclick={() => onclick?.(id, name)}
 		onpointerenter={() => (hoveredId = id)}
 		onpointerleave={() => (hoveredId = '')}
 		class="rounded-btn text-xs cursor-pointer hover:opacity-40 transition-all border-2"

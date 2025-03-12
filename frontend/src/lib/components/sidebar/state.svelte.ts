@@ -61,7 +61,7 @@ export class SidebarState {
 		$effect(() => {
 			// this.setSelectedItemId(layoutState.openPanelId);
 
-			this.setSelectedItemId(s.displayedPanel ? s.displayedPanel.id : '');
+			this.setSelectedItemId(s.displayedPanelOld ? s.displayedPanelOld.id : '');
 		});
 
 		wails.On(SidebarLoad, () => {

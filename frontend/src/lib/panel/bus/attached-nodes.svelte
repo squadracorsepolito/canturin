@@ -4,8 +4,8 @@
 	import { HoverPreview } from '$lib/components/hover-preview';
 	import { Table, TableTitle } from '$lib/components/table';
 	import TableField from '$lib/components/table/table-field.svelte';
-	import layoutStateSvelte from '$lib/state/layout-state.svelte';
 	import { getHexNumber } from '$lib/utils';
+	import { openPanel } from '../panel-stack-state.svelte';
 	import type { PanelSectionProps } from '../types';
 	import { getBusState } from './state.svelte';
 
@@ -41,7 +41,7 @@
 						{#snippet trigger()}
 							<LinkButton
 								label={node.name}
-								onclick={() => layoutStateSvelte.openPanel('node', node.entityId)}
+								onclick={() => openPanel('node', node.entityId, node.name)}
 							/>
 						{/snippet}
 

@@ -9,9 +9,10 @@
 		SignalTypePanel,
 		SignalUnitPanel
 	} from '.';
-	import { getPanelStackState } from './panel-stack-state.svelte';
+	import { getPanelStackState, type Panel, type PanelKind } from './panel-stack-state.svelte';
 	import {
 		BusIcon,
+		CloseIcon,
 		MessageIcon,
 		NetworkIcon,
 		NodeIcon,
@@ -20,11 +21,10 @@
 		SignalTypeIcon,
 		SignalUnitIcon
 	} from '../components/icon';
-	import type { PanelType } from '$lib/state/layout-state.svelte';
 
 	const s = getPanelStackState();
 
-	function getIcon(panelKind: PanelType) {
+	function getIcon(panelKind: PanelKind) {
 		switch (panelKind) {
 			case 'network':
 				return NetworkIcon;
@@ -49,9 +49,7 @@
 	}
 </script>
 
-{#snippet viewer()}
-	{@const panel = s.stack[s.diplayedIdx]}
-
+{#snippet viewer(panel: Panel)}
 	{#if panel.kind === 'network'}
 		<NetworkPanel />
 	{:else if panel.kind === 'bus'}
@@ -72,24 +70,36 @@
 {/snippet}
 
 <div class="flex-1 flex flex-col overflow-hidden">
-	<div class="overflow-x-auto">
-		<ul class="flex">
-			{#each s.stack as panel}
+	<div class="overflow-x-auto border-b-4 h-12">
+		<ul class="flex h-full">
+			{#each s.panels as [_, panel]}
 				{@const Icon = getIcon(panel.kind)}
+				{@const displayed = s.displayedPanel?.id === panel.id}
 
 				<li
-					class="px-2 py-1 {s.displayedPanel?.id === panel.id
+					class="group px-2 flex items-center gap-2 {displayed
 						? 'bg-primary-ghost text-primary'
-						: ''}"
+						: 'hover:bg-base-content/20'}"
 				>
-					<button class="flex items-center gap-2">
+					<button
+						onclick={() => s.open(panel.kind, panel.id, panel.name)}
+						class="flex items-center gap-2 py-2"
+					>
 						<span>
 							<Icon height={16} width={16} />
 						</span>
 
-						<span class="text-sm">
+						<span class="text-sm truncate">
 							{panel.name}
 						</span>
+					</button>
+
+					<button
+						onclick={() => s.close(panel.id)}
+						class="text-error hover:bg-error-ghost p-1 rounded-btn {!displayed &&
+							'invisible'} group-hover:visible"
+					>
+						<CloseIcon height={16} width={16} />
 					</button>
 				</li>
 			{/each}
@@ -97,8 +107,8 @@
 	</div>
 
 	<div class="flex-1 overflow-y-auto">
-		{#if s.diplayedIdx >= 0}
-			{@render viewer()}
+		{#if s.displayedPanel}
+			{@render viewer(s.displayedPanel)}
 		{/if}
 	</div>
 </div>

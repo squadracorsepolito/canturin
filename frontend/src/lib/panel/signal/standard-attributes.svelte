@@ -3,13 +3,14 @@
 		MessageService,
 		SignalTypeService,
 		SignalUnitService,
+		type SignalTypeBrief,
 		type StandardSignal
 	} from '$lib/api/canturin';
 	import { Attribute } from '$lib/components/attribute';
 	import { LinkButton } from '$lib/components/button';
 	import { Combobox } from '$lib/components/combobox';
 	import Divider from '$lib/components/divider/divider.svelte';
-	import layoutStateSvelte from '$lib/state/layout-state.svelte';
+	import { openPanel } from '../panel-stack-state.svelte';
 	import { signalTypeKindLables } from '../signal-type/utils';
 	import { signalUnitKindLabels } from '../signal-unit/utils';
 	import { getSignalState } from './state.svelte';
@@ -29,6 +30,10 @@
 
 	function handleSignalUnit(sigUnitEntId: string) {
 		ss.updateSignalUnit(sigUnitEntId);
+	}
+
+	function handleOpenSignalTypePanel(sigType: SignalTypeBrief) {
+		openPanel('signal_type', signal.signalType.entityId, signal.signalType.name);
 	}
 </script>
 
@@ -57,7 +62,7 @@
 			<div class="pt-2">
 				<LinkButton
 					label={`Go to ${signal.signalType.name}`}
-					onclick={() => layoutStateSvelte.openPanel('signal_type', signal.signalType.entityId)}
+					onclick={() => handleOpenSignalTypePanel(signal.signalType)}
 				/>
 			</div>
 		</Attribute>
@@ -87,7 +92,7 @@
 				<div class="pt-2">
 					<LinkButton
 						label={`Go to ${signal.signalUnit.name}`}
-						onclick={() => layoutStateSvelte.openPanel('signal_unit', signal.signalUnit.entityId)}
+						onclick={() => handleOpenSignalTypePanel(signal.signalType)}
 					/>
 				</div>
 			{/if}

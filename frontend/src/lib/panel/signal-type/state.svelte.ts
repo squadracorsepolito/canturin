@@ -2,8 +2,8 @@ import { SignalTypeKind, SignalTypeService, type SignalType } from '$lib/api/can
 import { HistorySignalTypeModify } from '$lib/constants/events';
 import { pushToast } from '$lib/components/toast/toast-provider.svelte';
 import { EntityState } from '../../state/entity-state.svelte';
-import layout from '../../state/layout-state.svelte';
 import { StateProvider } from '../../state/state-provider.svelte';
+import { closePanel } from '../panel-stack-state.svelte';
 
 const provider = new StateProvider(
 	(signalType: SignalType) => new SignalTypeState(signalType),
@@ -32,7 +32,7 @@ export async function deleteSignalType(entityId: string) {
 	try {
 		await SignalTypeService.Delete(entityId);
 		provider.remove(entityId);
-		layout.closeIfOpen(entityId);
+		closePanel(entityId);
 	} catch (err) {
 		console.error(err);
 		pushToast('error', 'Error', 'Operation failed');

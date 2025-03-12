@@ -5,11 +5,11 @@
 	import { HoverPreview } from '$lib/components/hover-preview';
 	import { AddIcon, CompactIcon, DeleteIcon } from '$lib/components/icon';
 	import { Table, TableField, TableTitle } from '$lib/components/table';
-	import layout from '$lib/state/layout-state.svelte';
 	import type { PanelSectionProps } from '../types';
 	import { getMessageState } from './state.svelte';
 	import { getSignalKindString } from './utils';
 	import { AddSignalModal } from '$lib/components/modal';
+	import { openPanel } from '../panel-stack-state.svelte';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -115,7 +115,7 @@
 								{#snippet trigger()}
 									<LinkButton
 										label={sig.name}
-										onclick={() => layout.openPanel('signal', sig.entityId)}
+										onclick={() => openPanel('signal', sig.entityId, sig.name)}
 									/>
 								{/snippet}
 
@@ -146,7 +146,7 @@
 				<SignalGrid
 					signals={msg.signals}
 					height={msg.sizeByte}
-					onclick={(entityId: string) => layout.openPanel('signal', entityId)}
+					onclick={(entityId, name) => openPanel('signal', entityId, name)}
 				/>
 			</div>
 		</div>

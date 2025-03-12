@@ -3,7 +3,7 @@
 	import { Attribute } from '$lib/components/attribute';
 	import { LinkButton } from '$lib/components/button';
 	import { Combobox } from '$lib/components/combobox';
-	import layout from '$lib/state/layout-state.svelte';
+	import { openPanel } from '../panel-stack-state.svelte';
 	import { getSignalState } from './state.svelte';
 
 	type Props = {
@@ -45,7 +45,8 @@
 			<div class="pt-2">
 				<LinkButton
 					label={`Go to ${signal.signalEnum.name}`}
-					onclick={() => layout.openPanel('signal_enum', signal.signalEnum.entityId)}
+					onclick={() =>
+						openPanel('signal_enum', signal.signalEnum.entityId, signal.signalEnum.name)}
 				/>
 			</div>
 		</Attribute>

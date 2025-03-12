@@ -2,19 +2,8 @@
 	import { IconButton, LinkButton } from '$lib/components/button';
 	import { AddIcon, RedoIcon, UndoIcon } from '$lib/components/icon';
 	import { Sidebar } from '$lib/components/sidebar';
-	import {
-		SignalEnumPanel,
-		SignalTypePanel,
-		BusPanel,
-		NodePanel,
-		SignalUnitPanel,
-		MessagePanel,
-		SignalPanel,
-		NetworkPanel
-	} from '$lib/panel';
 	import { loadNetwork, createNetwork, isNetworkLoaded } from '$lib/panel/network/state.svelte';
 	import { state } from '$lib/state/settings-state.svelte';
-	import layout from '$lib/state/layout-state.svelte';
 	import { Pane, PaneGroup, PaneResizer } from 'paneforge';
 	import history from '$lib/state/history-state.svelte';
 	import PanelStack from '$lib/panel/panel-stack.svelte';
@@ -36,28 +25,6 @@
 	}
 </script>
 
-{#snippet panel()}
-	{#if layout.openPanelType === 'network'}
-		<NetworkPanel />
-	{:else if layout.openPanelType === 'bus'}
-		<BusPanel entityId={layout.openPanelId} />
-	{:else if layout.openPanelType === 'node'}
-		<NodePanel entityId={layout.openPanelId} />
-	{:else if layout.openPanelType === 'message'}
-		<MessagePanel entityId={layout.openPanelId} />
-	{:else if layout.openPanelType === 'signal'}
-		<SignalPanel entityId={layout.openPanelId} />
-	{:else if layout.openPanelType === 'signal_type'}
-		<SignalTypePanel entityId={layout.openPanelId} />
-	{:else if layout.openPanelType === 'signal_unit'}
-		<SignalUnitPanel entityId={layout.openPanelId} />
-	{:else if layout.openPanelType === 'signal_enum'}
-		<SignalEnumPanel entityId={layout.openPanelId} />
-	{:else}
-		<div>open a panel</div>
-	{/if}
-{/snippet}
-
 {#snippet editor()}
 	<PaneGroup direction="horizontal" class="h-full w-full">
 		<Pane
@@ -76,7 +43,7 @@
 		/>
 
 		<Pane class="flex-1 flex flex-col">
-			<div class="h-12 bg-base-200 block">
+			<div class="h-12 bg-base-200 block border-b-4 border-base-300">
 				<div class="flex items-center h-full px-5 gap-2">
 					<IconButton onclick={handleUndo} disabled={!history.canUndo}>
 						<UndoIcon />

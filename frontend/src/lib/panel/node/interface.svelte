@@ -10,7 +10,7 @@
 	import { Readonly } from '$lib/components/readonly';
 	import { Select } from '$lib/components/select';
 	import { Table, TableField, TableTitle } from '$lib/components/table';
-	import layout from '$lib/state/layout-state.svelte';
+	import { openPanel } from '../panel-stack-state.svelte';
 	import type { PanelSectionProps } from '../types';
 	import { getNodeState } from './state.svelte';
 
@@ -149,7 +149,7 @@
 									{#snippet trigger()}
 										<LinkButton
 											label={msg.name}
-											onclick={() => layout.openMessagePanel(msg.entityId)}
+											onclick={() => openPanel('message', msg.entityId, msg.name)}
 										/>
 									{/snippet}
 
@@ -201,7 +201,7 @@
 									{#snippet trigger()}
 										<LinkButton
 											label={msg.name}
-											onclick={() => layout.openMessagePanel(msg.entityId)}
+											onclick={() => openPanel('message', msg.entityId, msg.name)}
 										/>
 									{/snippet}
 

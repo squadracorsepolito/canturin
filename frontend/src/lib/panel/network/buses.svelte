@@ -4,8 +4,8 @@
 	import { HoverPreview } from '$lib/components/hover-preview';
 	import { AddIcon, DeleteIcon } from '$lib/components/icon';
 	import { Table, TableField, TableTitle } from '$lib/components/table';
-	import layout from '$lib/state/layout-state.svelte';
 	import { getSelectItemFromBaudrate } from '../bus/utils';
+	import { openPanel } from '../panel-stack-state.svelte';
 	import { getNetworkState } from './state.svelte';
 
 	const ns = getNetworkState();
@@ -66,7 +66,10 @@
 				<TableField>
 					<HoverPreview placement="right">
 						{#snippet trigger()}
-							<LinkButton label={bus.name} onclick={() => layout.openPanel('bus', bus.entityId)} />
+							<LinkButton
+								label={bus.name}
+								onclick={() => openPanel('bus', bus.entityId, bus.name)}
+							/>
 						{/snippet}
 
 						{#snippet content()}

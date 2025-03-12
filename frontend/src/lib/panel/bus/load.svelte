@@ -4,7 +4,7 @@
 	import { LinkButton } from '$lib/components/button';
 	import { Collapsible } from '$lib/components/collapsible';
 	import { AltArrowIcon, CloseIcon } from '$lib/components/icon';
-	import layoutStateSvelte from '$lib/state/layout-state.svelte';
+	import { openPanel } from '../panel-stack-state.svelte';
 	import type { PanelSectionProps } from '../types';
 	import { getBusState } from './state.svelte';
 
@@ -50,7 +50,7 @@
 		<div class="h-full">
 			<LinkButton
 				label={loadMsg.name}
-				onclick={() => layoutStateSvelte.openPanel('message', loadMsg.entityId)}
+				onclick={() => openPanel('message', loadMsg.entityId, loadMsg.name)}
 			/>
 		</div>
 
