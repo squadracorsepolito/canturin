@@ -1,7 +1,9 @@
 import { pushToast } from '$lib/components/toast/toast-provider.svelte';
+import { updatePanelName } from '$lib/panel/panel-stack-state.svelte';
 
 export type Entity = {
 	entityId: string;
+	name: string;
 };
 
 export class EntityState<E extends Entity> {
@@ -16,12 +18,20 @@ export class EntityState<E extends Entity> {
 	async update(promise: Promise<E>) {
 		try {
 			const newEntity = await promise;
-			this.#fallback = this.entity;
-			this.entity = newEntity;
+			this.set(newEntity);
 		} catch (error) {
 			this.entity = this.#fallback;
 			pushToast('error', 'Error', 'Operation failed');
 			console.error(error);
 		}
+	}
+
+	set(entity: E) {
+		if (entity.name !== this.#fallback.name) {
+			updatePanelName(entity.entityId, entity.name);
+		}
+
+		this.#fallback = this.entity;
+		this.entity = entity;
 	}
 }

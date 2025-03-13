@@ -48,7 +48,23 @@ class PanelStackState {
 
 		if (dispPanel.id !== panelId) return;
 
-		this.displayedPanel = this.panels.get(dispPanel.prevId);
+		const newDispPanel = this.panels.get(dispPanel.prevId);
+		if (newDispPanel || (!newDispPanel && this.panels.size === 0)) {
+			this.displayedPanel = newDispPanel;
+			return;
+		}
+
+		for (const firstPanel of this.panels.values()) {
+			this.displayedPanel = firstPanel;
+			return;
+		}
+	}
+
+	updateName(panelId: string, name: string) {
+		const panel = this.panels.get(panelId);
+		if (panel) {
+			this.panels.set(panelId, { ...panel, name });
+		}
 	}
 }
 
@@ -64,6 +80,10 @@ export function openPanel(kind: PanelKind, id: string, name: string) {
 
 export function closePanel(panelId: string) {
 	state.close(panelId);
+}
+
+export function updatePanelName(panelId: string, name: string) {
+	state.updateName(panelId, name);
 }
 
 export function getPanelKind(entityKind: EntityKind) {

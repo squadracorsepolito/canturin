@@ -32,7 +32,7 @@ export class StateProvider<E extends Entity, S extends EntityState<E>> {
 	modify(entity: E) {
 		const s = this.states.get(entity.entityId);
 		if (s) {
-			s.entity = entity;
+			s.set(entity);
 		}
 	}
 }

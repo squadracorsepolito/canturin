@@ -47,6 +47,14 @@
 				return NetworkIcon;
 		}
 	}
+
+	function tab(el: HTMLElement, { id }: { id: string }) {
+		$effect(() => {
+			if (s.displayedPanel?.id === id) {
+				el.scrollIntoView({ behavior: 'smooth', block: 'end' });
+			}
+		});
+	}
 </script>
 
 {#snippet viewer(panel: Panel)}
@@ -70,13 +78,14 @@
 {/snippet}
 
 <div class="flex-1 flex flex-col overflow-hidden">
-	<div class="overflow-x-auto border-b-4 h-12">
+	<div class="overflow-x-auto border-b-4">
 		<ul class="flex h-full">
 			{#each s.panels as [_, panel]}
 				{@const Icon = getIcon(panel.kind)}
 				{@const displayed = s.displayedPanel?.id === panel.id}
 
 				<li
+					use:tab={{ id: panel.id }}
 					class="group px-2 flex items-center gap-2 {displayed
 						? 'bg-primary-ghost text-primary'
 						: 'hover:bg-base-content/20'}"
