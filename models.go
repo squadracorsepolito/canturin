@@ -60,7 +60,7 @@ type entity interface {
 	CreateTime() time.Time
 }
 
-func getBase(e entity) base {
+func newBase(e entity) base {
 	return base{
 		EntityID:   e.EntityID().String(),
 		Name:       e.Name(),

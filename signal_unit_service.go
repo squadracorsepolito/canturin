@@ -77,7 +77,7 @@ func newSignalUnit(sigUnit *acmelib.SignalUnit) SignalUnit {
 	refCount := sigUnit.ReferenceCount()
 
 	res := SignalUnit{
-		base: getBase(sigUnit),
+		base: newBase(sigUnit),
 
 		Kind:   newSignalUnitKind(sigUnit.Kind()),
 		Symbol: sigUnit.Symbol(),

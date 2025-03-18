@@ -6,6 +6,7 @@
 	import { SegmentedControl } from '$lib/components/segmented-control';
 	import type { PanelSectionProps } from '../types';
 	import EnumAttributes from './enum-attributes.svelte';
+	import MultiplexerAttributes from './multiplexer-attributes.svelte';
 	import StandardAttributes from './standard-attributes.svelte';
 	import { getSignalState } from './state.svelte';
 	import { signalKindOptions } from './utils';
@@ -46,6 +47,8 @@
 		<StandardAttributes {entityId} signal={sig.standard} />
 	{:else if sig.kind === SignalKind.SignalKindEnum}
 		<EnumAttributes {entityId} signal={sig.enum} />
+	{:else if sig.kind === SignalKind.SignalKindMultiplexer}
+		<MultiplexerAttributes {entityId} signal={sig.multiplexer} />
 	{/if}
 {/snippet}
 

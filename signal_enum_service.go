@@ -17,7 +17,7 @@ type SignalEnumValue struct {
 
 func signalEnumValueConverter(sigEnumValue *acmelib.SignalEnumValue) SignalEnumValue {
 	return SignalEnumValue{
-		base: getBase(sigEnumValue),
+		base: newBase(sigEnumValue),
 
 		Index: sigEnumValue.Index(),
 	}
@@ -55,7 +55,7 @@ func newSignalEnum(sigEnum *acmelib.SignalEnum) SignalEnum {
 	}
 
 	res := SignalEnum{
-		base: getBase(sigEnum),
+		base: newBase(sigEnum),
 
 		Size:     sigEnum.GetSize(),
 		MinSize:  sigEnum.MinSize(),

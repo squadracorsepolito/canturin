@@ -244,7 +244,7 @@ func (h *signalTypeHandler) toResponse(sigType *acmelib.SignalType) SignalType {
 	refCount := sigType.ReferenceCount()
 
 	res := SignalType{
-		base: getBase(sigType),
+		base: newBase(sigType),
 
 		Kind:   newSignalTypeKind(sigType.Kind()),
 		Size:   int(sigType.Size()),

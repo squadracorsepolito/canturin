@@ -223,7 +223,7 @@ func newNodeHandler(sidebar *sidebarController, bus *BusService, messageCtr *mes
 
 func (h *nodeHandler) toResponse(node *acmelib.Node) Node {
 	res := Node{
-		base: getBase(node),
+		base: newBase(node),
 
 		ID:         uint(node.ID()),
 		Interfaces: []NodeInterface{},

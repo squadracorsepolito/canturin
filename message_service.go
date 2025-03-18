@@ -107,7 +107,7 @@ type Message struct {
 
 func newMessage(msg *acmelib.Message) Message {
 	res := Message{
-		base: getBase(msg),
+		base: newBase(msg),
 
 		Paths: newMessageEntityPaths(msg),
 
@@ -150,7 +150,7 @@ func newMessage(msg *acmelib.Message) Message {
 	currPos := 0
 	for _, sig := range signals {
 		res.Signals = append(res.Signals, Signal{
-			base: getBase(sig),
+			base: newBase(sig),
 
 			Kind:     newSignalKind(sig.Kind()),
 			StartPos: sig.GetStartBit(),

@@ -12,7 +12,7 @@ type SignalKind string
 const (
 	SignalKindStandard    SignalKind = "standard"
 	SignalKindEnum        SignalKind = "enum"
-	SignalKindMultiplexed SignalKind = "multiplexed"
+	SignalKindMultiplexer SignalKind = "multiplexer"
 )
 
 func newSignalKind(kind acmelib.SignalKind) SignalKind {
@@ -22,7 +22,7 @@ func newSignalKind(kind acmelib.SignalKind) SignalKind {
 	case acmelib.SignalKindEnum:
 		return SignalKindEnum
 	case acmelib.SignalKindMultiplexer:
-		return SignalKindMultiplexed
+		return SignalKindMultiplexer
 	default:
 		return SignalKindStandard
 	}
@@ -34,7 +34,7 @@ func (sk SignalKind) parse() acmelib.SignalKind {
 		return acmelib.SignalKindStandard
 	case SignalKindEnum:
 		return acmelib.SignalKindEnum
-	case SignalKindMultiplexed:
+	case SignalKindMultiplexer:
 		return acmelib.SignalKindMultiplexer
 	default:
 		return acmelib.SignalKindStandard
@@ -68,6 +68,70 @@ func newEnumSignal(enumSig *acmelib.EnumSignal) EnumSignal {
 	}
 }
 
+type MultiplexerSignalGroup struct {
+	ID      int          `json:"id"`
+	Signals []BaseSignal `json:"signals"`
+}
+
+func newMultiplexerSignalGroup(groupID int, group []acmelib.Signal) MultiplexerSignalGroup {
+	res := MultiplexerSignalGroup{
+		ID:      groupID,
+		Signals: []BaseSignal{},
+	}
+
+	for _, sig := range group {
+		res.Signals = append(res.Signals, newBaseSignal(sig))
+	}
+
+	return res
+}
+
+type MultiplexerSignal struct {
+	GroupCount int                      `json:"groupCount"`
+	GroupSize  int                      `json:"groupSize"`
+	Groups     []MultiplexerSignalGroup `json:"groups"`
+}
+
+func newMultiplexedSignal(muxSig *acmelib.MultiplexerSignal) MultiplexerSignal {
+	if muxSig == nil {
+		return MultiplexerSignal{}
+	}
+
+	res := MultiplexerSignal{
+		GroupCount: muxSig.GroupCount(),
+		GroupSize:  muxSig.GroupSize(),
+		Groups:     []MultiplexerSignalGroup{},
+	}
+
+	for groupID, group := range muxSig.GetSignalGroups() {
+		res.Groups = append(res.Groups, newMultiplexerSignalGroup(groupID, group))
+	}
+
+	return res
+}
+
+type BaseSignal struct {
+	base
+
+	Kind     SignalKind `json:"kind"`
+	StartPos int        `json:"startPos"`
+	Size     int        `json:"size"`
+}
+
+func newBaseSignal(sig acmelib.Signal) BaseSignal {
+	if sig == nil {
+		return BaseSignal{}
+	}
+
+	return BaseSignal{
+		base: newBase(sig),
+
+		Kind:     newSignalKind(sig.Kind()),
+		StartPos: sig.GetStartBit(),
+		Size:     sig.GetSize(),
+	}
+}
+
 type Signal struct {
 	base
 
@@ -79,13 +143,14 @@ type Signal struct {
 	StartPos int        `json:"startPos"`
 	Size     int        `json:"size"`
 
-	Standard StandardSignal `json:"standard"`
-	Enum     EnumSignal     `json:"enum"`
+	Standard    StandardSignal    `json:"standard"`
+	Enum        EnumSignal        `json:"enum"`
+	Multiplexer MultiplexerSignal `json:"multiplexer"`
 }
 
 func newSignal(sig acmelib.Signal) Signal {
 	res := Signal{
-		base: getBase(sig),
+		base: newBase(sig),
 
 		Paths: newSignalEntityPaths(sig),
 
@@ -113,6 +178,13 @@ func newSignal(sig acmelib.Signal) Signal {
 			panic(err)
 		}
 		res.Enum = newEnumSignal(enumSig)
+
+	case acmelib.SignalKindMultiplexer:
+		muxSig, err := sig.ToMultiplexer()
+		if err != nil {
+			panic(err)
+		}
+		res.Multiplexer = newMultiplexedSignal(muxSig)
 	}
 
 	return res
