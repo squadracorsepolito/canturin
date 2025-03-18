@@ -4,9 +4,9 @@
 	import { Sidebar } from '$lib/components/sidebar';
 	import { loadNetwork, createNetwork, isNetworkLoaded } from '$lib/panel/network/state.svelte';
 	import { state } from '$lib/state/settings-state.svelte';
-	import { Pane, PaneGroup, PaneResizer } from 'paneforge';
 	import history from '$lib/state/history-state.svelte';
 	import PanelStack from '$lib/panel/panel-stack.svelte';
+	import { Splitter } from '$lib/components/splitter';
 
 	function handleUndo() {
 		history.undo();
@@ -26,23 +26,20 @@
 </script>
 
 {#snippet editor()}
-	<PaneGroup direction="horizontal" class="h-full w-full">
-		<Pane
-			defaultSize={15}
-			minSize={5}
-			maxSize={25}
-			class="h-full bg-base-200 flex flex-col overflow-hidden"
-		>
+	<Splitter
+		leftPanel={{
+			size: 15,
+			minSize: 5,
+			maxSize: 20
+		}}
+	>
+		{#snippet left()}
 			<div class="h-12 block bg-base-300"></div>
 
 			<Sidebar />
-		</Pane>
+		{/snippet}
 
-		<PaneResizer
-			class="h-full w-1 bg-base-300 data-[active=pointer]:bg-accent hover:bg-accent transition-colors delay-75"
-		/>
-
-		<Pane class="flex-1 flex flex-col">
+		{#snippet right()}
 			<div class="h-12 bg-base-200 block border-b-4 border-base-300">
 				<div class="flex items-center h-full px-5 gap-2">
 					<IconButton onclick={handleUndo} disabled={!history.canUndo}>
@@ -60,8 +57,8 @@
 			</div>
 
 			<PanelStack />
-		</Pane>
-	</PaneGroup>
+		{/snippet}
+	</Splitter>
 {/snippet}
 
 {#snippet home()}
