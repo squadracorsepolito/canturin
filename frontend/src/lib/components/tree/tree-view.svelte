@@ -1,5 +1,5 @@
 <script lang="ts" generics="T extends {[K in keyof T]: any } & {children?: T[] | null} ">
-	import { uniqueId, type KeyOfString } from '$lib/utils';
+	import { type KeyOfString } from '$lib/utils';
 	import { mergeProps, normalizeProps, useMachine } from '@zag-js/svelte';
 	import * as tree from '@zag-js/tree-view';
 	import { AltArrowIcon } from '../icon';
@@ -30,6 +30,8 @@
 		actions
 	}: Props = $props();
 
+	const id = $props.id();
+
 	const collection = tree.collection({
 		rootNode: root,
 		nodeToValue: (node) => node[valueKey],
@@ -37,7 +39,7 @@
 	});
 
 	const zagTreeProps: tree.Props = $derived({
-		id: uniqueId(),
+		id: id,
 		collection,
 		selectedValue: [selectedValue],
 		onSelectionChange: (details) => {
@@ -120,7 +122,7 @@
 	{/if}
 {/snippet}
 
-<div {...api.getRootProps()} class="overflow-x-hidden">
+<div {...api.getRootProps()} class="overflow-hidden h-full flex-1 flex flex-col">
 	<div class="flex items-center gap-2 p-2 pt-3">
 		<span>
 			<RootIcon height="20" width="20" />
@@ -133,7 +135,7 @@
 		{@render actions({ collapse: api.collapse })}
 	</div>
 
-	<div {...treeProps}>
+	<div {...treeProps} class="overflow-y-auto flex-1">
 		{#if collection.rootNode.children}
 			{#each collection.rootNode.children as child, idx}
 				{@render treeNode(child, [idx])}

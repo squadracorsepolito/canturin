@@ -8,7 +8,7 @@
 </script>
 
 {#await loadSettings() then}
-	<main class="bg-base-100 flex overflow-hidden">
+	<main class="bg-base-100 flex">
 		<aside class="h-full w-12 flex flex-col justify-between bg-base-300">
 			<ul>
 				<li>

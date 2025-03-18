@@ -77,9 +77,9 @@
 	{/if}
 {/snippet}
 
-<div class="flex-1 flex flex-col overflow-hidden">
+<div class="flex-1 flex flex-col h-full overflow-hidden">
 	<div class="overflow-x-auto border-b-4">
-		<ul class="flex h-full">
+		<ul class="flex">
 			{#each s.panels as [_, panel]}
 				{@const Icon = getIcon(panel.kind)}
 				{@const displayed = s.displayedPanel?.id === panel.id}
@@ -115,7 +115,7 @@
 		</ul>
 	</div>
 
-	<div class="flex-1 overflow-y-auto">
+	<div class="overflow-y-auto flex-1">
 		{#if s.displayedPanel}
 			{@render viewer(s.displayedPanel)}
 		{/if}

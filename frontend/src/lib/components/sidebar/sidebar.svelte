@@ -94,59 +94,57 @@
 	$inspect(s.sidebar);
 </script>
 
-<div class="overflow-y-auto">
-	{#if s.sidebar}
-		{@const netName = s.sidebar.root ? s.sidebar.root.name : ''}
+{#if s.sidebar}
+	{@const netName = s.sidebar.root ? s.sidebar.root.name : ''}
 
-		<TreeView
-			root={s.sidebar.root}
-			bind:selectedValue={s.selectedItemId}
-			valueKey="id"
-			labelKey="name"
-			getIcon={getTreeViewIcon}
-			onrootclick={() => openPanel('network', '', netName)}
-			onselect={handleSelect}
-			ondelete={handleDelete}
-		>
-			{#snippet actions({ collapse })}
-				{#if s.selectedItemKind}
-					{#if s.selectedItemKind === SidebarItemKind.SidebarItemKindNode}
-						<AddNodeModal onsubmit={(nodeKind) => s.addNode(nodeKind)}>
-							{#snippet trigger({ getProps })}
-								<IconButton {...getProps()}>
-									<AddIcon height="20" width="20" />
-								</IconButton>
-							{/snippet}
-						</AddNodeModal>
-					{:else if s.selectedItemKind === SidebarItemKind.SidebarItemKindSignal}
-						<AddSignalModal onsubmit={(signalKind) => s.addSignal(signalKind)}>
-							{#snippet trigger({ getProps })}
-								<IconButton {...getProps()}>
-									<AddIcon height="20" width="20" />
-								</IconButton>
-							{/snippet}
-						</AddSignalModal>
-					{:else if s.selectedItemKind === SidebarItemKind.SidebarItemKindSignalType}
-						<AddSignalTypeModal
-							onsubmit={(signalTypeKind, size) => s.addSignalType(signalTypeKind, size)}
-						>
-							{#snippet trigger({ getProps })}
-								<IconButton {...getProps()}>
-									<AddIcon height="20" width="20" />
-								</IconButton>
-							{/snippet}
-						</AddSignalTypeModal>
-					{:else}
-						<IconButton onclick={handleAdd}>
-							<AddIcon height="20" width="20" />
-						</IconButton>
-					{/if}
+	<TreeView
+		root={s.sidebar.root}
+		bind:selectedValue={s.selectedItemId}
+		valueKey="id"
+		labelKey="name"
+		getIcon={getTreeViewIcon}
+		onrootclick={() => openPanel('network', '', netName)}
+		onselect={handleSelect}
+		ondelete={handleDelete}
+	>
+		{#snippet actions({ collapse })}
+			{#if s.selectedItemKind}
+				{#if s.selectedItemKind === SidebarItemKind.SidebarItemKindNode}
+					<AddNodeModal onsubmit={(nodeKind) => s.addNode(nodeKind)}>
+						{#snippet trigger({ getProps })}
+							<IconButton {...getProps()}>
+								<AddIcon height="20" width="20" />
+							</IconButton>
+						{/snippet}
+					</AddNodeModal>
+				{:else if s.selectedItemKind === SidebarItemKind.SidebarItemKindSignal}
+					<AddSignalModal onsubmit={(signalKind) => s.addSignal(signalKind)}>
+						{#snippet trigger({ getProps })}
+							<IconButton {...getProps()}>
+								<AddIcon height="20" width="20" />
+							</IconButton>
+						{/snippet}
+					</AddSignalModal>
+				{:else if s.selectedItemKind === SidebarItemKind.SidebarItemKindSignalType}
+					<AddSignalTypeModal
+						onsubmit={(signalTypeKind, size) => s.addSignalType(signalTypeKind, size)}
+					>
+						{#snippet trigger({ getProps })}
+							<IconButton {...getProps()}>
+								<AddIcon height="20" width="20" />
+							</IconButton>
+						{/snippet}
+					</AddSignalTypeModal>
+				{:else}
+					<IconButton onclick={handleAdd}>
+						<AddIcon height="20" width="20" />
+					</IconButton>
 				{/if}
+			{/if}
 
-				<IconButton onclick={() => collapse()}>
-					<CollapseIcon height="20" width="20" />
-				</IconButton>
-			{/snippet}
-		</TreeView>
-	{/if}
-</div>
+			<IconButton onclick={() => collapse()}>
+				<CollapseIcon height="20" width="20" />
+			</IconButton>
+		{/snippet}
+	</TreeView>
+{/if}

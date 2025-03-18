@@ -42,13 +42,17 @@
 
 <div {...api.getRootProps()}>
 	<div {...api.getPanelProps({ id: 'left' })}>
-		{@render left()}
+		<div class="h-full overflow-hidden flex flex-col">
+			{@render left()}
+		</div>
 	</div>
 
 	<div {...api.getResizeTriggerProps({ id: 'left:right' })}></div>
 
 	<div {...api.getPanelProps({ id: 'right' })}>
-		{@render right()}
+		<div class="h-full overflow-hidden flex flex-col">
+			{@render right()}
+		</div>
 	</div>
 </div>
 
