@@ -104,6 +104,10 @@ func newMultiplexedSignal(muxSig *acmelib.MultiplexerSignal) MultiplexerSignal {
 	}
 
 	for groupID, group := range muxSig.GetSignalGroups() {
+		if len(group) == 0 {
+			continue
+		}
+
 		res.Groups = append(res.Groups, newMultiplexerSignalGroup(groupID, group))
 	}
 

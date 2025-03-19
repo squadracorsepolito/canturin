@@ -13,9 +13,10 @@ export function getSignalState(entityId: string) {
 	return provider.get(entityId);
 }
 
-export async function loadSignal(entityId: string) {
+export async function loadSignal(entityId: string): Promise<Signal> {
 	const signal = await SignalService.Get(entityId);
 	provider.add(signal);
+	return signal;
 }
 
 export async function createSignal(msgEntityId: string, signalKind: SignalKind) {

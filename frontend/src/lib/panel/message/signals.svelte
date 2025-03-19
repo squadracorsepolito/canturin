@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { type Message, type Signal, SignalKind } from '$lib/api/canturin';
-	import { IconButton, LinkButton } from '$lib/components/button';
+	import { IconButton } from '$lib/components/button';
 	import { SignalGrid } from '$lib/components/grid';
-	import { HoverPreview } from '$lib/components/hover-preview';
+	import { SignalHoverPreview } from '$lib/components/hover-preview';
 	import { AddIcon, CompactIcon, DeleteIcon } from '$lib/components/icon';
 	import { Table, TableField, TableTitle } from '$lib/components/table';
 	import type { PanelSectionProps } from '../types';
 	import { getMessageState } from './state.svelte';
-	import { getSignalKindString } from './utils';
 	import { AddSignalModal } from '$lib/components/modal';
 	import { openPanel } from '../panel-stack-state.svelte';
+	import { SignalKindBadge } from '$lib/components/badge';
 
 	let { entityId }: PanelSectionProps = $props();
 
@@ -35,31 +35,6 @@
 		ms.deleteSignal(signal.entityId);
 	}
 </script>
-
-{#snippet preview(sig: Signal)}
-	<div>
-		<span class="font-medium text-sm pr-1">{sig.name}</span>
-
-		<span>
-			{@render kindBadge(sig.kind)}
-		</span>
-	</div>
-
-	{#if sig.desc}
-		<div class="text-xs text-dimmed pt-1">{sig.desc}</div>
-	{/if}
-{/snippet}
-
-{#snippet kindBadge(kind: SignalKind)}
-	<span
-		class={[
-			'badge badge-sm',
-			kind === SignalKind.SignalKindStandard && 'badge-primary',
-			kind === SignalKind.SignalKindEnum && 'badge-secondary',
-			kind === SignalKind.SignalKindMultiplexed && 'badge-accent'
-		]}>{getSignalKindString(kind)}</span
-	>
-{/snippet}
 
 {#snippet section(msg: Message)}
 	{#if msg.signals}
@@ -111,22 +86,11 @@
 
 					{#snippet row(sig)}
 						<TableField>
-							<HoverPreview placement="right">
-								{#snippet trigger()}
-									<LinkButton
-										label={sig.name}
-										onclick={() => openPanel('signal', sig.entityId, sig.name)}
-									/>
-								{/snippet}
-
-								{#snippet content()}
-									{@render preview(sig)}
-								{/snippet}
-							</HoverPreview>
+							<SignalHoverPreview signal={sig} />
 						</TableField>
 
 						<TableField>
-							{@render kindBadge(sig.kind)}
+							<SignalKindBadge signalKind={sig.kind} />
 						</TableField>
 
 						<TableField>{sig.size}</TableField>
