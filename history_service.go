@@ -165,6 +165,8 @@ func (s *HistoryService) sendModifyEvent(opDomain serviceKind, res any) {
 		eventName = HistorySignalUnitModify
 	case serviceKindSignalEnum:
 		eventName = HistorySignalEnumModify
+	case serviceKindCANIDBuilder:
+		eventName = HistoryCANIDBuilderModify
 	}
 
 	application.Get().EmitEvent(eventName, res)

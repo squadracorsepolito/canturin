@@ -7,14 +7,13 @@ import {
 	type SidebarItem
 } from '$lib/api/canturin';
 import {
+	SidebarCANIDBuilderGroupID,
 	SidebarNodeGroupID,
 	SidebarSignalEnumGroupID,
 	SidebarSignalTypeGroupID,
 	SidebarSignalUnitGroupID
 } from '$lib/constants/constants';
 import { SidebarAdd, SidebarLoad, SidebarDelete, SidebarUpdateName } from '$lib/constants/events';
-import type { PanelType } from '$lib/state/layout-state.svelte';
-// import layoutState from '$lib/state/layout-state.svelte';
 import { Events as wails } from '@wailsio/runtime';
 import { createBus, deleteBus } from '$lib/panel/bus/state.svelte';
 import { createMessage, deleteMessage } from '$lib/panel/message/state.svelte';
@@ -23,7 +22,7 @@ import { createSignalType, deleteSignalType } from '$lib/panel/signal-type/state
 import { createSignalUnit, deleteSignalUnit } from '$lib/panel/signal-unit/state.svelte';
 import { createSignalEnum, deleteSignalEnum } from '$lib/panel/signal-enum/state.svelte';
 import { createNode, deleteNode } from '$lib/panel/node/state.svelte';
-import { getPanelStackState, openPanel } from '$lib/panel/panel-stack-state.svelte';
+import { getPanelStackState, openPanel, type PanelKind } from '$lib/panel/panel-stack-state.svelte';
 
 type SidebarUpdateNameEvent = {
 	updatedId: string;
@@ -59,9 +58,7 @@ export class SidebarState {
 		const s = getPanelStackState();
 
 		$effect(() => {
-			// this.setSelectedItemId(layoutState.openPanelId);
-
-			this.setSelectedItemId(s.displayedPanelOld ? s.displayedPanelOld.id : '');
+			this.setSelectedItemId(s.displayedPanel ? s.displayedPanel.id : '');
 		});
 
 		wails.On(SidebarLoad, () => {
@@ -199,6 +196,8 @@ export class SidebarState {
 				return SidebarItemKind.SidebarItemKindSignalUnit;
 			case SidebarSignalEnumGroupID:
 				return SidebarItemKind.SidebarItemKindSignalEnum;
+			case SidebarCANIDBuilderGroupID:
+				return SidebarItemKind.SidebarItemKindCANIDBuilder;
 		}
 
 		const item = this.getItem(groupId);
@@ -209,7 +208,7 @@ export class SidebarState {
 		return SidebarItemKind.SidebarItemKindNetwork;
 	}
 
-	getPanelType(itemKind: SidebarItemKind): PanelType {
+	getPanelKind(itemKind: SidebarItemKind): PanelKind {
 		switch (itemKind) {
 			case SidebarItemKind.SidebarItemKindNetwork:
 				break;
@@ -229,6 +228,8 @@ export class SidebarState {
 				return 'signal_unit';
 			case SidebarItemKind.SidebarItemKindSignalEnum:
 				return 'signal_enum';
+			case SidebarItemKind.SidebarItemKindCANIDBuilder:
+				return 'can_id_builder';
 		}
 
 		return 'none';
@@ -249,8 +250,7 @@ export class SidebarState {
 			return;
 		}
 
-		const panelType = this.getPanelType(item.kind);
-		// layoutState.openPanel(panelType, item.id);
+		const panelType = this.getPanelKind(item.kind);
 		openPanel(panelType, item.id, item.name);
 	}
 

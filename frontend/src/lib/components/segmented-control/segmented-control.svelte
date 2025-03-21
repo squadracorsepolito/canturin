@@ -2,7 +2,6 @@
 	import * as radioGroup from '@zag-js/radio-group';
 	import { useMachine, normalizeProps } from '@zag-js/svelte';
 	import { TickIcon } from '../icon';
-	import { uniqueId } from '$lib/utils';
 	import type { SegmentedControlOption } from './types';
 
 	type Props = {
@@ -15,8 +14,9 @@
 
 	let { selectedValue = $bindable(), name, options, readOnly, onchange }: Props = $props();
 
+	const id = $props.id();
 	const radioGroupProps: radioGroup.Props = $derived({
-		id: uniqueId(),
+		id,
 		name,
 		orientation: 'horizontal',
 		value: selectedValue,

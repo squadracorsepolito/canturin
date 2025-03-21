@@ -24,6 +24,7 @@ const (
 	SidebarItemKindSignalType    SidebarItemKind = "signal-type"
 	SidebarItemKindSignalUnit    SidebarItemKind = "signal-unit"
 	SidebarItemKindSignalEnum    SidebarItemKind = "signal-enum"
+	SidebarItemKindCANIDBuilder  SidebarItemKind = "can-id-builder"
 )
 
 type SidebarItem struct {
@@ -213,6 +214,7 @@ func (s *SidebarService) handleLoad(req *sidebarLoadReq) {
 	clear(s.items)
 
 	nodes := make(map[acmelib.EntityID]*acmelib.Node)
+	canIDBuilders := make(map[acmelib.EntityID]*acmelib.CANIDBuilder)
 	sigTypes := make(map[acmelib.EntityID]*acmelib.SignalType)
 	sigUnits := make(map[acmelib.EntityID]*acmelib.SignalUnit)
 	sigEnums := make(map[acmelib.EntityID]*acmelib.SignalEnum)
@@ -228,6 +230,11 @@ func (s *SidebarService) handleLoad(req *sidebarLoadReq) {
 	nodeGroupItem := newSidebarItem(SidebarItemKindGroup, SidebarNodeGroupID, "Nodes")
 	s.addItem(nodeGroupItem)
 	netItem.addChild(nodeGroupItem)
+
+	// it groups all the CAN ID builders
+	canIDBuilderGroupItem := newSidebarItem(SidebarItemKindGroup, SidebarCANIDBuilderGroupID, "CAN ID Builders")
+	s.addItem(canIDBuilderGroupItem)
+	netItem.addChild(canIDBuilderGroupItem)
 
 	// it groups all the signal types
 	sigTypeGroupItem := newSidebarItem(SidebarItemKindGroup, SidebarSignalTypeGroupID, "Signal Types")
@@ -249,6 +256,9 @@ func (s *SidebarService) handleLoad(req *sidebarLoadReq) {
 		busItem := newSidebarItem(SidebarItemKindBus, bus.EntityID().String(), bus.Name())
 		s.addItem(busItem)
 		netItem.addChild(busItem)
+
+		canIDBuilder := bus.CANIDBuilder()
+		canIDBuilders[canIDBuilder.EntityID()] = canIDBuilder
 
 		for _, nodeInt := range bus.NodeInterfaces() {
 			node := nodeInt.Node()
@@ -302,6 +312,13 @@ func (s *SidebarService) handleLoad(req *sidebarLoadReq) {
 		nodeItem := newSidebarItem(SidebarItemKindNode, node.EntityID().String(), node.Name())
 		s.addItem(nodeItem)
 		nodeGroupItem.addChild(nodeItem)
+	}
+
+	// add CAN ID builders
+	for _, canIDBuilder := range canIDBuilders {
+		canIDBuilderItem := newSidebarItem(SidebarItemKindCANIDBuilder, canIDBuilder.EntityID().String(), canIDBuilder.Name())
+		s.addItem(canIDBuilderItem)
+		canIDBuilderGroupItem.addChild(canIDBuilderItem)
 	}
 
 	// add signal types
@@ -549,6 +566,10 @@ func (s *sidebarController) sendAdd(ent entity) {
 	case acmelib.EntityKindSignalEnum:
 		sigEnumItem := newSidebarItem(SidebarItemKindSignalEnum, ent.EntityID().String(), ent.Name())
 		s.addCh <- newSidebarAddReq(sigEnumItem, SidebarSignalEnumGroupID)
+
+	case acmelib.EntityKindCANIDBuilder:
+		canIDBuilderItem := newSidebarItem(SidebarItemKindCANIDBuilder, ent.EntityID().String(), ent.Name())
+		s.addCh <- newSidebarAddReq(canIDBuilderItem, SidebarCANIDBuilderGroupID)
 	}
 }
 

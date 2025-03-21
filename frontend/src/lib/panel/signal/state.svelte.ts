@@ -13,7 +13,7 @@ export function getSignalState(entityId: string) {
 	return provider.get(entityId);
 }
 
-export async function loadSignal(entityId: string): Promise<Signal> {
+export async function loadSignal(entityId: string) {
 	const signal = await SignalService.Get(entityId);
 	provider.add(signal);
 	return signal;
@@ -70,5 +70,20 @@ class SignalState extends EntityState<Signal> {
 
 	updateSignalEnum(signalEnumEntityId: string) {
 		this.update(SignalService.UpdateSignalEnum(this.entity.entityId, { signalEnumEntityId }));
+	}
+
+	deleteMultiplexedSignals(groupId: number, signalEntityIds: string[]) {
+		this.update(
+			SignalService.DeleteMultiplexedSignals(this.entity.entityId, { groupId, signalEntityIds })
+		);
+	}
+
+	deleteMultiplexedSignal(groupId: number, signalEntityId: string) {
+		this.update(
+			SignalService.DeleteMultiplexedSignals(this.entity.entityId, {
+				groupId,
+				signalEntityIds: [signalEntityId]
+			})
+		);
 	}
 }

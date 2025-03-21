@@ -19,7 +19,7 @@
 		<Attributes {entityId} />
 
 		{#if signal.kind === SignalKind.SignalKindMultiplexer}
-			<MultiplexerSignals {entityId} signal={signal.multiplexer} />
+			<MultiplexerSignals {entityId} />
 		{/if}
 	{/await}
 </Panel>

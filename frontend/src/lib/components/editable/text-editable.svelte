@@ -1,6 +1,5 @@
 <script lang="ts">
 	import './styles.css';
-	import { uniqueId } from '$lib/utils';
 	import * as editable from '@zag-js/editable';
 	import { useMachine, normalizeProps, mergeProps } from '@zag-js/svelte';
 	import type { EditableProps } from './types';
@@ -19,8 +18,9 @@
 
 	let fallbackValue = $state(value);
 
+	const id = $props.id();
 	const editableProps: editable.Props = $derived({
-		id: uniqueId(),
+		id,
 		name: name,
 		value: value,
 		activationMode: 'dblclick',

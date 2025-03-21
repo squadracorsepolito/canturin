@@ -7,44 +7,6 @@ import (
 	"github.com/squadracorsepolito/acmelib"
 )
 
-type NodeInterface struct {
-	Number           int          `json:"number"`
-	AttachedBus      BaseEntity   `json:"attachedBus"`
-	SentMessages     []BaseEntity `json:"sentMessages"`
-	ReceivedMessages []BaseEntity `json:"receivedMessages"`
-}
-
-func getNodeInterface(nodeInt *acmelib.NodeInterface) NodeInterface {
-	sentMessages := []BaseEntity{}
-	for _, tmpMsg := range nodeInt.SentMessages() {
-		sentMessages = append(sentMessages, newBaseEntity(tmpMsg))
-	}
-
-	receivedMessages := []BaseEntity{}
-	for _, tmpMsg := range nodeInt.ReceivedMessages() {
-		receivedMessages = append(receivedMessages, newBaseEntity(tmpMsg))
-	}
-
-	res := NodeInterface{
-		Number:           nodeInt.Number(),
-		SentMessages:     sentMessages,
-		ReceivedMessages: receivedMessages,
-	}
-
-	if nodeInt.ParentBus() != nil {
-		res.AttachedBus = newBaseEntity(nodeInt.ParentBus())
-	}
-
-	return res
-}
-
-type Node struct {
-	base
-
-	ID         uint            `json:"id"`
-	Interfaces []NodeInterface `json:"interfaces"`
-}
-
 type NodeService struct {
 	*service[*acmelib.Node, Node, *nodeHandler]
 }
@@ -222,18 +184,7 @@ func newNodeHandler(sidebar *sidebarController, bus *BusService, messageCtr *mes
 }
 
 func (h *nodeHandler) toResponse(node *acmelib.Node) Node {
-	res := Node{
-		base: newBase(node),
-
-		ID:         uint(node.ID()),
-		Interfaces: []NodeInterface{},
-	}
-
-	for _, nodeInt := range node.Interfaces() {
-		res.Interfaces = append(res.Interfaces, getNodeInterface(nodeInt))
-	}
-
-	return res
+	return newNode(node)
 }
 
 func (h *nodeHandler) updateName(node *acmelib.Node, req *request, res *nodeRes) error {

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { uniqueId } from '$lib/utils';
 	import * as dialog from '@zag-js/dialog';
 	import { portal, normalizeProps, useMachine } from '@zag-js/svelte';
 	import type { Snippet } from 'svelte';
@@ -15,9 +14,8 @@
 
 	let { title, desc, trigger, content, actions }: Props = $props();
 
-	const service = useMachine(dialog.machine, {
-		id: uniqueId()
-	});
+	const id = $props.id();
+	const service = useMachine(dialog.machine, { id });
 
 	const api = $derived(dialog.connect(service, normalizeProps));
 </script>

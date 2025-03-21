@@ -7,193 +7,6 @@ import (
 	"github.com/squadracorsepolito/acmelib"
 )
 
-type SignalKind string
-
-const (
-	SignalKindStandard    SignalKind = "standard"
-	SignalKindEnum        SignalKind = "enum"
-	SignalKindMultiplexer SignalKind = "multiplexer"
-)
-
-func newSignalKind(kind acmelib.SignalKind) SignalKind {
-	switch kind {
-	case acmelib.SignalKindStandard:
-		return SignalKindStandard
-	case acmelib.SignalKindEnum:
-		return SignalKindEnum
-	case acmelib.SignalKindMultiplexer:
-		return SignalKindMultiplexer
-	default:
-		return SignalKindStandard
-	}
-}
-
-func (sk SignalKind) parse() acmelib.SignalKind {
-	switch sk {
-	case SignalKindStandard:
-		return acmelib.SignalKindStandard
-	case SignalKindEnum:
-		return acmelib.SignalKindEnum
-	case SignalKindMultiplexer:
-		return acmelib.SignalKindMultiplexer
-	default:
-		return acmelib.SignalKindStandard
-	}
-}
-
-type StandardSignal struct {
-	SignalType SignalTypeBrief `json:"signalType"`
-	SignalUnit BaseEntity      `json:"signalUnit"`
-}
-
-func newStandardSignal(stdSig *acmelib.StandardSignal) StandardSignal {
-	res := StandardSignal{
-		SignalType: newSignalTypeBrief(stdSig.Type()),
-	}
-
-	if stdSig.Unit() != nil {
-		res.SignalUnit = newBaseEntity(stdSig.Unit())
-	}
-
-	return res
-}
-
-type EnumSignal struct {
-	SignalEnum SignalEnumBrief `json:"signalEnum"`
-}
-
-func newEnumSignal(enumSig *acmelib.EnumSignal) EnumSignal {
-	return EnumSignal{
-		SignalEnum: newSignalEnumBrief(enumSig.Enum()),
-	}
-}
-
-type MultiplexerSignalGroup struct {
-	ID      int          `json:"id"`
-	Signals []BaseSignal `json:"signals"`
-}
-
-func newMultiplexerSignalGroup(groupID int, group []acmelib.Signal) MultiplexerSignalGroup {
-	res := MultiplexerSignalGroup{
-		ID:      groupID,
-		Signals: []BaseSignal{},
-	}
-
-	for _, sig := range group {
-		res.Signals = append(res.Signals, newBaseSignal(sig))
-	}
-
-	return res
-}
-
-type MultiplexerSignal struct {
-	GroupCount int                      `json:"groupCount"`
-	GroupSize  int                      `json:"groupSize"`
-	Groups     []MultiplexerSignalGroup `json:"groups"`
-}
-
-func newMultiplexedSignal(muxSig *acmelib.MultiplexerSignal) MultiplexerSignal {
-	if muxSig == nil {
-		return MultiplexerSignal{}
-	}
-
-	res := MultiplexerSignal{
-		GroupCount: muxSig.GroupCount(),
-		GroupSize:  muxSig.GroupSize(),
-		Groups:     []MultiplexerSignalGroup{},
-	}
-
-	for groupID, group := range muxSig.GetSignalGroups() {
-		if len(group) == 0 {
-			continue
-		}
-
-		res.Groups = append(res.Groups, newMultiplexerSignalGroup(groupID, group))
-	}
-
-	return res
-}
-
-type BaseSignal struct {
-	base
-
-	Kind     SignalKind `json:"kind"`
-	StartPos int        `json:"startPos"`
-	Size     int        `json:"size"`
-}
-
-func newBaseSignal(sig acmelib.Signal) BaseSignal {
-	if sig == nil {
-		return BaseSignal{}
-	}
-
-	return BaseSignal{
-		base: newBase(sig),
-
-		Kind:     newSignalKind(sig.Kind()),
-		StartPos: sig.GetStartBit(),
-		Size:     sig.GetSize(),
-	}
-}
-
-type Signal struct {
-	base
-
-	Paths []EntityPath `json:"paths"`
-
-	ParentMessage BaseEntity `json:"parentMessage"`
-
-	Kind     SignalKind `json:"kind"`
-	StartPos int        `json:"startPos"`
-	Size     int        `json:"size"`
-
-	Standard    StandardSignal    `json:"standard"`
-	Enum        EnumSignal        `json:"enum"`
-	Multiplexer MultiplexerSignal `json:"multiplexer"`
-}
-
-func newSignal(sig acmelib.Signal) Signal {
-	res := Signal{
-		base: newBase(sig),
-
-		Paths: newSignalEntityPaths(sig),
-
-		Kind:     newSignalKind(sig.Kind()),
-		StartPos: sig.GetStartBit(),
-		Size:     sig.GetSize(),
-	}
-
-	parMsg := sig.ParentMessage()
-	if parMsg != nil {
-		res.ParentMessage = newBaseEntity(parMsg)
-	}
-
-	switch sig.Kind() {
-	case acmelib.SignalKindStandard:
-		stdSig, err := sig.ToStandard()
-		if err != nil {
-			panic(err)
-		}
-		res.Standard = newStandardSignal(stdSig)
-
-	case acmelib.SignalKindEnum:
-		enumSig, err := sig.ToEnum()
-		if err != nil {
-			panic(err)
-		}
-		res.Enum = newEnumSignal(enumSig)
-
-	case acmelib.SignalKindMultiplexer:
-		muxSig, err := sig.ToMultiplexer()
-		if err != nil {
-			panic(err)
-		}
-		res.Multiplexer = newMultiplexedSignal(muxSig)
-	}
-
-	return res
-}
-
 type SignalService struct {
 	*service[acmelib.Signal, Signal, *signalHandler]
 }
@@ -249,6 +62,10 @@ func (s *SignalService) UpdateSignalUnit(entityID string, req UpdateSignalUnitRe
 
 func (s *SignalService) UpdateSignalEnum(entityID string, req UpdateSignalEnumReq) (Signal, error) {
 	return s.handle(entityID, &req, s.handler.updateSignalEnum)
+}
+
+func (s *SignalService) DeleteMultiplexedSignals(entityID string, req DeleteMultiplexedSignalsReq) (Signal, error) {
+	return s.handle(entityID, &req, s.handler.deleteMultiplexedSignals)
 }
 
 type signalRes = response[acmelib.Signal]
@@ -371,7 +188,7 @@ func (h *signalHandler) updateSignalType(sig acmelib.Signal, req *request, res *
 			if err := stdSig.SetType(oldSigType); err != nil {
 				return nil, err
 			}
-			return sig, nil
+			return stdSig, nil
 		},
 	)
 
@@ -380,7 +197,7 @@ func (h *signalHandler) updateSignalType(sig acmelib.Signal, req *request, res *
 			if err := stdSig.SetType(sigType); err != nil {
 				return nil, err
 			}
-			return sig, nil
+			return stdSig, nil
 		},
 	)
 
@@ -423,14 +240,14 @@ func (h *signalHandler) updateSignalUnit(sig acmelib.Signal, req *request, res *
 	res.setUndo(
 		func() (acmelib.Signal, error) {
 			stdSig.SetUnit(oldSigUnit)
-			return sig, nil
+			return stdSig, nil
 		},
 	)
 
 	res.setRedo(
 		func() (acmelib.Signal, error) {
 			stdSig.SetUnit(sigUnit)
-			return sig, nil
+			return stdSig, nil
 		},
 	)
 
@@ -465,7 +282,7 @@ func (h *signalHandler) updateSignalEnum(sig acmelib.Signal, req *request, res *
 			if err := enumSig.SetEnum(oldSigEnum); err != nil {
 				return nil, err
 			}
-			return sig, nil
+			return enumSig, nil
 		},
 	)
 
@@ -474,7 +291,75 @@ func (h *signalHandler) updateSignalEnum(sig acmelib.Signal, req *request, res *
 			if err := enumSig.SetEnum(sigEnum); err != nil {
 				return nil, err
 			}
-			return sig, nil
+			return enumSig, nil
+		},
+	)
+
+	return nil
+}
+
+func (h *signalHandler) deleteMultiplexedSignals(sig acmelib.Signal, req *request, res *signalRes) error {
+	parsedReq := req.toDeleteMultiplexedSignals()
+
+	if len(parsedReq.SignalEntityIDs) == 0 {
+		return nil
+	}
+
+	groupID := parsedReq.GroupID
+
+	muxSig, err := sig.ToMultiplexer()
+	if err != nil {
+		return err
+	}
+
+	remSigIDs := make(map[string]struct{})
+	for _, sigID := range parsedReq.SignalEntityIDs {
+		remSigIDs[sigID] = struct{}{}
+	}
+
+	remSignals := []acmelib.Signal{}
+	remStartPos := make(map[string]int)
+	for _, sig := range muxSig.GetSignalGroup(groupID) {
+		tmpID := sig.EntityID().String()
+
+		if _, ok := remSigIDs[tmpID]; ok {
+			remSignals = append(remSignals, sig)
+			remStartPos[tmpID] = sig.GetRelativeStartPos()
+		}
+	}
+
+	for _, sig := range remSignals {
+		if err := muxSig.RemoveSignal(sig.EntityID()); err != nil {
+			return err
+		}
+	}
+
+	res.setUndo(
+		func() (acmelib.Signal, error) {
+			for _, sig := range remSignals {
+				startPos, ok := remStartPos[sig.EntityID().String()]
+				if !ok {
+					continue
+				}
+
+				if err := muxSig.InsertSignal(sig, startPos, groupID); err != nil {
+					return nil, err
+				}
+			}
+
+			return muxSig, nil
+		},
+	)
+
+	res.setRedo(
+		func() (acmelib.Signal, error) {
+			for _, sig := range remSignals {
+				if err := muxSig.RemoveSignal(sig.EntityID()); err != nil {
+					return nil, err
+				}
+			}
+
+			return muxSig, nil
 		},
 	)
 

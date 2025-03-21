@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { colorByName } from '$lib/actions/color-name.svelte';
-	import type { Signal } from '$lib/api/canturin';
+	import type { BaseSignal } from '$lib/api/canturin';
 	import { BackwardIcon, ForwardIcon } from '../icon';
 
 	type Item = {
@@ -15,7 +15,7 @@
 	};
 
 	type Props = {
-		signals: Signal[];
+		signals: BaseSignal[];
 		height: number;
 		width?: number;
 		onclick?: (id: string, name: string) => void;
@@ -33,7 +33,7 @@
 		const res: Item[] = [];
 
 		for (const sig of signals) {
-			const startPos = sig.startPos;
+			const startPos = sig.relativeStartPos;
 			const size = sig.size;
 			const name = sig.name;
 			const id = sig.entityId;

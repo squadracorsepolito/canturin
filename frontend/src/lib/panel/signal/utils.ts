@@ -14,7 +14,7 @@ export const signalKindOptions: SegmentedControlOption[] = [
 	},
 	{
 		label: 'Multiplexer',
-		value: SignalKind.SignalKindMultiplexed,
+		value: SignalKind.SignalKindMultiplexer,
 		desc: 'Signal that contains multiple signals'
 	}
 ];

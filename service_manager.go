@@ -45,6 +45,9 @@ type serviceManager struct {
 
 	signalEnumSrv *SignalEnumService
 	signalEnumCtr *signalEnumController
+
+	canIDBuilderSrv *CANIDBuilderService
+	canIDBuilderCtr *canIDBuilderController
 }
 
 func newServiceManager() *serviceManager {
@@ -67,6 +70,10 @@ func newServiceManager() *serviceManager {
 	signalEnumSrv := newSignalEnumService(mux, sidebarCtr)
 	signalEnumSrv.setHistoryController(historyCtr)
 	signalEnumCtr := signalEnumSrv.getController()
+
+	canIDBuilderSrv := newCANIDBuilderService(mux, sidebarCtr)
+	canIDBuilderSrv.setHistoryController(historyCtr)
+	canIDBuilderCtr := canIDBuilderSrv.getController()
 
 	signalSrv := newSignalService(mux, sidebarCtr, signalTypeCtr, signalUnitCtr, signalEnumCtr)
 	signalSrv.setHistoryController(historyCtr)
@@ -121,6 +128,9 @@ func newServiceManager() *serviceManager {
 
 		signalEnumSrv: signalEnumSrv,
 		signalEnumCtr: signalEnumCtr,
+
+		canIDBuilderSrv: canIDBuilderSrv,
+		canIDBuilderCtr: canIDBuilderCtr,
 	}
 }
 
@@ -139,6 +149,7 @@ func (m *serviceManager) getServices() []application.Service {
 		application.NewService(manager.signalTypeSrv),
 		application.NewService(manager.signalUnitSrv),
 		application.NewService(manager.signalEnumSrv),
+		application.NewService(manager.canIDBuilderSrv),
 	}
 }
 
@@ -161,8 +172,12 @@ func (m *serviceManager) initNetwork(net *acmelib.Network) {
 	sigTypes := make(map[acmelib.EntityID]*acmelib.SignalType)
 	sigUnits := make(map[acmelib.EntityID]*acmelib.SignalUnit)
 	sigEnums := make(map[acmelib.EntityID]*acmelib.SignalEnum)
+	canIDBuilders := make(map[acmelib.EntityID]*acmelib.CANIDBuilder)
 
 	for _, bus := range buses {
+		canIDBuilder := bus.CANIDBuilder()
+		canIDBuilders[canIDBuilder.EntityID()] = canIDBuilder
+
 		for _, nodeInt := range bus.NodeInterfaces() {
 			tmpNode := nodeInt.Node()
 			nodes[tmpNode.EntityID()] = tmpNode
@@ -208,6 +223,7 @@ func (m *serviceManager) initNetwork(net *acmelib.Network) {
 	m.signalTypeCtr.sendLoad(maps.Values(sigTypes))
 	m.signalUnitCtr.sendLoad(maps.Values(sigUnits))
 	m.signalEnumCtr.sendLoad(maps.Values(sigEnums))
+	m.canIDBuilderCtr.sendLoad(maps.Values(canIDBuilders))
 }
 
 func (m *serviceManager) getEncoding(path string) acmelib.SaveEncoding {
@@ -397,4 +413,5 @@ func (m *serviceManager) clearServices() {
 	m.signalTypeCtr.sendClear()
 	m.signalUnitCtr.sendClear()
 	m.signalEnumCtr.sendClear()
+	m.canIDBuilderCtr.sendClear()
 }

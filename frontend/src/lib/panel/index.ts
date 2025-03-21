@@ -6,3 +6,4 @@ export { default as SignalPanel } from './signal/proxy.svelte';
 export { default as SignalTypePanel } from './signal-type/proxy.svelte';
 export { default as SignalEnumPanel } from './signal-enum/proxy.svelte';
 export { default as SignalUnitPanel } from './signal-unit/proxy.svelte';
+export { default as CanIdBuilderPanel } from './can-id-builder/proxy.svelte';

@@ -14,7 +14,9 @@ export class StateProvider<E extends Entity, S extends EntityState<E>> {
 	}
 
 	add(entity: E) {
-		this.states.set(entity.entityId, this.genFn(entity));
+		const s = this.genFn(entity);
+		this.states.set(entity.entityId, s);
+		return s;
 	}
 
 	remove(entityId: string) {

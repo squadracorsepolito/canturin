@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { uniqueId } from '$lib/utils';
 	import * as hoverCard from '@zag-js/hover-card';
 	import { portal, useMachine, normalizeProps } from '@zag-js/svelte';
 	import type { Snippet } from 'svelte';
@@ -12,8 +11,9 @@
 
 	let { trigger, content, placement }: Props = $props();
 
+	const id = $props.id();
 	const service = useMachine(hoverCard.machine, {
-		id: uniqueId(),
+		id,
 		openDelay: 1300,
 		closeDelay: 200,
 		positioning: {

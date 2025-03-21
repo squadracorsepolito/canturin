@@ -8,30 +8,6 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
-type Network struct {
-	BaseEntity
-
-	Buses []BusBase `json:"buses"`
-}
-
-func newNetwork(net *acmelib.Network) Network {
-	if net == nil {
-		return Network{}
-	}
-
-	res := Network{
-		BaseEntity: newBaseEntity(net),
-
-		Buses: []BusBase{},
-	}
-
-	for _, bus := range net.Buses() {
-		res.Buses = append(res.Buses, newBusBase(bus))
-	}
-
-	return res
-}
-
 type NetworkService struct {
 	handler *networkHandler
 

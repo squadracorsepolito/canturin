@@ -10,7 +10,8 @@ export type PanelKind =
 	| 'signal'
 	| 'signal_type'
 	| 'signal_unit'
-	| 'signal_enum';
+	| 'signal_enum'
+	| 'can_id_builder';
 
 export type Panel = {
 	kind: PanelKind;

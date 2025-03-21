@@ -1,6 +1,7 @@
 <script lang="ts">
 	import {
 		BusPanel,
+		CanIdBuilderPanel,
 		MessagePanel,
 		NetworkPanel,
 		NodePanel,
@@ -9,9 +10,15 @@
 		SignalTypePanel,
 		SignalUnitPanel
 	} from '.';
-	import { getPanelStackState, type Panel, type PanelKind } from './panel-stack-state.svelte';
+	import {
+		closePanel,
+		getPanelStackState,
+		type Panel,
+		type PanelKind
+	} from './panel-stack-state.svelte';
 	import {
 		BusIcon,
+		CanIdBuilderIcon,
 		CloseIcon,
 		MessageIcon,
 		NetworkIcon,
@@ -42,6 +49,8 @@
 				return SignalUnitIcon;
 			case 'signal_enum':
 				return SignalEnumIcon;
+			case 'can_id_builder':
+				return CanIdBuilderIcon;
 
 			default:
 				return NetworkIcon;
@@ -54,6 +63,17 @@
 				el.scrollIntoView({ behavior: 'smooth', block: 'end' });
 			}
 		});
+	}
+
+	function handleTabClick(panel: Panel) {
+		s.open(panel.kind, panel.id, panel.name);
+	}
+
+	function handleTabMiddleClick(e: MouseEvent, panel: Panel) {
+		if (e.button !== 1) return;
+
+		e.preventDefault();
+		closePanel(panel.id);
 	}
 </script>
 
@@ -74,6 +94,8 @@
 		<SignalUnitPanel entityId={panel.id} />
 	{:else if panel.kind === 'signal_enum'}
 		<SignalEnumPanel entityId={panel.id} />
+	{:else if panel.kind === 'can_id_builder'}
+		<CanIdBuilderPanel entityId={panel.id} />
 	{/if}
 {/snippet}
 
@@ -91,7 +113,8 @@
 						: 'hover:bg-base-content/20'}"
 				>
 					<button
-						onclick={() => s.open(panel.kind, panel.id, panel.name)}
+						onclick={() => handleTabClick(panel)}
+						onmousedown={(e) => handleTabMiddleClick(e, panel)}
 						class="flex items-center gap-2 py-2"
 					>
 						<span>

@@ -129,7 +129,15 @@ class MessageState extends EntityState<Message> {
 	}
 
 	addSignal(signalKind: SignalKind) {
-		this.update(MessageService.AddSignal(this.entity.entityId, { signalKind }));
+		this.update(
+			MessageService.AddSignal(this.entity.entityId, { signalKind, groupCount: 0, groupSize: 0 })
+		);
+	}
+
+	addMultiplexerSignal(signalKind: SignalKind, groupCount: number, groupSize: number) {
+		this.update(
+			MessageService.AddSignal(this.entity.entityId, { signalKind, groupCount, groupSize })
+		);
 	}
 
 	deleteSignals(signalEntityIds: string[]) {

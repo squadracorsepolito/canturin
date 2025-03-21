@@ -1,5 +1,5 @@
 <script lang="ts" generics="T extends { [K in keyof T]: any }, V extends string">
-	import { uniqueId, type FieldNameOf } from '$lib/utils';
+	import { type FieldNameOf } from '$lib/utils';
 	import * as select from '@zag-js/select';
 	import { normalizeProps, portal, useMachine } from '@zag-js/svelte';
 	import { AltArrowIcon, CheckIcon } from '../icon';
@@ -33,8 +33,9 @@
 		itemToValue: (item) => item[valueKey]
 	});
 
+	const id = $props.id();
 	const selectProps: select.Props = $derived({
-		id: uniqueId(),
+		id,
 		collection,
 		name: name,
 		value: [selected],

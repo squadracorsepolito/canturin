@@ -4,27 +4,10 @@ import (
 	"context"
 	"errors"
 	"sync"
-	"time"
 
 	"github.com/squadracorsepolito/acmelib"
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
-
-type BaseEntity struct {
-	EntityID   string    `json:"entityId"`
-	Name       string    `json:"name"`
-	Desc       string    `json:"desc"`
-	CreateTime time.Time `json:"createTime"`
-}
-
-func newBaseEntity(e entity) BaseEntity {
-	return BaseEntity{
-		EntityID:   e.EntityID().String(),
-		Name:       e.Name(),
-		Desc:       e.Desc(),
-		CreateTime: e.CreateTime(),
-	}
-}
 
 type serviceKind int
 
@@ -37,6 +20,7 @@ const (
 	serviceKindSignalType
 	serviceKindSignalUnit
 	serviceKindSignalEnum
+	serviceKindCANIDBuilder
 )
 
 type serviceHandler[E entity, R any] interface {
@@ -152,6 +136,8 @@ func (s *service[E, R, H]) handleAdd(ent E) {
 		addEventName = SignalUnitAdded
 	case serviceKindSignalEnum:
 		addEventName = SignalEnumAdded
+	case serviceKindCANIDBuilder:
+		addEventName = CANIDBuilderAdded
 	}
 
 	if len(addEventName) > 0 {
@@ -329,3 +315,4 @@ type signalController = serviceController[acmelib.Signal]
 type signalTypeController = serviceController[*acmelib.SignalType]
 type signalUnitController = serviceController[*acmelib.SignalUnit]
 type signalEnumController = serviceController[*acmelib.SignalEnum]
+type canIDBuilderController = serviceController[*acmelib.CANIDBuilder]

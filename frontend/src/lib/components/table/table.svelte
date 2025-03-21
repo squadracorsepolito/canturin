@@ -8,7 +8,7 @@
 	import { DragHandleIcon, SortIcon } from '../icon';
 	import { Toggle } from '../toggle';
 	import './styles.css';
-	import { uniqueId, type KeyOfString } from '$lib/utils';
+	import { type KeyOfString } from '$lib/utils';
 
 	type Props = {
 		items: T[];
@@ -86,8 +86,9 @@
 		return items.filter((item) => selectedIds.includes(item[idKey]));
 	});
 
+	const id = $props.id();
 	const sortable = new Sortable({
-		instanceId: uniqueId(),
+		instanceId: id,
 		enabled: false,
 		itemsGetter: () => items.map((item) => ({ id: item[idKey] })),
 		reorder: (id, from, to) => {

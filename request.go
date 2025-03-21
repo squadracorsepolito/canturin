@@ -260,6 +260,8 @@ func (r *request) toUpdateStartDelayTime() *UpdateStartDelayTimeReq {
 
 type AddSignalReq struct {
 	SignalKind SignalKind `json:"signalKind"`
+	GroupCount int        `json:"groupCount"`
+	GroupSize  int        `json:"groupSize"`
 }
 
 func (r *request) toAddSignal() *AddSignalReq {
@@ -402,6 +404,19 @@ func (r *request) toUpdateOffset() *UpdateOffsetReq {
 	req, ok := r.data.(*UpdateOffsetReq)
 	if !ok {
 		panic("cannot convert to UpdateOffsetReq")
+	}
+	return req
+}
+
+type DeleteMultiplexedSignalsReq struct {
+	GroupID         int      `json:"groupId"`
+	SignalEntityIDs []string `json:"signalEntityIds"`
+}
+
+func (r *request) toDeleteMultiplexedSignals() *DeleteMultiplexedSignalsReq {
+	req, ok := r.data.(*DeleteMultiplexedSignalsReq)
+	if !ok {
+		panic("cannot convert to DeleteMultiplexedSignalsReq")
 	}
 	return req
 }

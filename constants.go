@@ -1,8 +1,9 @@
 package main
 
 const (
-	SidebarNodeGroupID       = "nodes"
-	SidebarSignalTypeGroupID = "signal-types"
-	SidebarSignalUnitGroupID = "signal-units"
-	SidebarSignalEnumGroupID = "signal-enums"
+	SidebarNodeGroupID         = "nodes"
+	SidebarCANIDBuilderGroupID = "can-id-builder"
+	SidebarSignalTypeGroupID   = "signal-types"
+	SidebarSignalUnitGroupID   = "signal-units"
+	SidebarSignalEnumGroupID   = "signal-enums"
 )

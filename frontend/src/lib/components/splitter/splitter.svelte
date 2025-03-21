@@ -18,23 +18,28 @@
 
 	let { left, leftPanel, right, rightPanel }: Props = $props();
 
+	function getDefaultSize(panel?: PanelProps) {
+		if (!panel || !panel.size) return 50;
+
+		return panel.size;
+	}
+
 	const id = $props.id();
 	const service = useMachine(splitter.machine, {
 		id,
-		defaultSize: [
+		panels: [
 			{
 				id: 'left',
-				size: leftPanel?.size,
 				minSize: leftPanel?.minSize,
 				maxSize: leftPanel?.maxSize
 			},
 			{
 				id: 'right',
-				size: rightPanel?.size,
 				minSize: rightPanel?.minSize,
 				maxSize: rightPanel?.maxSize
 			}
-		]
+		],
+		defaultSize: [getDefaultSize(leftPanel), getDefaultSize(rightPanel)]
 	});
 
 	const api = $derived(splitter.connect(service, normalizeProps));

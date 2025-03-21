@@ -1,6 +1,5 @@
 <script lang="ts">
 	import './styles.css';
-	import { uniqueId } from '$lib/utils';
 	import * as editable from '@zag-js/editable';
 	import * as numberInput from '@zag-js/number-input';
 	import { useMachine, normalizeProps, mergeProps } from '@zag-js/svelte';
@@ -11,7 +10,9 @@
 		max?: number;
 	};
 
-	const inputId = uniqueId() + ':input';
+	const id = $props.id();
+
+	const inputId = id + ':input';
 
 	let {
 		value = $bindable(),
@@ -30,7 +31,7 @@
 	let fallbackValue = $state(value);
 
 	const editableProps: editable.Props = $derived({
-		id: uniqueId(),
+		id: id + '0',
 		name: name,
 		value: value + '',
 		readOnly: readOnly,
@@ -69,7 +70,7 @@
 	const editableService = useMachine(editable.machine, () => editableProps);
 
 	const numberInputProps: numberInput.Props = $derived({
-		id: uniqueId(),
+		id: id + '1',
 		name: name,
 		value: value + '',
 		min: min,

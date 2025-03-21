@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { type Message, type Signal, SignalKind } from '$lib/api/canturin';
+	import { type Message, type BaseSignal, SignalKind } from '$lib/api/canturin';
 	import { IconButton } from '$lib/components/button';
 	import { SignalGrid } from '$lib/components/grid';
 	import { SignalHoverPreview } from '$lib/components/hover-preview';
@@ -27,11 +27,11 @@
 		ms.reorderSignal(sigEntId, from, to);
 	}
 
-	function handleBulkDelete(signals: Signal[]) {
+	function handleBulkDelete(signals: BaseSignal[]) {
 		ms.deleteSignals(signals.map((sig) => sig.entityId));
 	}
 
-	function handleDelete(signal: Signal) {
+	function handleDelete(signal: BaseSignal) {
 		ms.deleteSignal(signal.entityId);
 	}
 </script>

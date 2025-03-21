@@ -9,172 +9,6 @@ import (
 	"github.com/squadracorsepolito/acmelib"
 )
 
-type MessageSendType string
-
-const (
-	MessageSendTypeUnset                      MessageSendType = "unset"
-	MessageSendTypeCyclic                     MessageSendType = "cyclic"
-	MessageSendTypeCyclicIfActive             MessageSendType = "cyclic_if_active"
-	MessageSendTypeCyclicAndTriggered         MessageSendType = "cyclic_and_triggered"
-	MessageSendTypeCyclicIfActiveAndTriggered MessageSendType = "cyclic_if_active_and_triggered"
-)
-
-func newMessageSendType(st acmelib.MessageSendType) MessageSendType {
-	switch st {
-	case acmelib.MessageSendTypeCyclic:
-		return MessageSendTypeCyclic
-	case acmelib.MessageSendTypeCyclicIfActive:
-		return MessageSendTypeCyclicIfActive
-	case acmelib.MessageSendTypeCyclicAndTriggered:
-		return MessageSendTypeCyclicAndTriggered
-	case acmelib.MessageSendTypeCyclicIfActiveAndTriggered:
-		return MessageSendTypeCyclicIfActiveAndTriggered
-	default:
-		return MessageSendTypeUnset
-	}
-}
-
-func (st MessageSendType) parse() acmelib.MessageSendType {
-	switch st {
-	case MessageSendTypeCyclic:
-		return acmelib.MessageSendTypeCyclic
-	case MessageSendTypeCyclicIfActive:
-		return acmelib.MessageSendTypeCyclicIfActive
-	case MessageSendTypeCyclicAndTriggered:
-		return acmelib.MessageSendTypeCyclicAndTriggered
-	case MessageSendTypeCyclicIfActiveAndTriggered:
-		return acmelib.MessageSendTypeCyclicIfActiveAndTriggered
-	default:
-		return acmelib.MessageSendTypeUnset
-	}
-}
-
-type MessageByteOrder string
-
-const (
-	MessageByteOrderLittleEndian MessageByteOrder = "little-endian"
-	MessageByteOrderBigEndian    MessageByteOrder = "big-endian"
-)
-
-func newMessageByteOrder(bo acmelib.MessageByteOrder) MessageByteOrder {
-	switch bo {
-	case acmelib.MessageByteOrderLittleEndian:
-		return MessageByteOrderLittleEndian
-	case acmelib.MessageByteOrderBigEndian:
-		return MessageByteOrderBigEndian
-	default:
-		return MessageByteOrderLittleEndian
-	}
-}
-
-func (bo MessageByteOrder) parse() acmelib.MessageByteOrder {
-	switch bo {
-	case MessageByteOrderLittleEndian:
-		return acmelib.MessageByteOrderLittleEndian
-	case MessageByteOrderBigEndian:
-		return acmelib.MessageByteOrderBigEndian
-	default:
-		return acmelib.MessageByteOrderLittleEndian
-	}
-}
-
-type Message struct {
-	base
-
-	Paths []EntityPath `json:"paths"`
-
-	HasStaticCANID bool `json:"hasStaticCANID"`
-	ID             uint `json:"id"`
-	CANID          uint `json:"canId"`
-
-	SizeByte               int              `json:"sizeByte"`
-	AvailableTrailingBytes int              `json:"availableTrailingBytes"`
-	MaxAvailableSpace      int              `json:"maxAvailableSpace"`
-	ByteOrder              MessageByteOrder `json:"byteOrder"`
-
-	CycleTime      int             `json:"cycleTime"`
-	SendType       MessageSendType `json:"sendType"`
-	DelayTime      int             `json:"delayTime"`
-	StartDelayTime int             `json:"startDelayTime"`
-
-	Signals []Signal `json:"signals"`
-
-	Receivers []Node0 `json:"receivers"`
-
-	SenderNode BaseEntity `json:"senderNode"`
-	ParentBus  BaseEntity `json:"parentBus"`
-}
-
-func newMessage(msg *acmelib.Message) Message {
-	res := Message{
-		base: newBase(msg),
-
-		Paths: newMessageEntityPaths(msg),
-
-		HasStaticCANID: msg.HasStaticCANID(),
-		ID:             uint(msg.ID()),
-		CANID:          uint(msg.GetCANID()),
-
-		SizeByte:               msg.SizeByte(),
-		AvailableTrailingBytes: msg.SizeByte(),
-		MaxAvailableSpace:      0,
-		ByteOrder:              newMessageByteOrder(msg.ByteOrder()),
-
-		CycleTime:      msg.CycleTime(),
-		SendType:       newMessageSendType(msg.SendType()),
-		DelayTime:      msg.DelayTime(),
-		StartDelayTime: msg.StartDelayTime(),
-
-		Signals: []Signal{},
-
-		Receivers: []Node0{},
-	}
-
-	if nodeInt := msg.SenderNodeInterface(); nodeInt != nil {
-		res.SenderNode = newBaseEntity(nodeInt.Node())
-
-		if bus := nodeInt.ParentBus(); bus != nil {
-			res.ParentBus = newBaseEntity(bus)
-		}
-	}
-
-	signals := msg.Signals()
-
-	if len(signals) > 0 {
-		lastSig := signals[len(signals)-1]
-		trailingBits := msg.SizeByte()*8 - lastSig.GetStartBit() - lastSig.GetSize()
-		res.AvailableTrailingBytes = trailingBits / 8
-	}
-
-	holes := []int{}
-	currPos := 0
-	for _, sig := range signals {
-		res.Signals = append(res.Signals, Signal{
-			base: newBase(sig),
-
-			Kind:     newSignalKind(sig.Kind()),
-			StartPos: sig.GetStartBit(),
-			Size:     sig.GetSize(),
-		})
-
-		if currPos < sig.GetStartBit() {
-			holes = append(holes, sig.GetStartBit()-currPos)
-		}
-
-		currPos = sig.GetStartBit() + sig.GetSize()
-	}
-
-	if currPos < msg.SizeByte()*8 {
-		holes = append(holes, msg.SizeByte()*8-currPos)
-	}
-
-	if len(holes) > 0 {
-		res.MaxAvailableSpace = slices.Max(holes)
-	}
-
-	return res
-}
-
 type MessageService struct {
 	*service[*acmelib.Message, Message, *messageHandler]
 }
@@ -717,6 +551,11 @@ func (h *messageHandler) addSignal(msg *acmelib.Message, req *request, res *mess
 		sig = tmpSig
 
 	case acmelib.SignalKindMultiplexer:
+		tmpSig, err := acmelib.NewMultiplexerSignal(sigName, parsedReq.GroupCount, parsedReq.GroupSize)
+		if err != nil {
+			return err
+		}
+		sig = tmpSig
 	}
 
 	if err := msg.InsertSignal(sig, startPos); err != nil {

@@ -9,75 +9,6 @@ import (
 	"github.com/squadracorsepolito/acmelib"
 )
 
-type SignalTypeKind string
-
-const (
-	SignalTypeKindCustom  SignalTypeKind = "custom"
-	SignalTypeKindFlag    SignalTypeKind = "flag"
-	SignalTypeKindInteger SignalTypeKind = "integer"
-	SignalTypeKindDecimal SignalTypeKind = "decimal"
-)
-
-func newSignalTypeKind(kind acmelib.SignalTypeKind) SignalTypeKind {
-	return SignalTypeKind(kind.String())
-}
-
-func compareSignalTypeKind(a, b SignalTypeKind) int {
-	if a == b {
-		return 0
-	}
-
-	switch a {
-	case SignalTypeKindFlag:
-		return -1
-
-	case SignalTypeKindInteger:
-		if b == SignalTypeKindFlag {
-			return 1
-		}
-		return -1
-
-	case SignalTypeKindDecimal:
-		if b == SignalTypeKindCustom {
-			return -1
-		}
-		return 1
-	}
-
-	return 1
-}
-
-type SignalTypeBrief struct {
-	BaseEntity
-
-	Kind SignalTypeKind `json:"kind"`
-	Size int            `json:"size"`
-}
-
-func newSignalTypeBrief(sigType *acmelib.SignalType) SignalTypeBrief {
-	return SignalTypeBrief{
-		BaseEntity: newBaseEntity(sigType),
-
-		Kind: newSignalTypeKind(sigType.Kind()),
-		Size: sigType.Size(),
-	}
-}
-
-type SignalType struct {
-	base
-
-	Kind   SignalTypeKind `json:"kind"`
-	Size   int            `json:"size"`
-	Signed bool           `json:"signed"`
-	Min    float64        `json:"min"`
-	Max    float64        `json:"max"`
-	Scale  float64        `json:"scale"`
-	Offset float64        `json:"offset"`
-
-	ReferenceCount int         `json:"referenceCount"`
-	References     []Reference `json:"references"`
-}
-
 type SignalTypeService struct {
 	*service[*acmelib.SignalType, SignalType, *signalTypeHandler]
 }
@@ -176,6 +107,31 @@ func (s *SignalTypeService) Delete(entityID string) error {
 	return nil
 }
 
+func (s *SignalTypeService) compareKind(a, b SignalTypeKind) int {
+	if a == b {
+		return 0
+	}
+
+	switch a {
+	case SignalTypeKindFlag:
+		return -1
+
+	case SignalTypeKindInteger:
+		if b == SignalTypeKindFlag {
+			return 1
+		}
+		return -1
+
+	case SignalTypeKindDecimal:
+		if b == SignalTypeKindCustom {
+			return -1
+		}
+		return 1
+	}
+
+	return 1
+}
+
 func (s *SignalTypeService) ListBrief() []SignalTypeBrief {
 	s.mux.RLock()
 	defer s.mux.RUnlock()
@@ -194,7 +150,7 @@ func (s *SignalTypeService) ListBrief() []SignalTypeBrief {
 			return a.Size - b.Size
 		}
 
-		return compareSignalTypeKind(a.Kind, b.Kind)
+		return s.compareKind(a.Kind, b.Kind)
 	})
 
 	return res
@@ -241,66 +197,7 @@ func newSignalTypeHandler(sidebar *sidebarController) *signalTypeHandler {
 }
 
 func (h *signalTypeHandler) toResponse(sigType *acmelib.SignalType) SignalType {
-	refCount := sigType.ReferenceCount()
-
-	res := SignalType{
-		base: newBase(sigType),
-
-		Kind:   newSignalTypeKind(sigType.Kind()),
-		Size:   int(sigType.Size()),
-		Signed: sigType.Signed(),
-		Min:    sigType.Min(),
-		Max:    sigType.Max(),
-		Scale:  sigType.Scale(),
-		Offset: sigType.Offset(),
-
-		ReferenceCount: refCount,
-	}
-
-	if refCount == 0 {
-		return res
-	}
-
-	rootRefs := []*reference{}
-	refs := make(map[acmelib.EntityID]*reference)
-	for _, sig := range sigType.References() {
-		sigRef := newReference(sig)
-		refs[sig.EntityID()] = sigRef
-
-		var msgRef *reference
-		msg := sig.ParentMessage()
-		msgRef, ok := refs[msg.EntityID()]
-		if !ok {
-			msgRef = newReference(msg)
-			refs[msg.EntityID()] = msgRef
-		}
-		msgRef.addChild(sigRef)
-
-		var nodeRef *reference
-		node := msg.SenderNodeInterface().Node()
-		nodeRef, ok = refs[node.EntityID()]
-		if !ok {
-			nodeRef = newReference(node)
-			refs[node.EntityID()] = nodeRef
-		}
-		nodeRef.addChild(msgRef)
-
-		var busRef *reference
-		bus := msg.SenderNodeInterface().ParentBus()
-		busRef, ok = refs[bus.EntityID()]
-		if !ok {
-			busRef = newReference(bus)
-			refs[bus.EntityID()] = busRef
-			rootRefs = append(rootRefs, busRef)
-		}
-		busRef.addChild(nodeRef)
-	}
-
-	for _, tmpRef := range rootRefs {
-		res.References = append(res.References, tmpRef.toResponse())
-	}
-
-	return res
+	return newSignalType(sigType)
 }
 
 func (h *signalTypeHandler) updateName(sigType *acmelib.SignalType, req *request, res *signalTypeRes) error {

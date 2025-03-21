@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { normalizeProps, useMachine, mergeProps } from '@zag-js/svelte';
 	import * as checkbox from '@zag-js/checkbox';
-	import { uniqueId } from '$lib/utils';
 
 	type Props = {
 		checked: boolean;
@@ -11,8 +10,9 @@
 
 	let { checked = $bindable(), label, oncheckchange }: Props = $props();
 
+	const id = $props.id();
 	const checkboxProps: checkbox.Props = $derived({
-		id: uniqueId(),
+		id,
 		checked: checked,
 		onCheckedChange: (details) => {
 			let tmpChecked = false;

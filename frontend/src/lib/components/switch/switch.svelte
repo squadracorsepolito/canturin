@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { uniqueId } from '$lib/utils';
 	import { normalizeProps, useMachine } from '@zag-js/svelte';
 	import * as zagSwitch from '@zag-js/switch';
 
@@ -12,8 +11,9 @@
 
 	let { checked = $bindable(), label, readOnly, oncheckedchange: oncheckchange }: Props = $props();
 
+	const id = $props.id();
 	const switchProps: zagSwitch.Props = $derived({
-		id: uniqueId(),
+		id,
 		checked: checked,
 		readOnly: readOnly,
 		onCheckedChange: (details) => {

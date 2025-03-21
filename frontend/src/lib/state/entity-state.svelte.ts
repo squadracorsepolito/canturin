@@ -1,10 +1,8 @@
+import type { BaseEntity } from '$lib/api/canturin';
 import { pushToast } from '$lib/components/toast/toast-provider.svelte';
 import { updatePanelName } from '$lib/panel/panel-stack-state.svelte';
 
-export type Entity = {
-	entityId: string;
-	name: string;
-};
+export type Entity = BaseEntity;
 
 export class EntityState<E extends Entity> {
 	#fallback: E;

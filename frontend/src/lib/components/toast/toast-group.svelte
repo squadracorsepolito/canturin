@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { uniqueId } from '$lib/utils';
 	import { normalizeProps, useMachine } from '@zag-js/svelte';
 	import * as toast from '@zag-js/toast';
 	import Toast from './toast.svelte';
@@ -12,8 +11,9 @@
 		overlap: true
 	});
 
+	const id = $props.id();
 	const service = useMachine(toast.group.machine, {
-		id: uniqueId(),
+		id,
 		store: store
 	});
 

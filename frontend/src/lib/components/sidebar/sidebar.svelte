@@ -11,7 +11,8 @@
 		SignalEnumIcon,
 		SignalIcon,
 		SignalTypeIcon,
-		SignalUnitIcon
+		SignalUnitIcon,
+		CanIdBuilderIcon
 	} from '../icon';
 	import { TreeView } from '../tree';
 	import { SidebarState } from './state.svelte';
@@ -47,6 +48,8 @@
 				return SignalUnitIcon;
 			case SidebarItemKind.SidebarItemKindSignalEnum:
 				return SignalEnumIcon;
+			case SidebarItemKind.SidebarItemKindCANIDBuilder:
+				return CanIdBuilderIcon;
 
 			default:
 				return AltArrowIcon;

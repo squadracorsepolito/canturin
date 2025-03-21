@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { uniqueId } from '$lib/utils';
 	import * as editable from '@zag-js/editable';
 	import { useMachine, normalizeProps } from '@zag-js/svelte';
 	import { AddIcon } from '../icon';
@@ -15,15 +14,13 @@
 
 	let { initialValue, name, triggerLabel, rows = 8, onsubmit }: Props = $props();
 
+	const id = $props.id();
 	const service = useMachine(editable.machine, {
-		id: uniqueId(),
-		value: initialValue,
+		id,
+		defaultValue: initialValue,
 		name: name,
 		activationMode: 'dblclick',
 		submitMode: 'both',
-		onInteractOutside: (e) => {
-			console.log(e);
-		},
 		onValueCommit: (details) => {
 			onsubmit(details.value);
 		}

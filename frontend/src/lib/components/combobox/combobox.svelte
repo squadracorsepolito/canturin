@@ -1,5 +1,5 @@
 <script lang="ts" generics="T extends { [K in keyof T]: any }, V extends string">
-	import { uniqueId, type FieldNameOf } from '$lib/utils';
+	import { type FieldNameOf } from '$lib/utils';
 	import * as combobox from '@zag-js/combobox';
 	import { mergeProps, normalizeProps, useMachine } from '@zag-js/svelte';
 	import { AltArrowIcon, CheckIcon, CloseIcon } from '../icon';
@@ -39,8 +39,9 @@
 		isItemDisabled: filter
 	});
 
+	const id = $props.id();
 	const comboboxProps: combobox.Props = $derived({
-		id: uniqueId(),
+		id: id,
 		name,
 		collection,
 		defaultValue: [selected],
