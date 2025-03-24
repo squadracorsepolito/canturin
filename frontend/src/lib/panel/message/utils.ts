@@ -1,5 +1,39 @@
-import { MessageByteOrder, MessageSendType } from '$lib/api/canturin';
+import { MessageByteOrder, MessagePriority, MessageSendType } from '$lib/api/canturin';
 import type { SegmentedControlOption } from '$lib/components/segmented-control/types';
+
+export const prioritySelectItems = [
+	{
+		label: 'Very High',
+		value: MessagePriority.MessagePriorityVeryHigh
+	},
+	{
+		label: 'High',
+		value: MessagePriority.MessagePriorityHigh
+	},
+	{
+		label: 'Medium',
+		value: MessagePriority.MessagePriorityMedium
+	},
+	{
+		label: 'Low',
+		value: MessagePriority.MessagePriorityLow
+	}
+];
+
+export function priorityToNumber(priority: MessagePriority) {
+	switch (priority) {
+		case MessagePriority.MessagePriorityVeryHigh:
+			return 0;
+		case MessagePriority.MessagePriorityHigh:
+			return 1;
+		case MessagePriority.MessagePriorityMedium:
+			return 2;
+		case MessagePriority.MessagePriorityLow:
+			return 3;
+		default:
+			return 0;
+	}
+}
 
 export const sendTypeSelectItems = [
 	{

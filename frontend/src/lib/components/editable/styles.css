@@ -1,6 +1,14 @@
 .editable {
 	@apply relative;
 
+	[data-part='label'] {
+		@apply text-sm;
+
+		div {
+			@apply pb-1;
+		}
+	}
+
 	[data-part='area'] {
 		@apply rounded-btn border-2 px-2 py-1 transition-colors;
 

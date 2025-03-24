@@ -523,3 +523,21 @@ func (r *request) toUpdateValueIndex() *UpdateValueIndexReq {
 	}
 	return req
 }
+
+/////////////////////////////
+// CAN ID BUILDER REQUESTS //
+/////////////////////////////
+
+type CalculateCANIDReq struct {
+	MessagePrioriry MessagePriority `json:"messagePriority"`
+	MessageID       uint            `json:"messageId"`
+	NodeID          uint            `json:"nodeId"`
+}
+
+func (r *request) toCalculateCANID() *CalculateCANIDReq {
+	req, ok := r.data.(*CalculateCANIDReq)
+	if !ok {
+		panic("cannot convert to CalculateCANIDReq")
+	}
+	return req
+}

@@ -100,7 +100,7 @@
 {/snippet}
 
 <div class="flex-1 flex flex-col h-full overflow-hidden">
-	<div class="overflow-x-auto border-b-4">
+	<div class="overflow-x-auto border-b-4 border-base-300">
 		<ul class="flex">
 			{#each s.panels as [_, panel]}
 				{@const Icon = getIcon(panel.kind)}

@@ -7,5 +7,6 @@ export type EditableProps<T> = {
 	fontWeight?: 'normal' | 'medium' | 'semibold';
 	border?: 'visible' | 'transparent';
 	readOnly?: boolean;
+	label?: string;
 	oncommit?: (value: T) => void;
 };

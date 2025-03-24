@@ -5,6 +5,10 @@ export function getHexNumber(num: number) {
 	return `0x${num.toString(16).padStart(2, '0')}`;
 }
 
+export function getBinaryNumber(num: number) {
+	return `0b${num.toString(2).padStart(8, '0')}`;
+}
+
 export function getColorByName(name: string) {
 	const bgColor = randomColor({
 		seed: name

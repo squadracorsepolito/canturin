@@ -2,6 +2,7 @@
 	import PanelHeading from '../panel-heading.svelte';
 	import Panel from '../panel.svelte';
 	import type { PanelSectionProps } from '../types';
+	import Operations from './operations.svelte';
 	import { loadCanIdBuilder } from './state.svete';
 
 	let { entityId }: PanelSectionProps = $props();
@@ -12,5 +13,7 @@
 <Panel>
 	{#await promise then s}
 		<PanelHeading entityState={s} />
+
+		<Operations {s} />
 	{/await}
 </Panel>

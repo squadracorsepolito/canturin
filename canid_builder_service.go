@@ -26,6 +26,29 @@ func (s *CANIDBuilderService) UpdateDesc(entityID string, req UpdateDescReq) (CA
 	return s.handle(entityID, &req, s.handler.updateDesc)
 }
 
+func (s *CANIDBuilderService) CalculateCANIDs(entityID string, req CalculateCANIDReq) ([]uint, error) {
+	s.mux.RLock()
+	defer s.mux.RUnlock()
+
+	builder, err := s.getEntity(entityID)
+	if err != nil {
+		return nil, err
+	}
+
+	msgPriority := req.MessagePrioriry.parse()
+	msgID := acmelib.MessageID(req.MessageID)
+	nodeID := acmelib.NodeID(req.NodeID)
+
+	canIDs := builder.CalculatePartials(msgPriority, msgID, nodeID)
+
+	res := make([]uint, len(canIDs))
+	for idx, canID := range canIDs {
+		res[idx] = uint(canID)
+	}
+
+	return res, nil
+}
+
 type canIDBuilderRes = response[*acmelib.CANIDBuilder]
 
 type canIDBuilderHandler struct {

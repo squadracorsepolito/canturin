@@ -13,6 +13,7 @@
 		fontWeight = 'normal',
 		border = 'visible',
 		readOnly = false,
+		label,
 		oncommit
 	}: EditableProps<string> = $props();
 
@@ -67,6 +68,14 @@
 </script>
 
 <div class="editable">
+	{#if label}
+		<div>
+			<label {...api.getLabelProps()}>
+				<div>{label}</div>
+			</label>
+		</div>
+	{/if}
+
 	<div {...rootProps}>
 		<div
 			{...api.getAreaProps()}

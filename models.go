@@ -289,6 +289,45 @@ func (st MessageSendType) parse() acmelib.MessageSendType {
 	}
 }
 
+type MessagePriority string
+
+const (
+	MessagePriorityVeryHigh MessagePriority = "very-high"
+	MessagePriorityHigh     MessagePriority = "high"
+	MessagePriorityMedium   MessagePriority = "medium"
+	MessagePriorityLow      MessagePriority = "low"
+)
+
+func newMessagePriority(priority acmelib.MessagePriority) MessagePriority {
+	switch priority {
+	case acmelib.MessagePriorityVeryHigh:
+		return MessagePriorityVeryHigh
+	case acmelib.MessagePriorityHigh:
+		return MessagePriorityHigh
+	case acmelib.MessagePriorityMedium:
+		return MessagePriorityMedium
+	case acmelib.MessagePriorityLow:
+		return MessagePriorityLow
+	default:
+		return MessagePriorityVeryHigh
+	}
+}
+
+func (mp MessagePriority) parse() acmelib.MessagePriority {
+	switch mp {
+	case MessagePriorityVeryHigh:
+		return acmelib.MessagePriorityVeryHigh
+	case MessagePriorityHigh:
+		return acmelib.MessagePriorityHigh
+	case MessagePriorityMedium:
+		return acmelib.MessagePriorityMedium
+	case MessagePriorityLow:
+		return acmelib.MessagePriorityLow
+	default:
+		return acmelib.MessagePriorityVeryHigh
+	}
+}
+
 type MessageByteOrder string
 
 const (
@@ -349,6 +388,7 @@ type Message struct {
 	MaxAvailableSpace      int              `json:"maxAvailableSpace"`
 	ByteOrder              MessageByteOrder `json:"byteOrder"`
 
+	Priority       MessagePriority `json:"priority"`
 	CycleTime      int             `json:"cycleTime"`
 	SendType       MessageSendType `json:"sendType"`
 	DelayTime      int             `json:"delayTime"`
@@ -380,6 +420,7 @@ func newMessage(msg *acmelib.Message) Message {
 		MaxAvailableSpace:      0,
 		ByteOrder:              newMessageByteOrder(msg.ByteOrder()),
 
+		Priority:       newMessagePriority(msg.Priority()),
 		CycleTime:      msg.CycleTime(),
 		SendType:       newMessageSendType(msg.SendType()),
 		DelayTime:      msg.DelayTime(),
@@ -979,12 +1020,83 @@ func newSignalEnum(sigEnum *acmelib.SignalEnum) SignalEnum {
 // CAN ID BUILDER MODELS //
 ///////////////////////////
 
+type CANIDBuilderOpKind string
+
+const (
+	CANIDBuilderOpKindMessagePriority CANIDBuilderOpKind = "message-priority"
+	CANIDBuilderOpKindMessageID       CANIDBuilderOpKind = "message-id"
+	CANIDBuilderOpKindNodeID          CANIDBuilderOpKind = "node-id"
+	CANIDBuilderOpKindBitMask         CANIDBuilderOpKind = "bit-mask"
+)
+
+func newCANIDBuilderOpKind(kind acmelib.CANIDBuilderOpKind) CANIDBuilderOpKind {
+	switch kind {
+	case acmelib.CANIDBuilderOpKindMessagePriority:
+		return CANIDBuilderOpKindMessagePriority
+	case acmelib.CANIDBuilderOpKindMessageID:
+		return CANIDBuilderOpKindMessageID
+	case acmelib.CANIDBuilderOpKindNodeID:
+		return CANIDBuilderOpKindNodeID
+	case acmelib.CANIDBuilderOpKindBitMask:
+		return CANIDBuilderOpKindBitMask
+	default:
+		return CANIDBuilderOpKindMessageID
+	}
+}
+
+func (bok CANIDBuilderOpKind) parse() acmelib.CANIDBuilderOpKind {
+	switch bok {
+	case CANIDBuilderOpKindMessagePriority:
+		return acmelib.CANIDBuilderOpKindMessagePriority
+	case CANIDBuilderOpKindMessageID:
+		return acmelib.CANIDBuilderOpKindMessageID
+	case CANIDBuilderOpKindNodeID:
+		return acmelib.CANIDBuilderOpKindNodeID
+	case CANIDBuilderOpKindBitMask:
+		return acmelib.CANIDBuilderOpKindBitMask
+	default:
+		return acmelib.CANIDBuilderOpKindMessageID
+	}
+}
+
+type CANIDBuilderOp struct {
+	Kind CANIDBuilderOpKind `json:"kind"`
+	From int                `json:"from"`
+	Len  int                `json:"len"`
+}
+
+func newCANIDBuilderOp(op *acmelib.CANIDBuilderOp) CANIDBuilderOp {
+	if op == nil {
+		return CANIDBuilderOp{}
+	}
+
+	return CANIDBuilderOp{
+		Kind: newCANIDBuilderOpKind(op.Kind()),
+		From: op.From(),
+		Len:  op.Len(),
+	}
+}
+
 type CANIDBuilder struct {
 	BaseEntity
+
+	Operations []CANIDBuilderOp `json:"operations"`
 }
 
 func newCANIDBuilder(builder *acmelib.CANIDBuilder) CANIDBuilder {
-	return CANIDBuilder{
-		BaseEntity: newBaseEntity(builder),
+	if builder == nil {
+		return CANIDBuilder{}
 	}
+
+	res := CANIDBuilder{
+		BaseEntity: newBaseEntity(builder),
+
+		Operations: []CANIDBuilderOp{},
+	}
+
+	for _, op := range builder.Operations() {
+		res.Operations = append(res.Operations, newCANIDBuilderOp(op))
+	}
+
+	return res
 }

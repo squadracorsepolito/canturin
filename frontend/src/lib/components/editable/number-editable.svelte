@@ -25,7 +25,8 @@
 		readOnly = false,
 		oncommit,
 		min,
-		max
+		max,
+		label
 	}: EditableProps<number> & Props = $props();
 
 	let fallbackValue = $state(value);
@@ -107,6 +108,14 @@
 
 <div class="editable">
 	<div {...rootProps}>
+		{#if label}
+			<div>
+				<label {...api.getLabelProps()}>
+					<div>{label}</div>
+				</label>
+			</div>
+		{/if}
+
 		<div
 			{...api.getAreaProps()}
 			data-error={errors ? true : undefined}
