@@ -58,7 +58,7 @@
 	}
 
 	[data-scope='dialog'][data-part='content'] {
-		@apply modal-box;
+		@apply modal-box max-w-3xl;
 
 		[data-part='description'] {
 			@apply opacity-85 pt-1;

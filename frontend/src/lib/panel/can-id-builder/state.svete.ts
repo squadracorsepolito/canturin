@@ -1,4 +1,9 @@
-import { CANIDBuilderService, MessagePriority, type CANIDBuilder } from '$lib/api/canturin';
+import {
+	CANIDBuilderOpKind,
+	CANIDBuilderService,
+	MessagePriority,
+	type CANIDBuilder
+} from '$lib/api/canturin';
 import { HistoryCANIDBuilderModify } from '$lib/constants/events';
 import { EntityState } from '$lib/state/entity-state.svelte';
 import { StateProvider } from '$lib/state/state-provider.svelte';
@@ -50,5 +55,23 @@ export class CanIdBuilderState extends EntityState<CANIDBuilder> {
 		if (canIds) return canIds;
 
 		return [];
+	}
+
+	insertOperation(opIndex: number, opKind: CANIDBuilderOpKind, opFrom: number, opLen: number) {
+		this.update(
+			CANIDBuilderService.InsertOperation(this.entity.entityId, { opKind, opFrom, opLen, opIndex })
+		);
+	}
+
+	deleteOperation(opIndex: number) {
+		this.update(CANIDBuilderService.DeleteOperation(this.entity.entityId, { opIndex }));
+	}
+
+	updateOperationFrom(opIndex: number, opFrom: number) {
+		this.update(CANIDBuilderService.UpdateOperationFrom(this.entity.entityId, { opIndex, opFrom }));
+	}
+
+	updateOperationLen(opIndex: number, opLen: number) {
+		this.update(CANIDBuilderService.UpdateOperationLen(this.entity.entityId, { opIndex, opLen }));
 	}
 }

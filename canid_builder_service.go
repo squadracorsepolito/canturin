@@ -49,6 +49,22 @@ func (s *CANIDBuilderService) CalculateCANIDs(entityID string, req CalculateCANI
 	return res, nil
 }
 
+func (s *CANIDBuilderService) InsertOperation(entityID string, req InsertOperationReq) (CANIDBuilder, error) {
+	return s.handle(entityID, &req, s.handler.insertOperation)
+}
+
+func (s *CANIDBuilderService) DeleteOperation(entityID string, req DeleteOperationReq) (CANIDBuilder, error) {
+	return s.handle(entityID, &req, s.handler.deleteOperation)
+}
+
+func (s *CANIDBuilderService) UpdateOperationFrom(entityID string, req UpdateOperationFromReq) (CANIDBuilder, error) {
+	return s.handle(entityID, &req, s.handler.updateOperationFrom)
+}
+
+func (s *CANIDBuilderService) UpdateOperationLen(entityID string, req UpdateOperationLenReq) (CANIDBuilder, error) {
+	return s.handle(entityID, &req, s.handler.updateOperationLen)
+}
+
 type canIDBuilderRes = response[*acmelib.CANIDBuilder]
 
 type canIDBuilderHandler struct {
@@ -128,6 +144,190 @@ func (h *canIDBuilderHandler) updateDesc(canIDBuilder *acmelib.CANIDBuilder, req
 	res.setRedo(
 		func() (*acmelib.CANIDBuilder, error) {
 			canIDBuilder.SetDesc(desc)
+			return canIDBuilder, nil
+		},
+	)
+
+	return nil
+}
+
+func (h *canIDBuilderHandler) insertOperation(canIDBuilder *acmelib.CANIDBuilder, req *request, res *canIDBuilderRes) error {
+	parsedReq := req.toInsertOperation()
+
+	kind := parsedReq.OpKind.parse()
+	from := parsedReq.OpFrom
+	len := parsedReq.OpLen
+	opIdx := parsedReq.OpIndex
+
+	if err := canIDBuilder.InsertOperation(kind, from, len, opIdx); err != nil {
+		return err
+	}
+
+	res.setUndo(
+		func() (*acmelib.CANIDBuilder, error) {
+			if err := canIDBuilder.RemoveOperation(opIdx); err != nil {
+				return nil, err
+			}
+			return canIDBuilder, nil
+		},
+	)
+
+	res.setRedo(
+		func() (*acmelib.CANIDBuilder, error) {
+			if err := canIDBuilder.InsertOperation(kind, from, len, opIdx); err != nil {
+				return nil, err
+			}
+			return canIDBuilder, nil
+		},
+	)
+
+	return nil
+}
+
+func (h *canIDBuilderHandler) deleteOperation(canIDBuilder *acmelib.CANIDBuilder, req *request, res *canIDBuilderRes) error {
+	parsedReq := req.toDeleteOperation()
+
+	idx := parsedReq.OpIndex
+
+	operations := canIDBuilder.Operations()
+	if idx < 0 || idx >= len(operations) {
+		return nil
+	}
+
+	op := operations[idx]
+
+	if err := canIDBuilder.RemoveOperation(idx); err != nil {
+		return err
+	}
+
+	res.setUndo(
+		func() (*acmelib.CANIDBuilder, error) {
+			if err := canIDBuilder.InsertOperation(op.Kind(), op.From(), op.Len(), idx); err != nil {
+				return nil, err
+			}
+
+			return canIDBuilder, nil
+		},
+	)
+
+	res.setRedo(
+		func() (*acmelib.CANIDBuilder, error) {
+			if err := canIDBuilder.RemoveOperation(idx); err != nil {
+				return nil, err
+			}
+
+			return canIDBuilder, nil
+		},
+	)
+
+	return nil
+}
+
+func (h *canIDBuilderHandler) updateOperationFrom(canIDBuilder *acmelib.CANIDBuilder, req *request, res *canIDBuilderRes) error {
+	parsedReq := req.toUpdateOperationFrom()
+
+	from := parsedReq.OpFrom
+	opIdx := parsedReq.OpIndex
+
+	operations := canIDBuilder.Operations()
+	if opIdx < 0 || opIdx >= len(operations) {
+		return nil
+	}
+
+	op := operations[opIdx]
+	oldFrom := op.From()
+	if from == oldFrom {
+		return nil
+	}
+
+	if err := canIDBuilder.RemoveOperation(opIdx); err != nil {
+		return err
+	}
+
+	if err := canIDBuilder.InsertOperation(op.Kind(), from, op.Len(), opIdx); err != nil {
+		return err
+	}
+
+	res.setUndo(
+		func() (*acmelib.CANIDBuilder, error) {
+			if err := canIDBuilder.RemoveOperation(opIdx); err != nil {
+				return nil, err
+			}
+
+			if err := canIDBuilder.InsertOperation(op.Kind(), oldFrom, op.Len(), opIdx); err != nil {
+				return nil, err
+			}
+
+			return canIDBuilder, nil
+		},
+	)
+
+	res.setRedo(
+		func() (*acmelib.CANIDBuilder, error) {
+			if err := canIDBuilder.RemoveOperation(opIdx); err != nil {
+				return nil, err
+			}
+
+			if err := canIDBuilder.InsertOperation(op.Kind(), from, op.Len(), opIdx); err != nil {
+				return nil, err
+			}
+
+			return canIDBuilder, nil
+		},
+	)
+
+	return nil
+}
+
+func (h *canIDBuilderHandler) updateOperationLen(canIDBuilder *acmelib.CANIDBuilder, req *request, res *canIDBuilderRes) error {
+	parsedReq := req.toUpdateOperationLen()
+
+	opLen := parsedReq.OpLen
+	opIdx := parsedReq.OpIndex
+
+	operations := canIDBuilder.Operations()
+	if opIdx < 0 || opIdx >= len(operations) {
+		return nil
+	}
+
+	op := operations[opIdx]
+	oldLen := op.Len()
+	if opLen == oldLen {
+		return nil
+	}
+
+	if err := canIDBuilder.RemoveOperation(opIdx); err != nil {
+		return err
+	}
+
+	if err := canIDBuilder.InsertOperation(op.Kind(), op.From(), opLen, opIdx); err != nil {
+		return err
+	}
+
+	res.setUndo(
+		func() (*acmelib.CANIDBuilder, error) {
+			if err := canIDBuilder.RemoveOperation(opIdx); err != nil {
+				return nil, err
+			}
+
+			if err := canIDBuilder.InsertOperation(op.Kind(), op.From(), oldLen, opIdx); err != nil {
+				return nil, err
+			}
+
+			return canIDBuilder, nil
+		},
+	)
+
+	res.setRedo(
+		func() (*acmelib.CANIDBuilder, error) {
+			if err := canIDBuilder.RemoveOperation(opIdx); err != nil {
+				return nil, err
+			}
+
+			if err := canIDBuilder.InsertOperation(op.Kind(), op.From(), opLen, opIdx); err != nil {
+				return nil, err
+			}
+
 			return canIDBuilder, nil
 		},
 	)

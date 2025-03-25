@@ -1060,9 +1060,10 @@ func (bok CANIDBuilderOpKind) parse() acmelib.CANIDBuilderOpKind {
 }
 
 type CANIDBuilderOp struct {
-	Kind CANIDBuilderOpKind `json:"kind"`
-	From int                `json:"from"`
-	Len  int                `json:"len"`
+	Index int                `json:"index"`
+	Kind  CANIDBuilderOpKind `json:"kind"`
+	From  int                `json:"from"`
+	Len   int                `json:"len"`
 }
 
 func newCANIDBuilderOp(op *acmelib.CANIDBuilderOp) CANIDBuilderOp {
@@ -1094,8 +1095,11 @@ func newCANIDBuilder(builder *acmelib.CANIDBuilder) CANIDBuilder {
 		Operations: []CANIDBuilderOp{},
 	}
 
-	for _, op := range builder.Operations() {
-		res.Operations = append(res.Operations, newCANIDBuilderOp(op))
+	for idx, tmpOp := range builder.Operations() {
+		op := newCANIDBuilderOp(tmpOp)
+		op.Index = idx
+
+		res.Operations = append(res.Operations, op)
 	}
 
 	return res

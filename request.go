@@ -534,10 +534,55 @@ type CalculateCANIDReq struct {
 	NodeID          uint            `json:"nodeId"`
 }
 
-func (r *request) toCalculateCANID() *CalculateCANIDReq {
-	req, ok := r.data.(*CalculateCANIDReq)
+type InsertOperationReq struct {
+	OpKind  CANIDBuilderOpKind `json:"opKind"`
+	OpFrom  int                `json:"opFrom"`
+	OpLen   int                `json:"opLen"`
+	OpIndex int                `json:"opIndex"`
+}
+
+func (r *request) toInsertOperation() *InsertOperationReq {
+	req, ok := r.data.(*InsertOperationReq)
 	if !ok {
-		panic("cannot convert to CalculateCANIDReq")
+		panic("cannot convert to InsertOperationReq")
+	}
+	return req
+}
+
+type DeleteOperationReq struct {
+	OpIndex int `json:"opIndex"`
+}
+
+func (r *request) toDeleteOperation() *DeleteOperationReq {
+	req, ok := r.data.(*DeleteOperationReq)
+	if !ok {
+		panic("cannot convert to DeleteOperationReq")
+	}
+	return req
+}
+
+type UpdateOperationFromReq struct {
+	OpIndex int `json:"opIndex"`
+	OpFrom  int `json:"opFrom"`
+}
+
+func (r *request) toUpdateOperationFrom() *UpdateOperationFromReq {
+	req, ok := r.data.(*UpdateOperationFromReq)
+	if !ok {
+		panic("cannot convert to UpdateOperationFromReq")
+	}
+	return req
+}
+
+type UpdateOperationLenReq struct {
+	OpIndex int `json:"opIndex"`
+	OpLen   int `json:"opLen"`
+}
+
+func (r *request) toUpdateOperationLen() *UpdateOperationLenReq {
+	req, ok := r.data.(*UpdateOperationLenReq)
+	if !ok {
+		panic("cannot convert to UpdateOperationLenReq")
 	}
 	return req
 }

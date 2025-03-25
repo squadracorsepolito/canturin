@@ -6,13 +6,14 @@
 		value: number;
 		name: string;
 		label?: string;
+		desc?: string;
 		errors?: string[];
 		min?: number;
 		max?: number;
 		disabled?: boolean;
 	};
 
-	let { value = $bindable(), name, label, errors, min, max, disabled }: Props = $props();
+	let { value = $bindable(), name, label, desc, errors, min, max, disabled }: Props = $props();
 
 	const id = $props.id();
 	const service = useMachine(numberInput.machine, () => ({
@@ -38,25 +39,47 @@
 
 <div {...api.getRootProps()}>
 	{#if label}
-		<label {...api.getLabelProps()}>{label}</label>
-	{/if}
+		<div class="flex-1">
+			<label {...api.getLabelProps()}>
+				<h4>{label}</h4>
 
-	<div {...api.getControlProps()}>
-		<input {...api.getInputProps()} />
-	</div>
-
-	{#if errors}
-		<div data-scope="number-input" data-part="error">
-			{#each errors as err}
-				<span>{err}</span>
-			{/each}
+				{#if desc}
+					<p>{desc}</p>
+				{/if}
+			</label>
 		</div>
 	{/if}
+
+	<div class="flex-1 relative">
+		<div {...api.getControlProps()}>
+			<input {...api.getInputProps()} />
+		</div>
+
+		{#if errors}
+			<div data-scope="number-input" data-part="error">
+				{#each errors as err}
+					<span>{err}</span>
+				{/each}
+			</div>
+		{/if}
+	</div>
 </div>
 
 <style lang="postcss">
 	[data-scope='number-input'][data-part='root'] {
-		@apply relative;
+		@apply flex items-start gap-3;
+	}
+
+	[data-scope='number-input'][data-part='label'] {
+		@apply flex-1;
+
+		p {
+			@apply text-sm text-dimmed;
+		}
+
+		&[data-invalid] {
+			@apply text-error;
+		}
 	}
 
 	[data-scope='number-input'][data-part='control'] {

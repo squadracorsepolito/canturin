@@ -11,10 +11,10 @@ export const canIdBuilderOpKindLabels = {
 
 export const canIdBuilderOpKindDescs = {
 	[CANIDBuilderOpKind.$zero]: '',
-	[CANIDBuilderOpKind.CANIDBuilderOpKindMessagePriority]: 'Uses the message priority',
-	[CANIDBuilderOpKind.CANIDBuilderOpKindMessageID]: 'Uses the message ID',
-	[CANIDBuilderOpKind.CANIDBuilderOpKindNodeID]: 'Uses the node ID',
-	[CANIDBuilderOpKind.CANIDBuilderOpKindBitMask]: 'Uses the bit mask'
+	[CANIDBuilderOpKind.CANIDBuilderOpKindMessagePriority]: 'Put the message priority in OR',
+	[CANIDBuilderOpKind.CANIDBuilderOpKindMessageID]: 'Put the message ID in OR',
+	[CANIDBuilderOpKind.CANIDBuilderOpKindNodeID]: 'Put the node ID in OR',
+	[CANIDBuilderOpKind.CANIDBuilderOpKindBitMask]: 'Put the bit mask in AND'
 };
 
 export const canIdBuilderOpKindOptions: SegmentedControlOption[] = [
