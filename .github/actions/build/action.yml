@@ -201,6 +201,11 @@ runs:
       shell: bash
       working-directory: ${{inputs.deno-working-directory}}
       run: ${{inputs.deno-build}}
+
+    # install pnpm
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+
     # install wails
     - name: Install Wails
       if: inputs.build == 'true' && inputs.wails-dev-build == 'false'
