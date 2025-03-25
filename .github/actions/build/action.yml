@@ -12,6 +12,14 @@ inputs:
     description: "Sign the build"
     required: false
     default: "false"
+  sign-sparkle:
+    description: "Sign the sparkle framework"
+    required: false
+    default: "true"
+  notarize:
+    description: "notarize the build"
+    required: false
+    default: "false"
   package:
     description: "Uploads workflow & uploads tag builds to a release"
     required: false
@@ -31,6 +39,10 @@ inputs:
     description: "Platform to build for"
     required: false
     default: "darwin/universal"
+  build-version:
+    description: "Version of app being built"
+    required: false
+    default: "1.0.0"
   build-tags:
     description: "Build tags to pass to Go compiler. Must be quoted. Space or comma (but not both) separated"
     required: false
@@ -73,6 +85,14 @@ inputs:
     default: "v1.20.x"
   sign-macos-app-id:
     description: "MacOS Application Certificate id"
+    required: false
+    default: ''
+  sign-macos-app-email:
+    description: "Apple ID email"
+    required: false
+    default: ''
+  sign-macos-app-team-id:
+    description: "Apple ID team"
     required: false
     default: ''
   sign-macos-apple-password:
@@ -184,24 +204,27 @@ runs:
     # install wails
     - name: Install Wails
       if: inputs.build == 'true' && inputs.wails-dev-build == 'false'
-      run: go install github.com/wailsapp/wails/v2/cmd/wails@${{inputs.wails-version}}
+      run: go install github.com/wailsapp/wails/v3/cmd/wails3@${{inputs.wails-version}}
       shell: bash
     - name: Install macOS Wails deps
       if: runner.os == 'macOS'
       run: brew install mitchellh/gon/gon
       shell: bash
     # Building step
+    - name: Set App Version
+      if: inputs.build == 'true'
+      env:
+        VERSION: ${{ inputs.build-version }}
+      run: |
+        /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" build/darwin/Info.plist
+        /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $VERSION" build/darwin/Info.plist
+      shell: bash
     - name: Build App
       if: inputs.build == 'true'
       env:
         BUILD_OPTIONS: ${{ steps.build_options.outputs.BUILD_OPTIONS }}
       working-directory: ${{ inputs.app-working-directory }}
-      run: wails build --platform ${{inputs.build-platform}} -webview2 ${{inputs.wails-build-webview2}} -o ${{inputs.build-name}} $BUILD_OPTIONS
-      shell: bash
-    - name: Add macOS perms
-      if: inputs.build == 'true' && runner.os == 'macOS'
-      working-directory: ${{ inputs.app-working-directory }}
-      run: chmod +x build/bin/*/Contents/MacOS/*
+      run: wails3 build
       shell: bash
     - name: Add Linux perms
       if: inputs.build == 'true' && runner.os  == 'Linux'
@@ -209,6 +232,13 @@ runs:
       run: chmod +x build/bin/*
       shell: bash
     # Package and Sign MacOS
+    - name: Package App
+      if: inputs.build == 'true'
+      env:
+        BUILD_OPTIONS: ${{ steps.build_options.outputs.BUILD_OPTIONS }}
+      working-directory: ${{ inputs.app-working-directory }}
+      run: wails3 package
+      shell: bash
     - name: Import Code-Signing Certificates for macOS
       if: runner.os == 'macOS' && inputs.sign != 'false' && startsWith(github.ref, 'refs/tags/')
       uses: Apple-Actions/import-codesign-certs@v1
@@ -229,36 +259,50 @@ runs:
       shell: bash
       working-directory: ${{ inputs.app-working-directory }}
       env:
-        APPLE_PASSWORD: ${{ inputs.sign-macos-apple-password }}
+        APPLE_DEVELOPER_PASSWORD: ${{ inputs.sign-macos-apple-password }}
       run: |
         echo "Signing Package"
         gon -log-level=info ./build/darwin/gon-sign.json
+    - name: Sign sparkle framework
+      if: runner.os == 'macOS' && inputs.sign-sparkle != 'false' && startsWith(github.ref, 'refs/tags/')
+      shell: bash
+      working-directory: ${{ inputs.app-working-directory }}
+      env:
+        CODE_SIGN_IDENTITY: ${{ inputs.sign-macos-app-id }}
+      run: |
+        codesign -f -s "$CODE_SIGN_IDENTITY" -o runtime bin/${{inputs.build-name}}.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc
+        codesign -f -s "$CODE_SIGN_IDENTITY" -o runtime --preserve-metadata=entitlements bin/${{inputs.build-name}}.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc
+        codesign -f -s "$CODE_SIGN_IDENTITY" -o runtime bin/${{inputs.build-name}}.app/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate
+        codesign -f -s "$CODE_SIGN_IDENTITY" -o runtime bin/${{inputs.build-name}}.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app
+        codesign -f -s "$CODE_SIGN_IDENTITY" -o runtime bin/${{inputs.build-name}}.app/Contents/Frameworks/Sparkle.framework
     - name: Build .app zip file
       if: runner.os == 'macOS'
       working-directory: ${{ inputs.app-working-directory }}
       shell: bash
       run: |
-        ditto -c -k --keepParent ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app.zip
+        ditto -c -k --keepParent ${{ inputs.app-working-directory }}/bin/${{inputs.build-name}}.app ${{ inputs.app-working-directory }}/bin/${{inputs.build-name}}.app.zip
     - name: Building Installer
       if: runner.os == 'macOS' && inputs.sign != 'false' && inputs.sign-macos-installer-id != '' && startsWith(github.ref, 'refs/tags/')
       shell: bash
       working-directory: ${{ inputs.app-working-directory }}
       run: |
-        productbuild --sign '${{inputs.sign-macos-installer-id}}' --component ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app /Applications ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.pkg
+        productbuild --sign '${{inputs.sign-macos-installer-id}}' --component ${{ inputs.app-working-directory }}/bin/${{inputs.build-name}}.app /Applications ${{ inputs.app-working-directory }}/bin/${{inputs.build-name}}.pkg
     - name: Building Installer
       if: runner.os == 'macOS' && inputs.sign-macos-installer-id == '' && startsWith(github.ref, 'refs/tags/')
       shell: bash
       working-directory: ${{ inputs.app-working-directory }}
       run: |
-        productbuild --component ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.app /Applications ${{ inputs.app-working-directory }}/build/bin/${{inputs.build-name}}.pkg
+        productbuild --component ${{ inputs.app-working-directory }}/bin/${{inputs.build-name}}.app /Applications ${{ inputs.app-working-directory }}/bin/${{inputs.build-name}}.pkg
     - name: Notarising Installer and zip
-      if: runner.os == 'macOS' && inputs.sign != 'false' && startsWith(github.ref, 'refs/tags/')
+      if: runner.os == 'macOS' && inputs.sign != 'false' && inputs.notarize != 'false' && startsWith(github.ref, 'refs/tags/')
       shell: bash
       working-directory: ${{ inputs.app-working-directory }}
       env:
-        APPLE_PASSWORD: ${{ inputs.sign-macos-apple-password }}
+        APPLE_ID: ${{ inputs.sign-macos-app-email }}
+        TEAM_ID: ${{ inputs.sign-macos-app-team-id }}
+        APPLE_DEVELOPER_PASSWORD: ${{ inputs.sign-macos-apple-password }}
       run: |
-        gon -log-level=info ${{ inputs.app-working-directory }}/build/darwin/gon-notarize.json
+        xcrun notarytool submit --apple-id $APPLE_ID --team-id $TEAM_ID --password $APPLE_DEVELOPER_PASSWORD ${{ inputs.app-working-directory }}/bin/${{inputs.build-name}}.app.zip
     # Windows signing
     - name: Sign Windows binaries
       shell: powershell
@@ -279,11 +323,5 @@ runs:
       with:
         name: Wails Build ${{runner.os}} ${{inputs.build-name}}
         path: |
-          */bin/
+          ./bin/
           *\bin\*
-    - name: Release
-      uses: softprops/action-gh-release@v1
-      if: inputs.package == 'true' && startsWith(github.ref, 'refs/tags/')
-      with:
-        files: |
-          */bin/*
