@@ -1,0 +1,31 @@
+name: Build and Release Application
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    strategy:
+      matrix:
+        # os: [ubuntu-latest, macos-latest, windows-latest]
+         os: [ubuntu-latest]
+         
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Install wails3
+        run: go install -v github.com/wailsapp/wails/v3/cmd/wails3@latest
+
+      - name: Test
+        run: wails3 doctor
