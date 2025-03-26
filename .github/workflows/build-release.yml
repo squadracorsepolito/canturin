@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - 'v*'
+      - '*'
 
 jobs:
-  build:
+  package:
     strategy:
       fail-fast: false
       matrix:
@@ -22,7 +22,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Linux Discovery
+      - name: "Linux: Install Dependencies"
         if: runner.os == 'Linux'
         id: linux_discovery
         run: |
@@ -51,18 +51,16 @@ jobs:
         with:
           version: 10
 
-      - name: Install Wails3
-        run: |
-          go install github.com/wailsapp/wails/v3/cmd/wails3@latest
-          wails3 version
+      - name: Install wails3
+        run: go install github.com/wailsapp/wails/v3/cmd/wails3@latest
         shell: bash
 
-      - name: Add Linux perms
+      - name: "Linux: Add Perms"
         if: runner.os  == 'Linux'
         run: chmod +x build/linux/*
         shell: bash
 
-      - name: Package App
+      - name: Package Application
         run: wails3 package
         shell: bash
 
@@ -70,9 +68,29 @@ jobs:
         run: ls -l ./bin
         shell: bash
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
         with:
-          name: Wails Build ${{runner.os}}
+          name: ${{runner.os}}-package
           path: |
             ./bin/
             *\bin\*
+
+  release:
+    needs: package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{runner.os}}-package
+
+      - name: Print workspace
+        run: ls -l
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "canturin ${{ github.ref_name }}"
+          files: |
+            **/*
