@@ -51,17 +51,10 @@ jobs:
         with:
           version: 10
 
-      - name: Print pnpm version
-        run: pnpm --version
-
       - name: Install Wails3
         run: |
           go install github.com/wailsapp/wails/v3/cmd/wails3@latest
           wails3 version
-        shell: bash
-
-      - name: Build App
-        run: wails3 build
         shell: bash
 
       - name: Add Linux perms
@@ -74,4 +67,5 @@ jobs:
         shell: bash
 
       - name: Print bin Folder
-        run: ls -l bin
+        run: ls -l build/linux/appimage/build
+        shell: bash

@@ -3,26 +3,26 @@
 #
 # The lines below are called `modelines`. See `:help modeline`
 
-name: "dummy.exe"
+name: "canturin.exe"
 arch: ${GOARCH}
 platform: "linux"
 version: "0.1.0"
 section: "default"
 priority: "extra"
 maintainer: ${GIT_COMMITTER_NAME} <${GIT_COMMITTER_EMAIL}>
-description: "My Product Description"
-vendor: "My Company"
+description: "CAN bus editor"
+vendor: "squadracorsepolito"
 homepage: "https://wails.io"
 license: "MIT"
 release: "1"
 
 contents:
-  - src: "./bin/dummy.exe"
-    dst: "/usr/local/bin/dummy.exe"
+  - src: "./bin/canturin.exe"
+    dst: "/usr/local/bin/canturin.exe"
   - src: "./build/appicon.png"
-    dst: "/usr/share/icons/hicolor/128x128/apps/dummy.exe.png"
-  - src: "./build/linux/dummy.exe.desktop"
-    dst: "/usr/share/applications/dummy.exe.desktop"
+    dst: "/usr/share/icons/hicolor/128x128/apps/canturin.exe.png"
+  - src: "./build/linux/canturin.exe.desktop"
+    dst: "/usr/share/applications/canturin.exe.desktop"
 
 depends:
   - gtk3
