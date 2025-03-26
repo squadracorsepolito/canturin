@@ -62,6 +62,9 @@ jobs:
         run: chmod +x build/linux/*
         shell: bash
 
+      - name: Print nfpm
+        run: cat build/linux/nfpm/nfpm.yaml
+
       - name: Package App
         run: wails3 package
         shell: bash
