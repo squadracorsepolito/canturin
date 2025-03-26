@@ -3,7 +3,7 @@
 #
 # The lines below are called `modelines`. See `:help modeline`
 
-name: "canturin.exe"
+name: "canturin"
 arch: ${GOARCH}
 platform: "linux"
 version: "0.1.0"
@@ -17,12 +17,12 @@ license: "MIT"
 release: "1"
 
 contents:
-  - src: "./bin/canturin.exe"
-    dst: "/usr/local/bin/canturin.exe"
+  - src: "./bin/canturin"
+    dst: "/usr/local/bin/canturin"
   - src: "./build/appicon.png"
-    dst: "/usr/share/icons/hicolor/128x128/apps/canturin.exe.png"
-  - src: "./build/linux/canturin.exe.desktop"
-    dst: "/usr/share/applications/canturin.exe.desktop"
+    dst: "/usr/share/icons/hicolor/128x128/apps/canturin.png"
+  - src: "./build/linux/canturin.desktop"
+    dst: "/usr/share/applications/canturin.desktop"
 
 depends:
   - gtk3
