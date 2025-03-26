@@ -46,9 +46,27 @@ jobs:
         with:
           go-version: '1.24'
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+
       - name: Install Wails3
         run: |
           go install github.com/wailsapp/wails/v3/cmd/wails3@latest
-          wails3 doctor
+          wails3 version
         shell: bash
 
+      - name: Build App
+        run: wails3 build
+        shell: bash
+
+      - name: Add Linux perms
+        if: runner.os  == 'Linux'
+        run: chmod +x build/bin/*
+        shell: bash
+
+      - name: Package App
+        run: wails3 package
+        shell: bash
+
+      - name: Print bin Folder
+        run: ls -l bin
