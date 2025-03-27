@@ -9,7 +9,7 @@ info:
   productName: "canturin" # The name of the application
   productIdentifier: "com.squadracorsepolito.canturin" # The unique product identifier
   description: "CAN bus editor" # The application description
-  copyright: "(c) 2024, squadracorsepolito" # Copyright text
+  copyright: "(c) 2025, squadracorsepolito" # Copyright text
   comments: "" # Comments
   version: "v0.0.1" # The application version
 
