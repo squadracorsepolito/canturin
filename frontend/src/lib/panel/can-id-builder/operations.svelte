@@ -94,8 +94,8 @@
 			/>
 		{/each}
 
-		<div class="flex items-end text-base-content bg-neutral rounded-box">
-			<div class="py-3 px-5 text-4xl text-neutral-content">Result</div>
+		<div class="flex items-end text-base-content bg-base-200 rounded-box">
+			<div class="py-3 px-5 text-4xl">Result</div>
 		</div>
 
 		<div></div>
@@ -103,7 +103,7 @@
 		<div>
 			<Divider />
 
-			<div class="flex items-center justify-between text-4xl font-bold">
+			<div class="flex items-center justify-between text-4xl font-bold gap-3">
 				<div class="bg-base-200 rounded-box px-5 py-3">
 					<div>{resultCanId}</div>
 				</div>

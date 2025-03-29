@@ -4720,50 +4720,50 @@ T
 
 RWaiU9o915CoDe6wV7Kxf (˜0˜8@Hr
 vXXG5NlrJI8ioh2dU4aLgr
-1H-I_8R0bjIk5HK3aa62cÀ„= "S
-M
-t0RYVsQbf7UK-ewVAu3Y4TLB_BAT"TSAL-latch-board battery ECU*¾Ø£µØ¾Ä "K
-E
-NXuQ12P1xATj0wntsYNMkSB_REAR"Sensorboard rear ECU*¾Ø£µØ¾Ä "A
-;
-uJ16YVGm7NRZLON1CB6g7DASH"Dashboard ECU*¾Ø£µØ¾Ä "E
-?
-1H-I_8R0bjIk5HK3aa62cSCANNER"Can Logger ECU*¾Ø£µØ¾Ä 	"l
-0
-V5byTJcG4GYv6gZODSIy_Charger*™ÿ¥¾ÀÂÇÎ"6
-V5byTJcG4GYv6gZODSIy_v1WcBHQeIDK3-ZLNl0ZnlPodium"G
-A
-Whx_j7xMZf7H66S7FSvatDSPACE"An automotive ECU*¾Ø£µØ¾Ä "M
-G
-ATCek_sUDfWJHjHb2chLpIMU"Inertial Measurement Unit.*¾Ø£µØ¾Ä "H
+1H-I_8R0bjIk5HK3aa62cÀ„= "h
+b
+uyhbEPzTdoo1QXRdAo_ZH
+EXTRA_NODE".Extra CAN BUS-Nodes not permanent or temporary*¾Ø£µØ¾Ä "H
 B
-vXXG5NlrJI8ioh2dU4aLgBRUSA"Brusa NLG5 charger.*¾Ø£µØ¾Ä "á
+vXXG5NlrJI8ioh2dU4aLgBRUSA"Brusa NLG5 charger.*¾Ø£µØ¾Ä "_
+Y
+A3lNgzNE5tedDv7ZXiJLTBMS_LV")Battery-Management-System Low-Voltage ECU*¾Ø£µØ¾Ä "H
+B
+ARBELr0gpn5_5JJQQrw0w	DIAG_TOOL"Diagnostic tool*¾Ø£µØ¾Ä "M
+G
+ATCek_sUDfWJHjHb2chLpIMU"Inertial Measurement Unit.*¾Ø£µØ¾Ä "á
 0
 EEIHPLWbdESQtHHgbImfpIVTMain*™ÿ¥¾ÀÂÇÎ"3
 EEIHPLWbdESQtHHgbImfp8ejzU6XjD1iYKQa5kRurhYes"?
 EEIHPLWbdESQtHHgbImfpv1WcBHQeIDK3-ZLNl0ZnlIsabellenhuette"3
-EEIHPLWbdESQtHHgbImfpRGWaULRz20Rq88YlRfIizyes"M
-G
-FJ6YzeSpeYcjWcallLBS4SB_FRONT"Sensorboard front ECU*¾Ø£µØ¾Ä "H
-B
-ARBELr0gpn5_5JJQQrw0w	DIAG_TOOL"Diagnostic tool*¾Ø£µØ¾Ä "h
-b
-uyhbEPzTdoo1QXRdAo_ZH
-EXTRA_NODE".Extra CAN BUS-Nodes not permanent or temporary*¾Ø£µØ¾Ä "S
+EEIHPLWbdESQtHHgbImfpRGWaULRz20Rq88YlRfIizyes"S
+M
+t0RYVsQbf7UK-ewVAu3Y4TLB_BAT"TSAL-latch-board battery ECU*¾Ø£µØ¾Ä "K
+E
+NXuQ12P1xATj0wntsYNMkSB_REAR"Sensorboard rear ECU*¾Ø£µØ¾Ä "G
+A
+Whx_j7xMZf7H66S7FSvatDSPACE"An automotive ECU*¾Ø£µØ¾Ä "E
+?
+1H-I_8R0bjIk5HK3aa62cSCANNER"Can Logger ECU*¾Ø£µØ¾Ä 	"S
 M
 SDF3GHIc3SdJ59e2_kmdqTPMS"Tire pressure monitoring system*¾Ø£µØ¾Ä 
-"2
+"8
+1
+6XkjT8V6jgg77g7yqeDtG	HAND_CART*¾Ø£µØ¾Ä €"2
 ,
-S1e2yK-ohjBCOqWZAwsamHVB*™ÿ¥¾ÀÂÇÎ"j
+S1e2yK-ohjBCOqWZAwsamHVB*™ÿ¥¾ÀÂÇÎ"Ÿ
+˜
+bEWVQwwe5kwsyQ3IYfYVZPC"kCalibration and debug tool reading the BMS firmware revision and the single cell voltages and temperatures.*™ÿ¥¾ÀÂÇÎ"j
 ,
 Anc9H43tkuhkFhsZdALHHVCU*™ÿ¥¾ÀÂÇÎ"6
-Anc9H43tkuhkFhsZdALHHv1WcBHQeIDK3-ZLNl0ZnlPodium"_
-Y
-A3lNgzNE5tedDv7ZXiJLTBMS_LV")Battery-Management-System Low-Voltage ECU*¾Ø£µØ¾Ä "8
-1
-6XkjT8V6jgg77g7yqeDtG	HAND_CART*¾Ø£µØ¾Ä €"Ÿ
-˜
-bEWVQwwe5kwsyQ3IYfYVZPC"kCalibration and debug tool reading the BMS firmware revision and the single cell voltages and temperatures.*™ÿ¥¾ÀÂÇÎ*Q
+Anc9H43tkuhkFhsZdALHHv1WcBHQeIDK3-ZLNl0ZnlPodium"A
+;
+uJ16YVGm7NRZLON1CB6g7DASH"Dashboard ECU*¾Ø£µØ¾Ä "l
+0
+V5byTJcG4GYv6gZODSIy_Charger*™ÿ¥¾ÀÂÇÎ"6
+V5byTJcG4GYv6gZODSIy_v1WcBHQeIDK3-ZLNl0ZnlPodium"M
+G
+FJ6YzeSpeYcjWcallLBS4SB_FRONT"Sensorboard front ECU*¾Ø£µØ¾Ä *Q
 9
 SI0HTnaIEuyaDGjkWQiCobms_lv_password_t*¾Ø£µœÜÜ"1      à@9      ğ?*N
 -
@@ -4883,21 +4883,21 @@ u4_0-0_1_0*™ÿ¥¾ØßêÚ9      ğ?*L
 *
 x8HmBM9IvJhitAfJJq-dE%*™ÿ¥¾ØË®Ú%20
 )
-M6b2bzL762rVXi2L38YgI%*¾Ø£µôƒ"%21
-*
-sUwbgZSKnMtqjz9C-JSEBA*™ÿ¥¾ØË®ÚA20
+M6b2bzL762rVXi2L38YgI%*¾Ø£µôƒ"%20
 )
-q5-xP2-5gRlYb4wgR34v5A*¾Ø£µ€—¹"A22
+q5-xP2-5gRlYb4wgR34v5A*¾Ø£µ€—¹"A21
+*
+sUwbgZSKnMtqjz9C-JSEBA*™ÿ¥¾ØË®ÚA22
 *
 5Nzys5eEqtjZ777bWslmCAh*¾Ø£µ¤¾"Ah23
 +
 QzjJEo5TY2AHb--zneGEqAs*™ÿ¥¾ØßêÚAs24
 +
-WdAzVHktm1XvsSKvr-D95Ohm*¾Ø£µĞ™Î"Ohm21
-*
-PSo2ZgW54oh_6AIrdA7SpV*™ÿ¥¾ÀÂÇÎV20
+WdAzVHktm1XvsSKvr-D95Ohm*¾Ø£µĞ™Î"Ohm20
 )
 5SzhFJh0-ar943uD3Dn7lV*¾Ø£µôƒ"V21
+*
+PSo2ZgW54oh_6AIrdA7SpV*™ÿ¥¾ÀÂÇÎV21
 *
 hpiAXy-Oc1NeY4I6gQgTxW*™ÿ¥¾ØßêÚW23
 +
@@ -4929,9 +4929,9 @@ u4_0-0_1_0*™ÿ¥¾ØßêÚ9      ğ?*L
 +
 AVsMyvi4k7qeDxuTchFytsec*¾Ø£µØ¾Ä sec26
 ,
-ijmjdCeCkFCjx8kHVZosxusec*¾Ø£µ¨ÊÓ!usec27
+ijmjdCeCkFCjx8kHVZosxusec*¾Ø£µ¨ÊÓ!usec26
 -
-f_2B6-36Me98RvJ2BiUAQï¿½C*™ÿ¥¾ØßêÚï¿½C:¾
+f_2B6-36Me98RvJ2BiUAQï¿½C*™ÿ¥¾ØßêÚÂ°C:¾
 F
 crsyQ62NWnNfIXO4U28VMDSPACE_amkInvFL_FSM_State_Enum*¾Ø£µØ¾Ä /
 -

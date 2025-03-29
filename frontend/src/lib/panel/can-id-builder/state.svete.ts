@@ -19,6 +19,9 @@ export function getCanIdBuilderState(entityId: string) {
 
 export async function loadCanIdBuilder(entityId: string) {
 	const canIdBuilder = await CANIDBuilderService.Get(entityId);
+
+	console.log(canIdBuilder);
+
 	return provider.add(canIdBuilder);
 }
 

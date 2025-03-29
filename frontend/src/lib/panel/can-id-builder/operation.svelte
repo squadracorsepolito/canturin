@@ -66,21 +66,23 @@
 </script>
 
 {#snippet bitSlice()}
-	<div class="join join-horizontal">
-		{#each { length: baseSize } as _, idx}
-			{@const bit = baseSize - idx - 1}
-			{@const isInRange = bit >= op.from && bit < op.from + op.len}
+	{#each { length: baseSize } as _, idx}
+		{@const bit = baseSize - idx - 1}
+		{@const isInRange = bit >= op.from && bit < op.from + op.len}
 
-			<div
-				class={[
-					'join-item p-4 w-14 bg-base-200 border border-neutral text-center',
-					{ [getColor(op.kind)]: isInRange }
-				]}
-			>
+		<div
+			class={[
+				'join-item bg-base-200 aspect-square border-l border-y border-neutral justify-center justify-items-center m-auto w-full flex items-center',
+				{ [getColor(op.kind)]: isInRange },
+				{ 'rounded-l-btn': idx === 0 },
+				{ 'border-r rounded-r-btn': idx === baseSize - 1 }
+			]}
+		>
+			<span>
 				{bit}
-			</div>
-		{/each}
-	</div>
+			</span>
+		</div>
+	{/each}
 {/snippet}
 
 {#snippet actions(incIndex?: boolean)}
@@ -152,42 +154,30 @@
 	<div class="flex-1 block bg-neutral w-2 rounded-b-box"></div>
 </div>
 
-<div class="grid row-span-2 grid-rows-subgrid">
-	<div class="flex items-center">
-		{@render bitSlice()}
-	</div>
+<div
+	class="grid row-span-2 grid-rows-subgrid"
+	style:grid-template-columns="repeat({baseSize}, minmax(0, 1fr))"
+>
+	{@render bitSlice()}
 
-	<div class="join">
-		{#each { length: baseSize }}
-			<div class="h-full w-14 flex justify-center join-item">
-				<div class="h-full bg-base-200 w-4 border border-base-300 rounded-box"></div>
-			</div>
-		{/each}
-	</div>
+	{#each { length: baseSize } as _, idx}
+		{@const bit = baseSize - idx - 1}
+		{@const isInRange = bit >= op.from && bit < op.from + op.len}
 
-	<div class="join">
-		{#each { length: baseSize } as _, idx}
-			{@const bit = baseSize - idx - 1}
-			{@const isInRange = bit >= op.from && bit < op.from + op.len}
-
-			<div class="h-full w-14 flex justify-center join-item">
-				{#if isInRange}
-					<div
-						class={[
-							'h-full border border-neutral rounded-box flex items-center',
-							getColor(op.kind)
-						]}
-					>
-						<div class="px-2">
-							{partialBits[idx]}
-						</div>
+		<div class="h-full flex justify-center join-item">
+			{#if isInRange}
+				<div
+					class={['h-full border border-neutral rounded-box flex items-center', getColor(op.kind)]}
+				>
+					<div class="px-2">
+						{partialBits[idx]}
 					</div>
-				{:else}
-					<div class="h-full bg-base-200 w-4 border border-base-300 rounded-box"></div>
-				{/if}
-			</div>
-		{/each}
-	</div>
+				</div>
+			{:else}
+				<div class="h-full bg-base-200 w-4 border border-base-300 rounded-box"></div>
+			{/if}
+		</div>
+	{/each}
 </div>
 
 {#if isLast}

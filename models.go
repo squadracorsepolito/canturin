@@ -1082,6 +1082,8 @@ type CANIDBuilder struct {
 	BaseEntity
 
 	Operations []CANIDBuilderOp `json:"operations"`
+
+	Ref Ref `json:"reference"`
 }
 
 func newCANIDBuilder(builder *acmelib.CANIDBuilder) CANIDBuilder {
@@ -1093,6 +1095,8 @@ func newCANIDBuilder(builder *acmelib.CANIDBuilder) CANIDBuilder {
 		BaseEntity: newBaseEntity(builder),
 
 		Operations: []CANIDBuilderOp{},
+
+		Ref: newBusRef(builder.References()).toResponse(),
 	}
 
 	for idx, tmpOp := range builder.Operations() {
@@ -1103,4 +1107,76 @@ func newCANIDBuilder(builder *acmelib.CANIDBuilder) CANIDBuilder {
 	}
 
 	return res
+}
+
+//
+//
+//
+
+type Ref struct {
+	BaseEntity
+
+	Children []Ref `json:"children"`
+}
+
+type ref struct {
+	BaseEntity
+
+	children    []*ref
+	childrenMap map[acmelib.EntityID]struct{}
+}
+
+func newRef(ent entity) *ref {
+	return &ref{
+		BaseEntity: newBaseEntity(ent),
+
+		children:    []*ref{},
+		childrenMap: make(map[acmelib.EntityID]struct{}),
+	}
+}
+
+func (r *ref) addChild(child *ref) {
+	entID := acmelib.EntityID(child.BaseEntity.EntityID)
+	if _, ok := r.childrenMap[entID]; ok {
+		return
+	}
+
+	r.children = append(r.children, child)
+	r.childrenMap[entID] = struct{}{}
+}
+
+func (r *ref) toResponse() Ref {
+	res := Ref{
+		BaseEntity: r.BaseEntity,
+
+		Children: []Ref{},
+	}
+
+	for _, child := range r.children {
+		res.Children = append(res.Children, child.toResponse())
+	}
+
+	return res
+}
+
+func newBusRef(buses []*acmelib.Bus) *ref {
+	var rootRef *ref
+
+	for _, bus := range buses {
+		parNet := bus.ParentNetwork()
+
+		if parNet == nil {
+			continue
+		}
+
+		busRef := newRef(bus)
+
+		if rootRef == nil {
+			rootRef = newRef(parNet)
+		}
+
+		rootRef.addChild(busRef)
+	}
+
+	return rootRef
 }

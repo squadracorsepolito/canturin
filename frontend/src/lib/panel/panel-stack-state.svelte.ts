@@ -1,4 +1,4 @@
-import { EntityKind } from '$lib/api/canturin';
+import { EntityKind, type BaseEntity } from '$lib/api/canturin';
 import { SvelteMap } from 'svelte/reactivity';
 
 export type PanelKind =
@@ -118,4 +118,8 @@ export function getPanelKind(entityKind: EntityKind) {
 			kind = 'network';
 	}
 	return kind;
+}
+
+export function openPanelFromEntity(entity: BaseEntity) {
+	openPanel(getPanelKind(entity.entityKind), entity.entityId, entity.name);
 }
